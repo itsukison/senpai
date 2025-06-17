@@ -1,60 +1,146 @@
-# Professional Tone Checker Chrome Extension
+# ToneCheck - Professional Writing Assistant
 
-このChrome拡張機能は、ユーザーがウェブ上で入力したテキストの「トーン」と「プロフェッショナリズム」を分析し、改善提案を提供します。Grammarlyのような機能で、特に業務コミュニケーションの質を向上させるために設計されています。
+A beautiful, Spotify-inspired Next.js application that helps you write with better tone and professionalism. Like Grammarly, but focused specifically on tone, respect, and clarity.
 
-## 機能
+## Features
 
-- ウェブページ上のテキストエリアやcontentEditableフィールドで入力中のテキストを検出
-- OpenAIまたはDeepSeek APIを使用してテキストのトーンや表現を分析
-- 強制的、攻撃的、または不適切な表現を検出
-- よりプロフェッショナルな代替表現を提案
-- ポップアップツールチップでその場で提案を表示
-- ワンクリックで提案を適用可能
+- 🎯 **Real-time tone analysis** - Analyzes your writing as you type
+- 🤖 **AI-powered suggestions** - Uses OpenAI API to provide professional alternatives
+- 💬 **Floating suggestions** - Grammarly-style popup suggestions
+- 🎨 **Beautiful UI** - Spotify-inspired dark theme with smooth animations
+- ⚡ **Fast & responsive** - Built with Next.js 14 and Tailwind CSS
+- 🔄 **One-click accept** - Easy suggestion acceptance and text replacement
 
-## インストール方法
+## Demo
 
-### 開発モードでインストール
+The app analyzes text for:
 
-1. このリポジトリをクローンまたはダウンロードします
-2. Chromeブラウザで `chrome://extensions` にアクセスします
-3. 右上の「デベロッパーモード」をオンにします
-4. 「パッケージ化されていない拡張機能を読み込む」をクリックします
-5. ダウンロードしたリポジトリのフォルダを選択します
+- Aggressive or confrontational language
+- Unprofessional tone
+- Coercive language
+- Unclear communication
 
-## 設定
+And suggests more respectful, clear, and professional alternatives.
 
-1. 拡張機能をインストールした後、ツールバーのアイコンをクリックして設定を開きます
-2. 使用するAIプロバイダー（OpenAIまたはDeepSeek）を選択します
-3. APIキーを入力します（これはローカルに保存され、分析リクエストにのみ使用されます）
-4. 必要に応じてシステムプロンプトをカスタマイズします
-5. 「保存」をクリックします
+## Getting Started
 
-## 使用方法
+### Prerequisites
 
-1. 設定を完了した後、任意のウェブサイト（Gmail、Slack、LinkedInなど）にアクセスします
-2. テキストエリアに文章を入力します
-3. 入力を一時停止すると、拡張機能が自動的にテキストを分析します
-4. 改善提案がある場合、カーソル付近にツールチップが表示されます
-5. 「採用する」ボタンをクリックすると、元のテキストが提案に置き換えられます
+- Node.js 18+
+- An OpenAI API key
 
-## 開発メモ
+### Installation
 
-- このプロトタイプはマニフェストV3を使用しています
-- APIキーがない場合、モックレスポンスが表示されます（テスト用）
-- より高度な機能（コンテキスト認識、特定サイト用のカスタム動作など）は今後の開発で追加予定です
+1. **Clone and setup**
 
-## プライバシーについて
+   ```bash
+   git clone <your-repo>
+   cd tone-checker
+   npm install
+   ```
 
-- 入力されたテキストは選択したAIプロバイダーに送信されます
-- APIキーはローカルのブラウザストレージにのみ保存され、外部に送信されることはありません
-- オフラインモードやプライバシー強化機能は今後の更新で追加予定です
+2. **Environment setup**
 
-## トラブルシューティング
+   ```bash
+   cp env.example .env.local
+   ```
 
-- 拡張機能が動作しない場合は、ブラウザを再起動してみてください
-- APIエラーが発生する場合は、APIキーが正しいことを確認してください
-- 特定のウェブサイトで機能しない場合は、そのサイトのDOM構造が特殊な可能性があります
+   Edit `.env.local` and add your OpenAI API key:
 
-## 注意事項
+   ```
+   OPENAI_API_KEY=your-actual-openai-api-key-here
+   ```
 
-このプロトタイプは、API提供者の利用規約に従って使用してください。OpenAIやDeepSeekのAPIの使用には料金が発生する場合があります。
+3. **Run the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Usage
+
+1. **Start typing** in the large text area
+2. **Wait for analysis** - The app analyzes your text after a 1-second pause
+3. **Review suggestions** - If tone issues are detected, a popup will appear
+4. **Accept or dismiss** - Click "Accept Suggestion" to replace your text, or "Ignore" to dismiss
+
+## Tech Stack
+
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS
+- **AI**: OpenAI GPT-3.5-turbo
+- **Language**: TypeScript
+- **Deployment**: Ready for Vercel, Netlify, or any Node.js hosting
+
+## API Configuration
+
+### OpenAI (Default)
+
+The app uses OpenAI's GPT-3.5-turbo model by default. Set your API key in `.env.local`:
+
+```
+OPENAI_API_KEY=your-openai-api-key
+```
+
+### DeepSeek (Alternative)
+
+To use DeepSeek instead, modify `src/app/api/check-tone/route.ts` and update the API configuration.
+
+## Customization
+
+### Modify the AI Prompt
+
+Edit the system prompt in `src/app/api/check-tone/route.ts` to change how the AI analyzes text.
+
+### Styling
+
+The app uses a Spotify-inspired theme defined in `tailwind.config.js`. Customize the colors:
+
+- `spotify-green`: Primary accent color
+- `spotify-black`: Main background
+- `spotify-darkgray`: Card backgrounds
+- `spotify-lightgray`: Secondary backgrounds
+
+### Analysis Delay
+
+Change the debounce delay in `src/components/ToneChecker.tsx` (currently 1000ms).
+
+## Deployment
+
+### Vercel (Recommended)
+
+```bash
+npm run build
+vercel --prod
+```
+
+### Other Platforms
+
+The app is a standard Next.js application and can be deployed anywhere that supports Node.js.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - feel free to use this project for personal or commercial purposes.
+
+## Support
+
+If you encounter any issues:
+
+1. Check that your OpenAI API key is correctly set
+2. Ensure you have sufficient API credits
+3. Verify your internet connection for API calls
+
+---
+
+**Built with ❤️ for better communication**
