@@ -83,7 +83,7 @@ export function ToneChecker() {
         const afterCursor = currentText.substring(cursorPos);
 
         // Find sentence start (look for . ! ? followed by space, or start of text)
-        const sentenceStarts = [...beforeCursor.matchAll(/[.!?]\s+/g)];
+        const sentenceStarts = Array.from(beforeCursor.matchAll(/[.!?]\s+/g));
         const sentenceStart =
           sentenceStarts.length > 0
             ? sentenceStarts[sentenceStarts.length - 1].index +
@@ -92,9 +92,10 @@ export function ToneChecker() {
 
         // Find sentence end (next . ! ? or end of text)
         const sentenceEndMatch = afterCursor.match(/[.!?]/);
-        const sentenceEnd = sentenceEndMatch
-          ? cursorPos + sentenceEndMatch.index + 1
-          : currentText.length;
+        const sentenceEnd =
+          sentenceEndMatch && sentenceEndMatch.index !== undefined
+            ? cursorPos + sentenceEndMatch.index + 1
+            : currentText.length;
 
         const sentence = currentText
           .substring(sentenceStart, sentenceEnd)

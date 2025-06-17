@@ -38,7 +38,7 @@ export function ToneSuggestion({
   // Update the position of the popup based on the selection or caret position
   const updatePosition = () => {
     const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
+    if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       // Set the position based on the caret's bounding rectangle
