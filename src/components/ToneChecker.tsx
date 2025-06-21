@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ToneSuggestion } from "./ToneSuggestion";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -11,43 +12,18 @@ interface ToneAnalysis {
   reasoning: string;
 }
 
-export function ToneChecker() {
+interface ToneCheckerProps {
+  isJapanese: boolean;
+}
+
+export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [text, setText] = useState("");
+  const [context, setContext] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
-  const [showSuggestion, setShowSuggestion] = useState(false);
-  const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 });
   const [lastAnalyzedText, setLastAnalyzedText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
-
-  // Calculate cursor position in textarea
-  const calculateCursorPosition = useCallback(() => {
-    if (!textareaRef.current) return { top: 0, left: 0 };
-
-    const textarea = textareaRef.current;
-    const cursorPos = textarea.selectionStart;
-
-    // Simple approximation based on character position
-    const lineHeight = 24; // Approximate line height
-    const charWidth = 8; // Approximate character width
-    const padding = 24; // textarea padding
-
-    // Calculate approximate line and column
-    const textBeforeCursor = text.substring(0, cursorPos);
-    const lines = textBeforeCursor.split("\n");
-    const currentLine = lines.length - 1;
-    const currentColumn = lines[lines.length - 1].length;
-
-    // Calculate position
-    const top = currentLine * lineHeight + padding;
-    const left = Math.min(
-      currentColumn * charWidth + padding,
-      textarea.offsetWidth - 300
-    );
-
-    return { top, left };
-  }, [text]);
 
   // Get newly added text for analysis with better sentence detection
   const getNewlyTypedText = useCallback(
@@ -115,7 +91,6 @@ export function ToneChecker() {
     async (textToAnalyze: string) => {
       if (!textToAnalyze.trim() || textToAnalyze.length < 10) {
         setSuggestion(null);
-        setShowSuggestion(false);
         return;
       }
 
@@ -134,7 +109,11 @@ export function ToneChecker() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ text: newContent }),
+          body: JSON.stringify({
+            text: newContent,
+            context: context,
+            language: isJapanese ? "japanese" : "english",
+          }),
         });
 
         if (!response.ok) {
@@ -144,26 +123,20 @@ export function ToneChecker() {
         const analysis: ToneAnalysis = await response.json();
 
         if (analysis.hasIssues && analysis.suggestion) {
-          // Calculate cursor position when showing suggestion
-          const position = calculateCursorPosition();
-          setCursorPosition(position);
           setSuggestion(analysis);
-          setShowSuggestion(true);
         } else {
           setSuggestion(null);
-          setShowSuggestion(false);
         }
 
         setLastAnalyzedText(textToAnalyze);
       } catch (error) {
         console.error("Error analyzing text:", error);
         setSuggestion(null);
-        setShowSuggestion(false);
       } finally {
         setIsAnalyzing(false);
       }
     },
-    [lastAnalyzedText, getNewlyTypedText, calculateCursorPosition]
+    [lastAnalyzedText, getNewlyTypedText, context, isJapanese]
   );
 
   // Handle text change with debouncing
@@ -190,7 +163,6 @@ export function ToneChecker() {
       setText(newText);
       setLastAnalyzedText(newText);
       setSuggestion(null);
-      setShowSuggestion(false);
       textareaRef.current?.focus();
     }
   };
@@ -198,7 +170,6 @@ export function ToneChecker() {
   // Dismiss suggestion
   const dismissSuggestion = () => {
     setSuggestion(null);
-    setShowSuggestion(false);
     // Mark current text as analyzed to avoid re-analyzing
     setLastAnalyzedText(text);
   };
@@ -212,93 +183,126 @@ export function ToneChecker() {
     };
   }, []);
 
+  const labels = {
+    contextTitle: isJapanese ? "会話履歴" : "Conversation Context",
+    contextPlaceholder: isJapanese
+      ? "これまでの会話履歴をここに貼り付けて、AIが文脈を理解できるようにしてください..."
+      : "Paste your conversation history here so the AI can understand the context...",
+    writeTitle: isJapanese ? "メッセージを書く" : "Write your message",
+    writePlaceholder: isJapanese
+      ? "ここにメッセージを入力してください... より専門的で敬意のあるメッセージにするお手伝いをします。"
+      : "Start typing your message here... We'll help you make it more professional and respectful.",
+    analyzing: isJapanese ? "分析中..." : "Analyzing...",
+    characters: isJapanese ? "文字" : "characters",
+    words: isJapanese ? "単語" : "words",
+    helpText: isJapanese
+      ? "ToneCheckはリアルタイムで文章を分析し、トーン、プロフェッショナリズム、明確さの改善を提案します。自然に書いてください。効果的なコミュニケーションをサポートします。"
+      : "ToneCheck analyzes your writing in real-time and suggests improvements for tone, professionalism, and clarity. Write naturally and we'll help you communicate more effectively.",
+  };
+
   return (
     <>
-      <div className="relative max-w-4xl mx-auto">
-        <div className="bg-spotify-lightgray rounded-2xl shadow-spotify-lg overflow-hidden border border-gray-800">
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-800 bg-spotify-darkgray">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-spotify-white">
-                Write your message
-              </h2>
-              <div className="flex items-center space-x-2">
-                {isAnalyzing && (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-spotify-green border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-sm text-spotify-gray">
-                      Analyzing...
-                    </span>
+      <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+        {/* Context Input */}
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          {/* Context Header */}
+          <div className="px-5 py-4 border-b border-purple-200 bg-purple-50">
+            <h3 className="text-base font-semibold text-purple-800 tracking-wide">
+              {labels.contextTitle}
+            </h3>
+          </div>
+
+          {/* Context Text Area */}
+          <div>
+            <Textarea
+              value={context}
+              onChange={(e) => setContext(e.target.value)}
+              placeholder={labels.contextPlaceholder}
+              className="h-80 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
+              style={{ fontFamily: "Inter, sans-serif" }}
+            />
+            <div className="relative">
+              <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
+                {context.length} {labels.characters}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Message Input and Suggestions */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Message Input */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            {/* Header */}
+            <div className="px-5 py-4 border-b border-purple-200 bg-purple-50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-semibold text-purple-800 tracking-wide">
+                  {labels.writeTitle}
+                </h3>
+                <div className="flex items-center space-x-3">
+                  {isAnalyzing && (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm font-medium text-purple-700">
+                        {labels.analyzing}
+                      </span>
+                    </div>
+                  )}
+                  <div className="text-sm font-medium text-slate-500">
+                    {text.length} {labels.characters}
                   </div>
-                )}
-                <div className="text-sm text-spotify-gray">
-                  {text.length} characters
                 </div>
+              </div>
+            </div>
+
+            {/* Text Area */}
+            <div className="relative">
+              <Textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => handleTextChange(e.target.value)}
+                placeholder={labels.writePlaceholder}
+                className="h-24 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
+                style={{ fontFamily: "Inter, sans-serif" }}
+              />
+
+              {/* Word count */}
+              <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
+                {text.split(" ").filter((word) => word.length > 0).length}{" "}
+                {labels.words}
               </div>
             </div>
           </div>
 
-          {/* Text Area */}
-          <div className="relative">
-            <textarea
-              ref={textareaRef}
-              value={text}
-              onChange={(e) => handleTextChange(e.target.value)}
-              placeholder="Start typing your message here... We'll help you make it more professional and respectful."
-              className="w-full h-96 p-6 bg-transparent text-spotify-white placeholder-spotify-gray resize-none focus:outline-none text-lg leading-relaxed"
-              style={{ fontFamily: "Inter, sans-serif" }}
-            />
-
-            {/* Word count and tips */}
-            <div className="absolute bottom-4 left-6 text-sm text-spotify-gray">
-              {text.split(" ").filter((word) => word.length > 0).length} words
-            </div>
-
-            {/* Suggestion Popup - Positioned right next to the text area like Grammarly */}
-            {showSuggestion && suggestion && (
+          {/* Suggestion Box */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-72 hover:shadow-xl transition-shadow duration-300">
+            {suggestion ? (
               <ToneSuggestion
                 suggestion={suggestion}
                 onAccept={acceptSuggestion}
                 onDismiss={dismissSuggestion}
-                position={cursorPosition}
+                position={{ top: 0, left: 0 }}
+                isJapanese={isJapanese}
+                isEmbedded={true}
               />
+            ) : (
+              <div className="h-full flex items-center justify-center bg-slate-50">
+                <p className="text-slate-500 text-base font-medium text-center px-6">
+                  {isJapanese
+                    ? "メッセージを入力すると、トーンの提案がここに表示されます"
+                    : "Tone suggestions will appear here as you type your message"}
+                </p>
+              </div>
             )}
           </div>
         </div>
       </div>
 
       {/* Help Text */}
-      <div className="mt-6 text-center">
-        <p className="text-spotify-gray text-sm max-w-2xl mx-auto">
-          ToneCheck analyzes your writing in real-time and suggests improvements
-          for tone, professionalism, and clarity. Write naturally and we'll help
-          you communicate more effectively.
+      <div className="mt-8 text-center">
+        <p className="text-slate-600 text-base max-w-4xl mx-auto leading-relaxed font-medium">
+          {labels.helpText}
         </p>
-      </div>
-
-      {/* Examples */}
-      <div className="mt-8 grid md:grid-cols-2 gap-6">
-        <div className="bg-spotify-lightgray rounded-xl p-6 border border-gray-800">
-          <h3 className="text-spotify-white font-semibold mb-3 flex items-center">
-            <span className="w-2 h-2 bg-red-500 rounded-full mr-3"></span>
-            Needs Improvement
-          </h3>
-          <p className="text-spotify-gray text-sm leading-relaxed">
-            "You need to fix this immediately. This is completely wrong and
-            unacceptable."
-          </p>
-        </div>
-
-        <div className="bg-spotify-lightgray rounded-xl p-6 border border-gray-800">
-          <h3 className="text-spotify-white font-semibold mb-3 flex items-center">
-            <span className="w-2 h-2 bg-spotify-green rounded-full mr-3"></span>
-            Professional Tone
-          </h3>
-          <p className="text-spotify-gray text-sm leading-relaxed">
-            "I'd like to discuss some concerns about this approach. Could we
-            schedule time to review the requirements together?"
-          </p>
-        </div>
       </div>
     </>
   );
