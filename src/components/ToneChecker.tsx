@@ -213,7 +213,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
           </div>
 
           {/* Context Text Area */}
-          <div>
+          <div className="relative">
             <Textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
@@ -221,10 +221,9 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
               className="h-80 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
               style={{ fontFamily: "Inter, sans-serif" }}
             />
-            <div className="relative">
-              <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
-                {context.length} {labels.characters}
-              </div>
+            {/* Word count */}
+            <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
+              {context.length} {labels.characters}
             </div>
           </div>
         </div>
