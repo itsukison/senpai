@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useLogging } from "@/hooks/useLogging";
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -8,12 +9,16 @@ interface ToneAnalysis {
   suggestion: string | null;
   issues: string[];
   reasoning: string;
+  ai_receipt?: string;  // 新規追加フィールド
+  improvement_points?: string;  // 新規追加フィールド
 }
 
 interface ToneSuggestionProps {
   suggestion: ToneAnalysis;
   onAccept: () => void;
   onDismiss: () => void;
+  onRevert?: () => void;
+  hasAcceptedSuggestion?: boolean;
   position: { top: number; left: number };
   isJapanese: boolean;
   isEmbedded?: boolean;
@@ -23,12 +28,19 @@ export function ToneSuggestion({
   suggestion,
   onAccept,
   onDismiss,
+  onRevert,
+  hasAcceptedSuggestion = false,
   position,
   isJapanese,
   isEmbedded = false,
 }: ToneSuggestionProps) {
+  // showCopyFeedback state をコンポーネントのトップレベルで定義
+  const [showCopyFeedback, setShowCopyFeedback] = useState(false);
+  const { log } = useLogging(isJapanese ? 'ja' : 'en'); // log取得用
+
   // Handle escape key to close popup
   useEffect(() => {
+    // const [showCopyFeedback, setShowCopyFeedback] = useState(false);  // ここから移動
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onDismiss();
@@ -68,47 +80,50 @@ export function ToneSuggestion({
   }, []);
 
   const labels = {
-    title: isJapanese ? "トーンチェック" : "Tone Check",
-    issues: isJapanese ? "問題点:" : "Issues:",
-    suggestion: isJapanese ? "提案:" : "Suggestion:",
-    why: isJapanese ? "理由:" : "Why:",
-    ignore: isJapanese ? "無視" : "Ignore",
-    accept: isJapanese ? "承認" : "Accept",
+    // title: isJapanese ? "トーンチェック" : "Tone Check",
+    title: isJapanese ? "改善提案" : "Improvement Suggestion",
+    // issues: isJapanese ? "問題点:" : "Issues:",
+    // suggestion: isJapanese ? "提案:" : "Suggestion:",
+    // why: isJapanese ? "理由:" : "Why:",
+    improvementTitle: isJapanese ? "改善ポイント" : "Improvement Points",
+    suggestionTitle: isJapanese ? "改善案" : "Suggestion",
+    ignore: isJapanese ? "戻す" : "Back",
+    accept: isJapanese ? "反映" : "Apply",
+    copyToClipboard: isJapanese ? "クリップボードにコピー" : "Copy to Clipboard",
   };
 
   if (isEmbedded) {
     return (
-      <div className="h-full overflow-auto bg-slate-50 rounded-lg border border-slate-200">
-        <div className="p-4 space-y-3">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm ring-2 ring-amber-100"></div>
-              <h3 className="text-slack-darkgray font-bold text-sm tracking-wide">
+      <div className="h-full overflow-auto bg-white rounded-lg">
+        <div className="p-5 space-y-4">
+          {/* ヘッダー with 💡 アイコン */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-2xl">💡</span>
+              <h3 className="text-base font-bold text-slate-800">
                 {labels.title}
               </h3>
             </div>
             <button
               onClick={onDismiss}
-              className="text-slate-400 hover:text-slate-600 transition-all duration-200 p-1.5 rounded-lg hover:bg-white/60 backdrop-blur-sm"
+              className="text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Issues */}
-          {suggestion.issues.length > 0 && (
+          {/* AI Receipt - 共感的な受け止め（背景色なし） */}
+          {/* バックエンドが対応するまでは reasoning を代用表示 */}
+          {(suggestion.ai_receipt || suggestion.reasoning) && (
+            <div className="text-sm text-slate-700 leading-relaxed">
+              {suggestion.ai_receipt || suggestion.reasoning}
+            </div>
+          )}
+
+          {/* 旧: Issues セクション（コメントアウト） */}
+          {/* {suggestion.issues.length > 0 && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <h4 className="text-sm font-semibold text-red-700 mb-2 flex items-center">
                 <svg
@@ -135,10 +150,25 @@ export function ToneSuggestion({
                 ))}
               </ul>
             </div>
+          )} */}
+
+          {/* 改善ポイント - 黄色背景 */}
+          {/* バックエンドが対応するまでは issues を結合して表示 */}
+          {(suggestion.improvement_points || suggestion.issues.length > 0) && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {labels.improvementTitle}
+              </h4>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {suggestion.improvement_points || suggestion.issues.join(' ')}
+                </p>
+              </div>
+            </div>
           )}
 
-          {/* Suggested improvement - enhanced version */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+          {/* 旧: Suggested improvement セクション（コメントアウト） */}
+          {/* <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
             <h4 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center">
               <svg
                 className="w-4 h-4 mr-2"
@@ -158,10 +188,24 @@ export function ToneSuggestion({
                 "{suggestion.suggestion}"
               </p>
             </div>
-          </div>
+          </div> */}
 
-          {/* Reasoning */}
-          {suggestion.reasoning && (
+          {/* 改善案 - 緑色背景 */}
+          {suggestion.suggestion && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {labels.suggestionTitle}
+              </h4>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                  {suggestion.suggestion}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 旧: Reasoning セクション（コメントアウト） */}
+          {/* {suggestion.reasoning && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 leading-relaxed">
                 <span className="font-semibold text-blue-900">
@@ -170,10 +214,10 @@ export function ToneSuggestion({
                 {suggestion.reasoning}
               </p>
             </div>
-          )}
+          )} */}
 
-          {/* Actions - enhanced */}
-          <div className="flex items-center justify-end space-x-3 pt-2">
+          {/* 旧: Actions（コメントアウト） */}
+          {/* <div className="flex items-center justify-end space-x-3 pt-2">
             <button
               onClick={onDismiss}
               className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 border border-slate-300 rounded-lg transition-all duration-200 hover:bg-white hover:shadow-sm"
@@ -186,12 +230,60 @@ export function ToneSuggestion({
             >
               {labels.accept}
             </button>
+          </div> */}
+
+          {/* 新: アクションボタン */}
+          <div className="flex items-center justify-start space-x-3 pt-3">
+            {!hasAcceptedSuggestion && (
+              <button
+                onClick={onAccept}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {labels.accept}
+              </button>
+            )}
+            <button
+              onClick={async () => {
+                if (suggestion.suggestion) {
+                  await navigator.clipboard.writeText(suggestion.suggestion);
+                  setShowCopyFeedback(true);
+                  setTimeout(() => setShowCopyFeedback(false), 2000);
+
+                  // ログ記録
+                  await log('text_copied', {
+                    action: 'copy',
+                    newText: suggestion.suggestion
+                  });
+                }
+              }}
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors relative"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              {showCopyFeedback ? (isJapanese ? "コピーしました！" : "Copied!") : labels.copyToClipboard}
+            </button>
+            {hasAcceptedSuggestion && onRevert && (
+              <button
+                onClick={onRevert}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                </svg>
+                {labels.ignore}
+              </button>
+            )}
           </div>
         </div>
       </div>
     );
   }
 
+  // ポップアップ版（現在使用していないのでそのまま残す）
   return (
     <div
       className="fixed z-50"

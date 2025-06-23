@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ToneSuggestion } from "./ToneSuggestion";
 import { Textarea } from "@/components/ui/textarea";
+import { useLogging } from "@/hooks/useLogging";//ログ保存機能
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -10,6 +11,8 @@ interface ToneAnalysis {
   suggestion: string | null;
   issues: string[];
   reasoning: string;
+  ai_receipt?: string;
+  improvement_points?: string;
 }
 
 interface ToneCheckerProps {
@@ -18,10 +21,13 @@ interface ToneCheckerProps {
 
 export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [text, setText] = useState("");
+  const { log } = useLogging(isJapanese ? 'ja' : 'en'); // log保存用
   const [context, setContext] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
   const [lastAnalyzedText, setLastAnalyzedText] = useState("");
+  const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
+  const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
 
@@ -93,15 +99,17 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         setSuggestion(null);
         return;
       }
-
-      // Get only the newly typed content for analysis
+	// Get only the newly typed content for analysis
       const newContent = getNewlyTypedText(textToAnalyze, lastAnalyzedText);
+      console.log("Analyzing text:", newContent); // デバッグ用
 
       if (!newContent.trim() || newContent.length < 10) {
+        console.log("Text too short, skipping analysis"); // デバッグ用
         return;
       }
 
       setIsAnalyzing(true);
+      const startTime = Date.now(); // 処理時間計測用
 
       try {
         const response = await fetch("/api/check-tone", {
@@ -121,11 +129,31 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         }
 
         const analysis: ToneAnalysis = await response.json();
+        console.log("API Response:", analysis); // デバッグ用
 
+        // AI分析完了ログを記録
+        await log('analysis_completed', {
+          context: context,
+          originalMessage: newContent,
+          aiResponse: {
+            hasIssues: analysis.hasIssues,
+            ai_receipt: analysis.ai_receipt,
+            improvement_points: analysis.improvement_points,
+            suggestion: analysis.suggestion,
+            reasoning: analysis.reasoning,
+            issues: analysis.issues
+          },
+          processingTime: Date.now() - startTime
+        });
+
+        console.log("hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion); // デバッグ用
+        
         if (analysis.hasIssues && analysis.suggestion) {
           setSuggestion(analysis);
+          console.log("Suggestion set!"); // デバッグ用
         } else {
           setSuggestion(null);
+          console.log("No suggestion set"); // デバッグ用
         }
 
         setLastAnalyzedText(textToAnalyze);
@@ -136,7 +164,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         setIsAnalyzing(false);
       }
     },
-    [lastAnalyzedText, getNewlyTypedText, context, isJapanese]
+    [lastAnalyzedText, getNewlyTypedText, context, isJapanese, log]
   );
 
   // Handle text change with debouncing
@@ -154,16 +182,44 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     }, 1000); // 1 second delay
   };
 
-  // Accept suggestion
-  const acceptSuggestion = () => {
+// Accept suggestion
+  const acceptSuggestion = async () => {
     if (suggestion?.suggestion) {
+      // 元のテキストを保存
+      setOriginalText(text);
       // Replace the problematic part with the suggestion
       const newContent = getNewlyTypedText(text, lastAnalyzedText);
       const newText = text.replace(newContent, suggestion.suggestion);
       setText(newText);
       setLastAnalyzedText(newText);
-      setSuggestion(null);
+      setHasAcceptedSuggestion(true);
+      // setSuggestion(null); // 提案を消さない
       textareaRef.current?.focus();
+
+      // ログ記録
+      await log('suggestion_accepted', {
+        action: 'accept',
+        previousText: text,
+        newText: newText
+      });
+    }
+  };
+
+  // Revert to original text
+  const revertToOriginal = async () => {
+    if (originalText) {
+      setText(originalText);
+      setLastAnalyzedText(originalText);
+      setHasAcceptedSuggestion(false);
+      setOriginalText("");
+      textareaRef.current?.focus();
+
+      // ログ記録
+      await log('suggestion_rejected', {
+        action: 'reject',
+        previousText: text,
+        newText: originalText
+      });
     }
   };
 
@@ -184,20 +240,20 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   }, []);
 
   const labels = {
-    contextTitle: isJapanese ? "会話履歴" : "Conversation Context",
+    contextTitle: isJapanese ? "過去のやりとり・会話の履歴" : "Conversation Context",
     contextPlaceholder: isJapanese
-      ? "これまでの会話履歴をここに貼り付けて、AIが文脈を理解できるようにしてください..."
+      ? "よろしければ、Slack/Teamsから、これまでの会話履歴をここにコピー＆ペーストして、AIが文脈を理解を助けてください。(なくても動きます)"
       : "Paste your conversation history here so the AI can understand the context...",
-    writeTitle: isJapanese ? "メッセージを書く" : "Write your message",
+    writeTitle: isJapanese ? "投稿予定のメッセージを書く" : "Write your message",
     writePlaceholder: isJapanese
-      ? "ここにメッセージを入力してください... より専門的で敬意のあるメッセージにするお手伝いをします。"
+      ? "ここに、これから相手に送ろうとしているメッセージを入力してください...。入力が進むと、自動的にAIの解析が始まります"
       : "Start typing your message here... We'll help you make it more professional and respectful.",
     analyzing: isJapanese ? "分析中..." : "Analyzing...",
     characters: isJapanese ? "文字" : "characters",
     words: isJapanese ? "単語" : "words",
     helpText: isJapanese
-      ? "ToneCheckはリアルタイムで文章を分析し、トーン、プロフェッショナリズム、明確さの改善を提案します。自然に書いてください。効果的なコミュニケーションをサポートします。"
-      : "ToneCheck analyzes your writing in real-time and suggests improvements for tone, professionalism, and clarity. Write naturally and we'll help you communicate more effectively.",
+      ? "SenpAI Senseiは、あなたの効果的なコミュニケーションのためのAIチームメイトです"
+      : "SenpAI Sensei is your AI teammate. We'll help you communicate more effectively.",
   };
 
   return (
@@ -261,7 +317,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
                 value={text}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder={labels.writePlaceholder}
-                className="h-24 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
+                className="h-48 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
                 style={{ fontFamily: "Inter, sans-serif" }}
               />
 
@@ -274,12 +330,14 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
           </div>
 
           {/* Suggestion Box */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-72 hover:shadow-xl transition-shadow duration-300">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-96 hover:shadow-xl transition-shadow duration-300">
             {suggestion ? (
               <ToneSuggestion
                 suggestion={suggestion}
-                onAccept={acceptSuggestion}
+                onAccept={() => acceptSuggestion()}
                 onDismiss={dismissSuggestion}
+                onRevert={() => revertToOriginal()}
+                hasAcceptedSuggestion={hasAcceptedSuggestion}
                 position={{ top: 0, left: 0 }}
                 isJapanese={isJapanese}
                 isEmbedded={true}
