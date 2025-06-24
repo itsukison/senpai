@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ToneSuggestion } from "./ToneSuggestion";
 import { Textarea } from "@/components/ui/textarea";
-import { useLogging } from "@/hooks/useLogging";//ログ保存機能
+import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -21,7 +21,7 @@ interface ToneCheckerProps {
 
 export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [text, setText] = useState("");
-  const { log } = useLogging(isJapanese ? 'ja' : 'en'); // log保存用
+  const { log } = useLogging(isJapanese ? "ja" : "en"); // log保存用
   const [context, setContext] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
@@ -29,7 +29,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>();
 
   // Get newly added text for analysis with better sentence detection
   const getNewlyTypedText = useCallback(
@@ -99,7 +99,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         setSuggestion(null);
         return;
       }
-	// Get only the newly typed content for analysis
+      // Get only the newly typed content for analysis
       const newContent = getNewlyTypedText(textToAnalyze, lastAnalyzedText);
       console.log("Analyzing text:", newContent); // デバッグ用
 
@@ -132,22 +132,27 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         console.log("API Response:", analysis); // デバッグ用
 
         // AI分析完了ログを記録
-        await log('analysis_completed', {
+        await log("analysis_completed", {
           context: context,
           originalMessage: newContent,
           aiResponse: {
             hasIssues: analysis.hasIssues,
             ai_receipt: analysis.ai_receipt,
             improvement_points: analysis.improvement_points,
-            suggestion: analysis.suggestion,
+            suggestion: analysis.suggestion || undefined,
             reasoning: analysis.reasoning,
-            issues: analysis.issues
+            issues: analysis.issues,
           },
-          processingTime: Date.now() - startTime
+          processingTime: Date.now() - startTime,
         });
 
-        console.log("hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion); // デバッグ用
-        
+        console.log(
+          "hasIssues:",
+          analysis.hasIssues,
+          "suggestion:",
+          analysis.suggestion
+        ); // デバッグ用
+
         if (analysis.hasIssues && analysis.suggestion) {
           setSuggestion(analysis);
           console.log("Suggestion set!"); // デバッグ用
@@ -182,7 +187,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     }, 1000); // 1 second delay
   };
 
-// Accept suggestion
+  // Accept suggestion
   const acceptSuggestion = async () => {
     if (suggestion?.suggestion) {
       // 元のテキストを保存
@@ -197,10 +202,10 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       textareaRef.current?.focus();
 
       // ログ記録
-      await log('suggestion_accepted', {
-        action: 'accept',
+      await log("suggestion_accepted", {
+        action: "accept",
         previousText: text,
-        newText: newText
+        newText: newText,
       });
     }
   };
@@ -215,10 +220,10 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       textareaRef.current?.focus();
 
       // ログ記録
-      await log('suggestion_rejected', {
-        action: 'reject',
+      await log("suggestion_rejected", {
+        action: "reject",
         previousText: text,
-        newText: originalText
+        newText: originalText,
       });
     }
   };
@@ -240,127 +245,109 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   }, []);
 
   const labels = {
-    contextTitle: isJapanese ? "過去のやりとり・会話の履歴" : "Conversation Context",
+    contextTitle: isJapanese
+      ? "過去のやりとり・会話の履歴"
+      : "Conversation Context",
     contextPlaceholder: isJapanese
       ? "よろしければ、Slack/Teamsから、これまでの会話履歴をここにコピー＆ペーストして、AIが文脈を理解を助けてください。(なくても動きます)"
       : "Paste your conversation history here so the AI can understand the context...",
-    writeTitle: isJapanese ? "投稿予定のメッセージを書く" : "Write your message",
+    writeTitle: isJapanese
+      ? "投稿予定のメッセージを書く"
+      : "Write your message",
     writePlaceholder: isJapanese
       ? "ここに、これから相手に送ろうとしているメッセージを入力してください...。入力が進むと、自動的にAIの解析が始まります"
       : "Start typing your message here... We'll help you make it more professional and respectful.",
     analyzing: isJapanese ? "分析中..." : "Analyzing...",
-    characters: isJapanese ? "文字" : "characters",
-    words: isJapanese ? "単語" : "words",
-    helpText: isJapanese
-      ? "SenpAI Senseiは、あなたの効果的なコミュニケーションのためのAIチームメイトです"
-      : "SenpAI Sensei is your AI teammate. We'll help you communicate more effectively.",
   };
 
   return (
-    <>
-      <div className="grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-        {/* Context Input */}
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
+      {/* Responsive Grid Container */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0">
+        {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-0">
           {/* Context Header */}
-          <div className="px-5 py-4 border-b border-purple-200 bg-purple-50">
-            <h3 className="text-base font-semibold text-purple-800 tracking-wide">
+          <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
+            <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
               {labels.contextTitle}
             </h3>
           </div>
 
           {/* Context Text Area */}
-          <div className="relative">
+          <div className="relative flex-1 flex flex-col min-h-0">
             <Textarea
               value={context}
               onChange={(e) => setContext(e.target.value)}
               placeholder={labels.contextPlaceholder}
-              className="h-80 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
+              className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
               style={{ fontFamily: "Inter, sans-serif" }}
             />
-            {/* Word count */}
-            <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
-              {context.length} {labels.characters}
-            </div>
           </div>
         </div>
 
-        {/* Main Message Input and Suggestions */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Message Input */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+        {/* Right Side Container - Message Input and Suggestions stacked vertically */}
+        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0">
+          {/* Message Input - Top of right side */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-0">
             {/* Header */}
-            <div className="px-5 py-4 border-b border-purple-200 bg-purple-50">
+            <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
               <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-purple-800 tracking-wide">
+                <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
                   {labels.writeTitle}
                 </h3>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 sm:space-x-3">
                   {isAnalyzing && (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 sm:space-x-2">
                       <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm font-medium text-purple-700">
+                      <span className="text-xs sm:text-sm font-medium text-purple-700">
                         {labels.analyzing}
                       </span>
                     </div>
                   )}
-                  <div className="text-sm font-medium text-slate-500">
-                    {text.length} {labels.characters}
-                  </div>
                 </div>
               </div>
             </div>
 
             {/* Text Area */}
-            <div className="relative">
+            <div className="relative flex-1 flex flex-col min-h-0">
               <Textarea
                 ref={textareaRef}
                 value={text}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder={labels.writePlaceholder}
-                className="h-48 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-sm leading-relaxed"
+                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
                 style={{ fontFamily: "Inter, sans-serif" }}
               />
-
-              {/* Word count */}
-              <div className="absolute bottom-3 left-4 text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg shadow-sm">
-                {text.split(" ").filter((word) => word.length > 0).length}{" "}
-                {labels.words}
-              </div>
             </div>
           </div>
 
-          {/* Suggestion Box */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden h-96 hover:shadow-xl transition-shadow duration-300">
-            {suggestion ? (
-              <ToneSuggestion
-                suggestion={suggestion}
-                onAccept={() => acceptSuggestion()}
-                onDismiss={dismissSuggestion}
-                onRevert={() => revertToOriginal()}
-                hasAcceptedSuggestion={hasAcceptedSuggestion}
-                position={{ top: 0, left: 0 }}
-                isJapanese={isJapanese}
-                isEmbedded={true}
-              />
-            ) : (
-              <div className="h-full flex items-center justify-center bg-slate-50">
-                <p className="text-slate-500 text-base font-medium text-center px-6">
-                  {isJapanese
-                    ? "メッセージを入力すると、トーンの提案がここに表示されます"
-                    : "Tone suggestions will appear here as you type your message"}
-                </p>
-              </div>
-            )}
+          {/* Suggestion Box - Bottom of right side */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-0">
+            <div className="flex-1 flex flex-col min-h-0">
+              {suggestion ? (
+                <ToneSuggestion
+                  suggestion={suggestion}
+                  onAccept={() => acceptSuggestion()}
+                  onDismiss={dismissSuggestion}
+                  onRevert={() => revertToOriginal()}
+                  hasAcceptedSuggestion={hasAcceptedSuggestion}
+                  position={{ top: 0, left: 0 }}
+                  isJapanese={isJapanese}
+                  isEmbedded={true}
+                />
+              ) : (
+                <div className="flex-1 flex items-center justify-center bg-slate-50 p-3 sm:p-4">
+                  <p className="text-slate-500 text-sm sm:text-base font-medium text-center max-w-xs">
+                    {isJapanese
+                      ? "メッセージを入力すると、トーンの提案がここに表示されます"
+                      : "Tone suggestions will appear here as you type your message"}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
-      {/* Help Text */}
-      <div className="mt-8 text-center">
-        <p className="text-slate-600 text-base max-w-4xl mx-auto leading-relaxed font-medium">
-          {labels.helpText}
-        </p>
-      </div>
-    </>
+    </div>
   );
 }

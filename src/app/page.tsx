@@ -4,19 +4,19 @@ import { useState, useRef, useEffect } from "react";
 import { ToneChecker } from "@/components/ToneChecker";
 
 export default function Home() {
-  const [isJapanese, setIsJapanese] = useState(false);
+  const [isJapanese, setIsJapanese] = useState(true);
 
   const toggleLanguage = () => {
     setIsJapanese(!isJapanese);
   };
 
   return (
-    <div className="min-h-screen bg-slack-white">
+    <div className="min-h-screen bg-slack-white flex flex-col">
       {/* Navigation Bar */}
-      <nav className="bg-white border-b border-slate-200 shadow-sm backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <nav className="bg-white border-b border-slate-200 shadow-sm backdrop-blur-md flex-shrink-0">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="text-xl font-bold text-slate-800 tracking-tight">
+            <div className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
               SenpAI<span className="text-purple-800"> Sensei</span>
             </div>
 
@@ -54,13 +54,13 @@ export default function Home() {
       </nav>
 
       {/* Title and Description */}
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="bg-white flex-shrink-0 mt-7 mb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
               SenpAI<span className="text-purple-800"> Sensei</span>
             </h1>
-            <p className="text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold">
+            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold px-4">
               {isJapanese
                 ? "リアルタイムで敬意、明確さ、プロフェッショナリズムを持ってコミュニケーションを取るためのプロフェッショナルライティングアシスタント。"
                 : "Professional writing assistant that helps you communicate with respect, clarity, and professionalism in real-time."}
@@ -69,23 +69,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto -mt-12 px-6 py-12 bg-white">
+      {/* Main Content - Flex container that takes remaining space */}
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white overflow-hidden mb-14">
         <ToneChecker isJapanese={isJapanese} />
       </div>
 
       {/* Footer */}
-      <div className="border-t border-slack-border mt-16 bg-slack-lightgray">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center text-slack-gray">
-            <p className="text-sm">
-              {isJapanese
-                ? "AIによって駆動 • より良いコミュニケーションのために作られました"
-                : "Powered by AI • Built for better communication • Made with ❤️"}
-            </p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
