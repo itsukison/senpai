@@ -9,8 +9,8 @@ interface ToneAnalysis {
   suggestion: string | null;
   issues: string[];
   reasoning: string;
-  ai_receipt?: string;  // 新規追加フィールド
-  improvement_points?: string;  // 新規追加フィールド
+  ai_receipt?: string; // 新規追加フィールド
+  improvement_points?: string; // 新規追加フィールド
 }
 
 interface ToneSuggestionProps {
@@ -36,7 +36,7 @@ export function ToneSuggestion({
 }: ToneSuggestionProps) {
   // showCopyFeedback state をコンポーネントのトップレベルで定義
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
-  const { log } = useLogging(isJapanese ? 'ja' : 'en'); // log取得用
+  const { log } = useLogging(isJapanese ? "ja" : "en"); // log取得用
 
   // Handle escape key to close popup
   useEffect(() => {
@@ -82,14 +82,16 @@ export function ToneSuggestion({
   const labels = {
     // title: isJapanese ? "トーンチェック" : "Tone Check",
     title: isJapanese ? "改善提案" : "Improvement Suggestion",
-    // issues: isJapanese ? "問題点:" : "Issues:",
-    // suggestion: isJapanese ? "提案:" : "Suggestion:",
-    // why: isJapanese ? "理由:" : "Why:",
+    issues: isJapanese ? "問題点:" : "Issues:",
+    suggestion: isJapanese ? "提案:" : "Suggestion:",
+    why: isJapanese ? "理由:" : "Why:",
     improvementTitle: isJapanese ? "改善ポイント" : "Improvement Points",
     suggestionTitle: isJapanese ? "改善案" : "Suggestion",
     ignore: isJapanese ? "戻す" : "Back",
     accept: isJapanese ? "反映" : "Apply",
-    copyToClipboard: isJapanese ? "クリップボードにコピー" : "Copy to Clipboard",
+    copyToClipboard: isJapanese
+      ? "クリップボードにコピー"
+      : "Copy to Clipboard",
   };
 
   if (isEmbedded) {
@@ -108,8 +110,18 @@ export function ToneSuggestion({
               onClick={onDismiss}
               className="text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -161,7 +173,7 @@ export function ToneSuggestion({
               </h4>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-slate-700 leading-relaxed">
-                  {suggestion.improvement_points || suggestion.issues.join(' ')}
+                  {suggestion.improvement_points || suggestion.issues.join(" ")}
                 </p>
               </div>
             </div>
@@ -239,8 +251,18 @@ export function ToneSuggestion({
                 onClick={onAccept}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 {labels.accept}
               </button>
@@ -253,26 +275,50 @@ export function ToneSuggestion({
                   setTimeout(() => setShowCopyFeedback(false), 2000);
 
                   // ログ記録
-                  await log('text_copied', {
-                    action: 'copy',
-                    newText: suggestion.suggestion
+                  await log("text_copied", {
+                    action: "copy",
+                    newText: suggestion.suggestion,
                   });
                 }
               }}
               className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors relative"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
               </svg>
-              {showCopyFeedback ? (isJapanese ? "コピーしました！" : "Copied!") : labels.copyToClipboard}
+              {showCopyFeedback
+                ? isJapanese
+                  ? "コピーしました！"
+                  : "Copied!"
+                : labels.copyToClipboard}
             </button>
             {hasAcceptedSuggestion && onRevert && (
               <button
                 onClick={onRevert}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-800 rounded-lg transition-colors"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
+                  />
                 </svg>
                 {labels.ignore}
               </button>
