@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ToneSuggestion } from "./ToneSuggestion";
 import { Textarea } from "@/components/ui/textarea";
 import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
+import { createConvo } from "@/lib/actions";
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -145,6 +146,23 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
           },
           processingTime: Date.now() - startTime,
         });
+
+        // Log analysis data to Supabase
+        try {
+          const result = await createConvo({
+            input: newContent,
+            feedback: analysis.suggestion || ""
+          });
+          
+          if (result) {
+            console.log("Successfully logged to Supabase");
+          } else {
+            console.warn("Failed to log to Supabase, but continuing with analysis");
+          }
+        } catch (error) {
+          console.error("Error logging to Supabase:", error);
+          // Don't let Supabase errors break the analysis flow
+        }
 
         console.log(
           "hasIssues:",
