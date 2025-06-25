@@ -11,7 +11,6 @@ interface ToneAnalysis {
   hasIssues: boolean;
   originalText: string;
   suggestion: string | null;
-//  issues: string[];
   reasoning: string;
   ai_receipt?: string;
   improvement_points?: string;
@@ -86,7 +85,6 @@ const analyzeText = useCallback(
           improvement_points: analysis.improvement_points,
           suggestion: analysis.suggestion || undefined,
           reasoning: analysis.reasoning,
-          issues: analysis.issues,
           issue_pattern: analysis.issue_pattern || [],  // 追加
         },
         processingTime: Date.now() - startTime,
@@ -111,13 +109,9 @@ const analyzeText = useCallback(
       console.log("hasIssues:", analysis.hasIssues);
       console.log("suggestion:", analysis.suggestion);
 
-      if (analysis.hasIssues && analysis.suggestion) {
-        console.log("提案を設定します");
-        setSuggestion(analysis);
-      } else {
-        console.log("提案なし - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
-        setSuggestion(null);
-      }
+      // hasIssuesがfalseでもanalyisを設定する
+      setSuggestion(analysis);
+      console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
 
       setLastAnalyzedText(textToAnalyze);
     } catch (error) {

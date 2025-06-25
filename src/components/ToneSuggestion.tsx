@@ -7,10 +7,12 @@ interface ToneAnalysis {
   hasIssues: boolean;
   originalText: string;
   suggestion: string | null;
-  issues: string[];
   reasoning: string;
   ai_receipt?: string; // 新規追加フィールド
   improvement_points?: string; // 新規追加フィールド
+  issue_pattern?: string[];
+  detected_mentions?: string[];
+  // issuesフィールドは削除
 }
 
 interface ToneSuggestionProps {
@@ -194,20 +196,6 @@ export function ToneSuggestion({
             </div>
           )}
 
-
-          {(suggestion.improvement_points) && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-slate-700">
-                {labels.improvementTitle}
-              </h4>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {suggestion.improvement_points || suggestion.issues.join(" ")}
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* 旧: Suggested improvement セクション（コメントアウト） */}
           {/* <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
             <h4 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center">
@@ -232,20 +220,18 @@ export function ToneSuggestion({
           </div> */}
 
           {/* 改善案またはOKメッセージ */}
-          {suggestion.hasIssues ? (
-            suggestion.suggestion && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-slate-700">
-                  {labels.suggestionTitle}
-                </h4>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                  <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
-                    {suggestion.suggestion}
-                  </p>
-                </div>
+          {suggestion.hasIssues && suggestion.suggestion ? (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {labels.suggestionTitle}
+              </h4>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                  {suggestion.suggestion}
+                </p>
               </div>
-            )
-          ) : (
+            </div>
+          ) : !suggestion.hasIssues && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
               <p className="text-sm text-blue-800 font-medium">
                 {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
@@ -282,8 +268,11 @@ export function ToneSuggestion({
           </div> */}
 
           {/* 新: アクションボタン */}
+
+          {/* アクションボタン */}
           <div className="flex items-center justify-start space-x-3 pt-3">
-            {!hasAcceptedSuggestion && (
+            {/* hasIssuesがtrueで、suggestionがある場合のみ「反映」ボタンを表示 */}
+            {suggestion.hasIssues && suggestion.suggestion && !hasAcceptedSuggestion && (
               <button
                 onClick={onAccept}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm"
@@ -304,6 +293,8 @@ export function ToneSuggestion({
                 {labels.accept}
               </button>
             )}
+            {/* hasIssuesがtrueで、suggestionがある場合のみコピーボタンを表示 */}
+            {suggestion.hasIssues && suggestion.suggestion && (
             <button
               onClick={async () => {
                 if (suggestion.suggestion) {
@@ -339,6 +330,9 @@ export function ToneSuggestion({
                   : "Copied!"
                 : labels.copyToClipboard}
             </button>
+            )}
+
+            {/* 戻すボタン */}
             {hasAcceptedSuggestion && onRevert && (
               <button
                 onClick={onRevert}
@@ -422,12 +416,13 @@ export function ToneSuggestion({
               {labels.issues}
             </h4>
             <ul className="space-y-1">
-              {suggestion.issues.map((issue, index) => (
+
+              {(suggestion.issue_pattern || []).map((pattern: string, index: number) => (
                 <li
                   key={index}
                   className="text-xs text-slack-gray leading-relaxed pl-1"
                 >
-                  • {issue}
+                  • {pattern}
                 </li>
               ))}
             </ul>
