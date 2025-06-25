@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 3. **問題判定**: issue_patternに基づきhasIssuesを判定
 4. **改善提案**: hasIssues:trueなら改善案、falseなら良い点を出力フォーマットに則って詳述
    - issue_pattern をもとに、よりよい suggestion(改善案) のための、 improvement_points を reasoning する
-   - ユーザーがそのまま返信に利用できる suggestion(改善案)を出力する
+   - ユーザーがそのまま返信に利用できる suggestion(改善案)を出力する。読みやすいように改行も適切に入れる。
 
 ## 入力仕様
 - thread_context: 会話履歴（文脈理解のための参考情報。重要：これまでの発言の流れと関係性を必ず考慮。最新の書き込みでユーザーがメンションされている可能性が高い。）

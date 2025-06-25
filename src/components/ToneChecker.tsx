@@ -29,8 +29,10 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
   const [lastAnalyzedText, setLastAnalyzedText] = useState("");
+
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
+  const [currentAnalyzingText, setCurrentAnalyzingText] = useState<string>("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>();
 
@@ -46,7 +48,11 @@ const analyzeText = useCallback(
       return;
     }
 
+    // 既に同じテキストを解析中の場合は何もしない
+    if (isAnalyzing && currentAnalyzingText === textToAnalyze) return;
+
     setIsAnalyzing(true);
+    setCurrentAnalyzingText(textToAnalyze);
     const startTime = Date.now();
 
     try {
@@ -122,42 +128,53 @@ const analyzeText = useCallback(
       console.log("=== 解析終了 ===");
     }
   },
-  [threadContext, isJapanese, log]
+  [threadContext, isJapanese, log, isAnalyzing, currentAnalyzingText]
 );
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
-    setUserDraft(value);
+      setUserDraft(value);
+      
+      // テキストが変更されたら反映状態をリセット（ユーザーが編集を始めたため）
+      if (hasAcceptedSuggestion && value !== suggestion?.suggestion) {
+        setHasAcceptedSuggestion(false);
+      }
 
-    // Clear existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+      // Clear existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
 
-    // Set new timeout for analysis
-    timeoutRef.current = setTimeout(() => {
-      analyzeText(value);
-    }, 1000); // 1 second delay
-  };
-  // Accept suggestion
-  const acceptSuggestion = async () => {
-    if (suggestion?.suggestion) {
-      // 元のテキストを保存
-      setOriginalText(userDraft);
-      // 全文を置換
-      setUserDraft(suggestion.suggestion);
-      setLastAnalyzedText(suggestion.suggestion);
-      setHasAcceptedSuggestion(true);
-      textareaRef.current?.focus();
+      // 反映ボタンが押された後は自動解析しない
+      if (hasAcceptedSuggestion) {
+        return;
+      }
 
-      // ログ記録
-      await log("suggestion_accepted", {
-        action: "accept",
-        previousText: userDraft,
-        newText: suggestion.suggestion,
-      });
-    }
-  };
+      // Set new timeout for analysis
+      timeoutRef.current = setTimeout(() => {
+        analyzeText(value);
+      }, 3000); // 3 seconds delay
+    };
+    
+    // Accept suggestion
+    const acceptSuggestion = async () => {
+      if (suggestion?.suggestion) {
+        // 元のテキストを保存
+        setOriginalText(userDraft);
+        // 全文を置換
+        setUserDraft(suggestion.suggestion);
+        setLastAnalyzedText(suggestion.suggestion);
+        setHasAcceptedSuggestion(true);
+        textareaRef.current?.focus();
+
+        // ログ記録
+        await log("suggestion_accepted", {
+          action: "accept",
+          previousText: userDraft,
+          newText: suggestion.suggestion,
+        });
+      }
+    };
 
   // Revert to original text
   const revertToOriginal = async () => {
@@ -272,7 +289,8 @@ const analyzeText = useCallback(
               <div className="absolute bottom-2 right-2">
                 <button
                   onClick={() => analyzeText(userDraft)}
-                  disabled={userDraft.trim().length < 15 || isAnalyzing}
+                  disabled={userDraft.trim().length < 15 || (suggestion !== null && lastAnalyzedText === userDraft)}
+
                   className={`
                     p-2 rounded-md transition-all duration-200
                     ${userDraft.trim().length >= 15 && !isAnalyzing
