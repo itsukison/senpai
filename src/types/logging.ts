@@ -16,6 +16,7 @@ export type LogEventType =
 export interface AnalysisCompletedData {
   context: string;
   originalMessage: string;
+  issue_pattern?: string[];  // 追加
   aiResponse: {
     hasIssues: boolean;
     ai_receipt?: string;
@@ -23,10 +24,10 @@ export interface AnalysisCompletedData {
     suggestion?: string;
     reasoning?: string;
     issues?: string[];
+    issue_pattern?: string[];  // 追加
   };
-  processingTime?: number; // ミリ秒
+  processingTime?: number;
 }
-
 export interface UserActionData {
   action: string;
   previousText?: string;

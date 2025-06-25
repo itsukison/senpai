@@ -62,15 +62,15 @@ export default function Home() {
             </h1>
             <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold px-4">
               {isJapanese
-                ? "リアルタイムで敬意、明確さ、プロフェッショナリズムを持ってコミュニケーションを取るためのプロフェッショナルライティングアシスタント。"
-                : "Professional writing assistant that helps you communicate with respect, clarity, and professionalism in real-time."}
+                ? "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ。"
+                : "AI-enhanced workplace messaging. Professional communication that moves teams forward."}
             </p>
           </div>
         </div>
       </div>
 
       {/* Main Content - Flex container that takes remaining space */}
-      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white overflow-hidden mb-14">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white mb-14">
         <ToneChecker isJapanese={isJapanese} />
       </div>
 

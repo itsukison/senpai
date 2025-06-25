@@ -6,14 +6,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
 import { createConvo } from "@/lib/actions";
 
+// 変更後
 interface ToneAnalysis {
   hasIssues: boolean;
   originalText: string;
   suggestion: string | null;
-  issues: string[];
+//  issues: string[];
   reasoning: string;
   ai_receipt?: string;
   improvement_points?: string;
+  issue_pattern?: string[];      // 追加
+  detected_mentions?: string[];  // 追加
 }
 
 interface ToneCheckerProps {
@@ -32,163 +35,101 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>();
 
-  // Get newly added text for analysis with better sentence detection
-  const getNewlyTypedText = useCallback(
-    (currentText: string, previousText: string) => {
-      if (!previousText || currentText.length <= previousText.length) {
-        // If it's the first time or text was deleted, analyze last sentence
-        const cursorPos =
-          textareaRef.current?.selectionStart || currentText.length;
-        const textBeforeCursor = currentText.substring(0, cursorPos);
+// Debounced analysis function - analyze full text
+const analyzeText = useCallback(
+  async (textToAnalyze: string) => {
+    console.log("=== 解析開始 ===");
+    console.log("入力文字数:", textToAnalyze.length);
+    console.log("入力内容:", textToAnalyze);
+    
+    if (!textToAnalyze.trim() || textToAnalyze.length < 15) {
+      setSuggestion(null);
+      return;
+    }
 
-        // Find the last complete sentence
-        const sentences = textBeforeCursor
-          .split(/[.!?]+/)
-          .filter((s) => s.trim().length > 0);
-        if (sentences.length > 0) {
-          return sentences[sentences.length - 1].trim();
-        }
-        return currentText.length > 50
-          ? currentText.substring(0, 50)
-          : currentText;
+    setIsAnalyzing(true);
+    const startTime = Date.now();
+
+    try {
+      const requestBody = {
+        user_draft: textToAnalyze,
+        thread_context: threadContext,
+        language: isJapanese ? "japanese" : "english",
+      };
+      console.log("APIリクエスト:", requestBody);
+
+      const response = await fetch("/api/check-tone", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log("APIレスポンスステータス:", response.status);
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze text");
       }
 
-      // Find the newly added portion
-      const newText = currentText.substring(previousText.length);
+      const analysis: ToneAnalysis = await response.json();
+      console.log("APIレスポンス内容:", analysis);
 
-      // If just a few characters were added, analyze the current sentence/phrase
-      if (newText.trim().length < 10) {
-        const cursorPos =
-          textareaRef.current?.selectionStart || currentText.length;
+      // 変更後
+      await log("analysis_completed", {
+        context: threadContext,
+        originalMessage: textToAnalyze,
+        issue_pattern: analysis.issue_pattern || [],  // 追加
+        aiResponse: {
+          hasIssues: analysis.hasIssues,
+          ai_receipt: analysis.ai_receipt,
+          improvement_points: analysis.improvement_points,
+          suggestion: analysis.suggestion || undefined,
+          reasoning: analysis.reasoning,
+          issues: analysis.issues,
+          issue_pattern: analysis.issue_pattern || [],  // 追加
+        },
+        processingTime: Date.now() - startTime,
+      });
 
-        // Look for sentence boundaries around the cursor
-        const beforeCursor = currentText.substring(0, cursorPos);
-        const afterCursor = currentText.substring(cursorPos);
-
-        // Find sentence start (look for . ! ? followed by space, or start of text)
-        const sentenceStarts = Array.from(beforeCursor.matchAll(/[.!?]\s+/g));
-        const sentenceStart =
-          sentenceStarts.length > 0
-            ? sentenceStarts[sentenceStarts.length - 1].index +
-              sentenceStarts[sentenceStarts.length - 1][0].length
-            : 0;
-
-        // Find sentence end (next . ! ? or end of text)
-        const sentenceEndMatch = afterCursor.match(/[.!?]/);
-        const sentenceEnd =
-          sentenceEndMatch && sentenceEndMatch.index !== undefined
-            ? cursorPos + sentenceEndMatch.index + 1
-            : currentText.length;
-
-        const sentence = currentText
-          .substring(sentenceStart, sentenceEnd)
-          .trim();
-        return sentence.length > 10 ? sentence : newText;
-      }
-
-      // For longer additions, include some context
-      const contextStart = Math.max(0, previousText.length - 30);
-      return currentText.substring(contextStart);
-    },
-    []
-  );
-
-  // Debounced analysis function with smart text detection
-  const analyzeText = useCallback(
-    async (textToAnalyze: string) => {
-      if (!textToAnalyze.trim() || textToAnalyze.length < 10) {
-        setSuggestion(null);
-        return;
-      }
-      // Get only the newly typed content for analysis
-      const newContent = getNewlyTypedText(textToAnalyze, lastAnalyzedText);
-      console.log("Analyzing text:", newContent); // デバッグ用
-
-      if (!newContent.trim() || newContent.length < 10) {
-        console.log("Text too short, skipping analysis"); // デバッグ用
-        return;
-      }
-
-      setIsAnalyzing(true);
-      const startTime = Date.now(); // 処理時間計測用
-
+      // Log analysis data to Supabase
       try {
-        const response = await fetch("/api/check-tone", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_draft: newContent,
-            thread_context: threadContext,
-            language: isJapanese ? "japanese" : "english",
-          }),
+        const result = await createConvo({
+          input: textToAnalyze,
+          feedback: analysis.suggestion || ""
         });
-
-        if (!response.ok) {
-          throw new Error("Failed to analyze text");
-        }
-
-        const analysis: ToneAnalysis = await response.json();
-        console.log("API Response:", analysis); // デバッグ用
-
-        // AI分析完了ログを記録
-        await log("analysis_completed", {
-          context: threadContext,
-          originalMessage: newContent,
-          aiResponse: {
-            hasIssues: analysis.hasIssues,
-            ai_receipt: analysis.ai_receipt,
-            improvement_points: analysis.improvement_points,
-            suggestion: analysis.suggestion || undefined,
-            reasoning: analysis.reasoning,
-            issues: analysis.issues,
-          },
-          processingTime: Date.now() - startTime,
-        });
-
-        // Log analysis data to Supabase
-        try {
-          const result = await createConvo({
-            input: newContent,
-            feedback: analysis.suggestion || ""
-          });
-          
-          if (result) {
-            console.log("Successfully logged to Supabase");
-          } else {
-            console.warn("Failed to log to Supabase, but continuing with analysis");
-          }
-        } catch (error) {
-          console.error("Error logging to Supabase:", error);
-          // Don't let Supabase errors break the analysis flow
-        }
-
-        console.log(
-          "hasIssues:",
-          analysis.hasIssues,
-          "suggestion:",
-          analysis.suggestion
-        ); // デバッグ用
-
-        if (analysis.hasIssues && analysis.suggestion) {
-          setSuggestion(analysis);
-          console.log("Suggestion set!"); // デバッグ用
+        
+        if (result) {
+          console.log("Successfully logged to Supabase");
         } else {
-          setSuggestion(null);
-          console.log("No suggestion set"); // デバッグ用
+          console.warn("Failed to log to Supabase, but continuing with analysis");
         }
-
-        setLastAnalyzedText(textToAnalyze);
       } catch (error) {
-        console.error("Error analyzing text:", error);
-        setSuggestion(null);
-      } finally {
-        setIsAnalyzing(false);
+        console.error("Error logging to Supabase:", error);
       }
-    },
-    [lastAnalyzedText, getNewlyTypedText, threadContext, isJapanese, log]
-  );
+
+      console.log("hasIssues:", analysis.hasIssues);
+      console.log("suggestion:", analysis.suggestion);
+
+      if (analysis.hasIssues && analysis.suggestion) {
+        console.log("提案を設定します");
+        setSuggestion(analysis);
+      } else {
+        console.log("提案なし - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
+        setSuggestion(null);
+      }
+
+      setLastAnalyzedText(textToAnalyze);
+    } catch (error) {
+      console.error("エラー詳細:", error);
+      setSuggestion(null);
+    } finally {
+      setIsAnalyzing(false);
+      console.log("=== 解析終了 ===");
+    }
+  },
+  [threadContext, isJapanese, log]
+);
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
@@ -204,26 +145,22 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       analyzeText(value);
     }, 1000); // 1 second delay
   };
-
   // Accept suggestion
   const acceptSuggestion = async () => {
     if (suggestion?.suggestion) {
       // 元のテキストを保存
       setOriginalText(userDraft);
-      // Replace the problematic part with the suggestion
-      const newContent = getNewlyTypedText(userDraft, lastAnalyzedText);
-      const newText = userDraft.replace(newContent, suggestion.suggestion);
-      setUserDraft(newText);
-      setLastAnalyzedText(newText);
+      // 全文を置換
+      setUserDraft(suggestion.suggestion);
+      setLastAnalyzedText(suggestion.suggestion);
       setHasAcceptedSuggestion(true);
-      // setSuggestion(null); // 提案を消さない
       textareaRef.current?.focus();
 
       // ログ記録
       await log("suggestion_accepted", {
         action: "accept",
         previousText: userDraft,
-        newText: newText,
+        newText: suggestion.suggestion,
       });
     }
   };
@@ -267,23 +204,23 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       ? "過去のやりとり・会話の履歴"
       : "Conversation Context",
     contextPlaceholder: isJapanese
-      ? "よろしければ、Slack/Teamsから、これまでの会話履歴をここにコピー＆ペーストして、AIが文脈を理解するのを助けてください。(なくても動きます)"
+      ? "SlackやTeamsから、これまでの会話履歴をここにコピー & ペーストして、SenpAI Senseiが文脈を理解するのを助けてください。(回答の精度が上がります)"
       : "Paste your conversation history here so the AI can understand the context...",
     writeTitle: isJapanese
       ? "投稿予定のメッセージを書く"
       : "Write your message",
     writePlaceholder: isJapanese
-      ? "ここに、これから相手に送ろうとしているメッセージを入力してください...。入力が進むと、自動的にAIの解析が始まります"
+      ? "ここに、これから相手に送ろうとしているメッセージを入力してください。　入力が進むと、自動的にAIの解析が始まります。"
       : "Start typing your message here... We'll help you make it more professional and respectful.",
-    analyzing: isJapanese ? "分析中..." : "Analyzing...",
+    analyzing: isJapanese ? "分析中......" : "Analyzing...",
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="flex-1 flex flex-col h-full overflow-visible">
       {/* Responsive Grid Container */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0">
         {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-0">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px]">
           {/* Context Header */}
           <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
             <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
@@ -306,7 +243,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         {/* Right Side Container - Message Input and Suggestions stacked vertically */}
         <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0">
           {/* Message Input - Top of right side */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-0">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-[200px]">
             {/* Header */}
             <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
               <div className="flex items-center justify-between">
@@ -333,9 +270,51 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
                 value={userDraft}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder={labels.writePlaceholder}
-                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
+                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full pb-12"
                 style={{ fontFamily: "Inter, sans-serif" }}
               />
+
+              {/* Slack風送信ボタン */}
+              <div className="absolute bottom-2 right-2">
+                <button
+                  onClick={() => analyzeText(userDraft)}
+                  disabled={userDraft.trim().length < 15 || isAnalyzing}
+                  className={`
+                    p-2 rounded-md transition-all duration-200
+                    ${userDraft.trim().length >= 15 && !isAnalyzing
+                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md' 
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }
+                  `}
+                  title={
+                    isAnalyzing
+                      ? isJapanese ? "解析中..." : "Analyzing..."
+                      : userDraft.trim().length < 15
+                      ? isJapanese ? "15文字以上入力してください" : "Enter at least 15 characters"
+                      : isJapanese ? "メッセージを解析" : "Analyze message"
+                  }
+                >
+                  {isAnalyzing ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg 
+                      className={`w-5 h-5 transform transition-transform duration-200 ${
+                        userDraft.trim().length >= 15 ? 'rotate-90' : 'rotate-45'
+                      }`}
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -355,9 +334,9 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
                 />
               ) : (
                 <div className="flex-1 flex items-center justify-center bg-slate-50 p-3 sm:p-4">
-                  <p className="text-slate-500 text-sm sm:text-base font-medium text-center max-w-xs">
+                  <p className="text-slate-500 text-sm sm:text-base font-medium text-center max-w-sm whitespace-pre-line">
                     {isJapanese
-                      ? "メッセージを入力すると、SenpAI Senseiによる、メッセージの改善案がここに表示されます"
+                      ? "メッセージを入力するとSenpAI Senseiによる\nメッセージの改善案がここに表示されます"
                       : "Tone suggestions will appear here as you type your message"}
                   </p>
                 </div>

@@ -101,9 +101,13 @@ export function ToneSuggestion({
           {/* ヘッダー with 💡 アイコン */}
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">💡</span>
+              <span className="text-2xl">
+                {suggestion.hasIssues ? '💡' : '❤️'}
+              </span>
               <h3 className="text-base font-bold text-slate-800">
-                {labels.title}
+                {suggestion.hasIssues 
+                  ? labels.title 
+                  : isJapanese ? "素敵な文章です" : "Great message!"}
               </h3>
             </div>
             <button
@@ -166,7 +170,32 @@ export function ToneSuggestion({
 
           {/* 改善ポイント - 黄色背景 */}
           {/* バックエンドが対応するまでは issues を結合して表示 */}
-          {(suggestion.improvement_points || suggestion.issues.length > 0) && (
+          {suggestion.hasIssues ? (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {labels.improvementTitle}
+              </h4>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {suggestion.improvement_points}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {isJapanese ? "Goodポイント" : "Strengths"}
+              </h4>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {suggestion.improvement_points}
+                </p>
+              </div>
+            </div>
+          )}
+
+
+          {(suggestion.improvement_points) && (
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-slate-700">
                 {labels.improvementTitle}
@@ -202,17 +231,25 @@ export function ToneSuggestion({
             </div>
           </div> */}
 
-          {/* 改善案 - 緑色背景 */}
-          {suggestion.suggestion && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-slate-700">
-                {labels.suggestionTitle}
-              </h4>
-              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
-                  {suggestion.suggestion}
-                </p>
+          {/* 改善案またはOKメッセージ */}
+          {suggestion.hasIssues ? (
+            suggestion.suggestion && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-slate-700">
+                  {labels.suggestionTitle}
+                </h4>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                  <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                    {suggestion.suggestion}
+                  </p>
+                </div>
               </div>
+            )
+          ) : (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <p className="text-sm text-blue-800 font-medium">
+                {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
+              </p>
             </div>
           )}
 
