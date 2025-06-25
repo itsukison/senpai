@@ -133,6 +133,16 @@ user_draft: "@同僚A 資料まだ？急いで"
 3. [ ] 新たなメンションを勝手に追加していないか
 4. [ ] 改善案はuser_draftの文脈に適しているか
 
+## 改善案の出力形式
+改善案（suggestion）を出力する際は、読みやすさを重視して以下の形式に従う：
+- 視覚的な区切りを作る(例えば、2-3文ごとに改行（\n）を入れる）
+- 箇条書きを使う場合は、各項目の前に改行を入れる
+- 長い文章は意味のまとまりで段落に分け、段落間に空行（\n\n）を入れる
+- メンションの後は改行を入れて、メッセージ本文を開始する
+
+例：
+"@田中 さん\nお忙しいところ恐れ入りますが、プロジェクトの進捗を教えていただけますでしょうか。\n\n特に以下の点について確認させてください：\n・現在の完成度\n・予定との差異\n・サポートが必要な箇所\n\nお手すきの際にご連絡いただければ幸いです。"
+
 ## 出力フォーマット（厳守）
 JSON オブジェクトのみを返す。説明文・コードブロック禁止。
 キー順と文字数制約を厳守（句読点・改行もカウント）：
@@ -250,6 +260,18 @@ Before outputting improvement, verify:
 2. [ ] thread_context content is not confused with improvement target
 3. [ ] No new mentions are added arbitrarily
 4. [ ] Improvement fits user_draft context
+
+
+## Suggestion Output Format
+When outputting suggestions, prioritize readability by following these formatting rules:
+- Add line breaks (\n) every 2-3 sentences to create visual separation
+- When using bullet points, add a line break before each item
+- Divide long text into meaningful paragraphs with blank lines (\n\n) between them
+- After mentions, add a line break before starting the message body
+
+Example:
+"@John\nI hope this message finds you well. Could you please update me on the project progress?\n\nI'd particularly appreciate information on:\n• Current completion status\n• Any deviations from the schedule\n• Areas where you might need support\n\nPlease let me know when you have a chance."
+
 
 ## Output Format (Strict)
 Return only JSON object. No explanations or code blocks.
