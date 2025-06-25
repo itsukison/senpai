@@ -29,10 +29,10 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
   const [lastAnalyzedText, setLastAnalyzedText] = useState("");
-
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
   const [currentAnalyzingText, setCurrentAnalyzingText] = useState<string>("");
+  const [isUserInitiatedAnalysis, setIsUserInitiatedAnalysis] = useState(false); // ユーザーがボタンを押したか  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>();
 
@@ -125,6 +125,7 @@ const analyzeText = useCallback(
       setSuggestion(null);
     } finally {
       setIsAnalyzing(false);
+      setIsUserInitiatedAnalysis(false); // 解析終了時にリセット
       console.log("=== 解析終了 ===");
     }
   },
@@ -133,29 +134,28 @@ const analyzeText = useCallback(
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
-      setUserDraft(value);
-      
-      // テキストが変更されたら反映状態をリセット（ユーザーが編集を始めたため）
-      if (hasAcceptedSuggestion && value !== suggestion?.suggestion) {
+    setUserDraft(value);
+    
+    // Clear existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // 反映ボタンが押された後の編集では自動解析しない
+    if (hasAcceptedSuggestion) {
+      // テキストが変更されたら反映状態をリセット（でも自動解析はしない）
+      if (value !== suggestion?.suggestion) {
         setHasAcceptedSuggestion(false);
       }
+      return; // 自動解析しない
+    }
 
-      // Clear existing timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+    // Set new timeout for analysis
+    timeoutRef.current = setTimeout(() => {
+      analyzeText(value);
+    }, 3000); // 3 seconds delay
+  };
 
-      // 反映ボタンが押された後は自動解析しない
-      if (hasAcceptedSuggestion) {
-        return;
-      }
-
-      // Set new timeout for analysis
-      timeoutRef.current = setTimeout(() => {
-        analyzeText(value);
-      }, 3000); // 3 seconds delay
-    };
-    
     // Accept suggestion
     const acceptSuggestion = async () => {
       if (suggestion?.suggestion) {
@@ -286,43 +286,80 @@ const analyzeText = useCallback(
               />
 
               {/* Slack風送信ボタン */}
-              <div className="absolute bottom-2 right-2">
-                <button
-                  onClick={() => analyzeText(userDraft)}
-                  disabled={userDraft.trim().length < 15 || (suggestion !== null && lastAnalyzedText === userDraft)}
+              <div className="absolute bottom-2 right-4">
 
+                <button
+                  onClick={() => {
+                    if (userDraft.trim().length < 15) return;
+                    
+                    // 既に解析済みで同じテキストの場合
+                    if (!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft) {
+                      return; // 何もしない
+                    }
+                    
+                    // ユーザーがボタンを押したことを記録
+                    setIsUserInitiatedAnalysis(true);
+                    
+                    // 既に解析中の場合は、フラグを立てるだけ
+                    if (isAnalyzing && currentAnalyzingText === userDraft) {
+                      return;
+                    }
+                    
+                    // 解析を実行
+                    analyzeText(userDraft);
+                  }}
+
+                  disabled={userDraft.trim().length < 15}
                   className={`
                     p-2 rounded-md transition-all duration-200
-                    ${userDraft.trim().length >= 15 && !isAnalyzing
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md' 
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    ${userDraft.trim().length >= 15
+                      ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
+                        ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
+                        : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md'  // 通常
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
                     }
                   `}
                   title={
-                    isAnalyzing
-                      ? isJapanese ? "解析中..." : "Analyzing..."
-                      : userDraft.trim().length < 15
+                    userDraft.trim().length < 15
                       ? isJapanese ? "15文字以上入力してください" : "Enter at least 15 characters"
-                      : isJapanese ? "メッセージを解析" : "Analyze message"
+                      : !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
+                        ? isJapanese ? "解析済み" : "Already analyzed"
+                        : isJapanese ? "メッセージを解析" : "Analyze message"
                   }
                 >
-                  {isAnalyzing ? (
+                  {/* ユーザーがボタンを押した場合のみローディング表示 */}
+                  {isAnalyzing && isUserInitiatedAnalysis ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <svg 
                       className={`w-5 h-5 transform transition-transform duration-200 ${
-                        userDraft.trim().length >= 15 ? 'rotate-90' : 'rotate-45'
+                        userDraft.trim().length >= 15 
+                          ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
+                            ? 'rotate-0'  // 解析済み
+                            : 'rotate-90'  // 解析可能
+                          : 'rotate-45'  // 無効
                       }`}
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
-                      />
+                      {!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft && userDraft.trim().length >= 15 ? (
+                        // チェックマークアイコン（解析済み）
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M5 13l4 4L19 7" 
+                        />
+                      ) : (
+                        // 紙飛行機アイコン（通常）
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                        />
+                      )}
                     </svg>
                   )}
                 </button>
