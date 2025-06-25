@@ -58,12 +58,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="text-center">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
-              SenpAI<span className="text-purple-800"> Sensei</span>
+              // Sen//pAI<span className="text-purple-800"> Sensei</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold px-4">
               {isJapanese
-                ? "リアルタイムで敬意、明確さ、プロフェッショナリズムを持ってコミュニケーションを取るためのプロフェッショナルライティングアシスタント。"
-                : "Professional writing assistant that helps you communicate with respect, clarity, and professionalism in real-time."}
+                ? "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ。"
+                : "AI-enhanced workplace messaging. Professional communication that moves teams forward."}
             </p>
           </div>
         </div>
