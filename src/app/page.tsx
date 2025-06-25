@@ -58,7 +58,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="text-center">
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
-              // Sen//pAI<span className="text-purple-800"> Sensei</span>
+              SenpAI<span className="text-purple-800"> Sensei</span>
             </h1>
             <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold px-4">
               {isJapanese
