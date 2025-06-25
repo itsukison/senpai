@@ -20,9 +20,9 @@ interface ToneCheckerProps {
 }
 
 export function ToneChecker({ isJapanese }: ToneCheckerProps) {
-  const [text, setText] = useState("");
+  const [userDraft, setUserDraft] = useState("");
   const { log } = useLogging(isJapanese ? "ja" : "en"); // log保存用
-  const [context, setContext] = useState("");
+  const [threadContext, setThreadContext] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
   const [lastAnalyzedText, setLastAnalyzedText] = useState("");
@@ -118,8 +118,8 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            text: newContent,
-            context: context,
+            user_draft: newContent,
+            thread_context: threadContext,
             language: isJapanese ? "japanese" : "english",
           }),
         });
@@ -133,7 +133,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
 
         // AI分析完了ログを記録
         await log("analysis_completed", {
-          context: context,
+          context: threadContext,
           originalMessage: newContent,
           aiResponse: {
             hasIssues: analysis.hasIssues,
@@ -169,12 +169,12 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
         setIsAnalyzing(false);
       }
     },
-    [lastAnalyzedText, getNewlyTypedText, context, isJapanese, log]
+    [lastAnalyzedText, getNewlyTypedText, threadContext, isJapanese, log]
   );
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
-    setText(value);
+    setUserDraft(value);
 
     // Clear existing timeout
     if (timeoutRef.current) {
@@ -191,11 +191,11 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const acceptSuggestion = async () => {
     if (suggestion?.suggestion) {
       // 元のテキストを保存
-      setOriginalText(text);
+      setOriginalText(userDraft);
       // Replace the problematic part with the suggestion
-      const newContent = getNewlyTypedText(text, lastAnalyzedText);
-      const newText = text.replace(newContent, suggestion.suggestion);
-      setText(newText);
+      const newContent = getNewlyTypedText(userDraft, lastAnalyzedText);
+      const newText = userDraft.replace(newContent, suggestion.suggestion);
+      setUserDraft(newText);
       setLastAnalyzedText(newText);
       setHasAcceptedSuggestion(true);
       // setSuggestion(null); // 提案を消さない
@@ -204,7 +204,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       // ログ記録
       await log("suggestion_accepted", {
         action: "accept",
-        previousText: text,
+        previousText: userDraft,
         newText: newText,
       });
     }
@@ -213,7 +213,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   // Revert to original text
   const revertToOriginal = async () => {
     if (originalText) {
-      setText(originalText);
+      setUserDraft(originalText);
       setLastAnalyzedText(originalText);
       setHasAcceptedSuggestion(false);
       setOriginalText("");
@@ -222,7 +222,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       // ログ記録
       await log("suggestion_rejected", {
         action: "reject",
-        previousText: text,
+        previousText: userDraft,
         newText: originalText,
       });
     }
@@ -232,7 +232,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const dismissSuggestion = () => {
     setSuggestion(null);
     // Mark current text as analyzed to avoid re-analyzing
-    setLastAnalyzedText(text);
+    setLastAnalyzedText(userDraft);
   };
 
   // Cleanup timeout on unmount
@@ -249,7 +249,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       ? "過去のやりとり・会話の履歴"
       : "Conversation Context",
     contextPlaceholder: isJapanese
-      ? "よろしければ、Slack/Teamsから、これまでの会話履歴をここにコピー＆ペーストして、AIが文脈を理解を助けてください。(なくても動きます)"
+      ? "よろしければ、Slack/Teamsから、これまでの会話履歴をここにコピー＆ペーストして、AIが文脈を理解するのを助けてください。(なくても動きます)"
       : "Paste your conversation history here so the AI can understand the context...",
     writeTitle: isJapanese
       ? "投稿予定のメッセージを書く"
@@ -276,8 +276,8 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
           {/* Context Text Area */}
           <div className="relative flex-1 flex flex-col min-h-0">
             <Textarea
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
+              value={threadContext}
+              onChange={(e) => setThreadContext(e.target.value)}
               placeholder={labels.contextPlaceholder}
               className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
               style={{ fontFamily: "Inter, sans-serif" }}
@@ -312,7 +312,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
             <div className="relative flex-1 flex flex-col min-h-0">
               <Textarea
                 ref={textareaRef}
-                value={text}
+                value={userDraft}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder={labels.writePlaceholder}
                 className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
@@ -339,7 +339,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
                 <div className="flex-1 flex items-center justify-center bg-slate-50 p-3 sm:p-4">
                   <p className="text-slate-500 text-sm sm:text-base font-medium text-center max-w-xs">
                     {isJapanese
-                      ? "メッセージを入力すると、トーンの提案がここに表示されます"
+                      ? "メッセージを入力すると、SenpAI Senseiによる、メッセージの改善案がここに表示されます"
                       : "Tone suggestions will appear here as you type your message"}
                   </p>
                 </div>
