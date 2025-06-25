@@ -23,7 +23,6 @@ export interface AnalysisCompletedData {
     improvement_points?: string;
     suggestion?: string;
     reasoning?: string;
-    issues?: string[];
     issue_pattern?: string[];  // 追加
   };
   processingTime?: number;

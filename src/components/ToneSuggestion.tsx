@@ -7,10 +7,12 @@ interface ToneAnalysis {
   hasIssues: boolean;
   originalText: string;
   suggestion: string | null;
-  issues: string[];
   reasoning: string;
   ai_receipt?: string; // 新規追加フィールド
   improvement_points?: string; // 新規追加フィールド
+  issue_pattern?: string[];
+  detected_mentions?: string[];
+  // issuesフィールドは削除
 }
 
 interface ToneSuggestionProps {
@@ -194,20 +196,6 @@ export function ToneSuggestion({
             </div>
           )}
 
-
-          {(suggestion.improvement_points) && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-slate-700">
-                {labels.improvementTitle}
-              </h4>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  {suggestion.improvement_points || suggestion.issues.join(" ")}
-                </p>
-              </div>
-            </div>
-          )}
-
           {/* 旧: Suggested improvement セクション（コメントアウト） */}
           {/* <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
             <h4 className="text-sm font-semibold text-emerald-700 mb-2 flex items-center">
@@ -232,24 +220,58 @@ export function ToneSuggestion({
           </div> */}
 
           {/* 改善案またはOKメッセージ */}
-          {suggestion.hasIssues ? (
-            suggestion.suggestion && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-slate-700">
-                  {labels.suggestionTitle}
-                </h4>
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-                  <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
-                    {suggestion.suggestion}
-                  </p>
-                </div>
+          {suggestion.hasIssues && suggestion.suggestion ? (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold text-slate-700">
+                {labels.suggestionTitle}
+              </h4>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <p className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                  {suggestion.suggestion}
+                </p>
               </div>
-            )
-          ) : (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-              <p className="text-sm text-blue-800 font-medium">
-                {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
-              </p>
+            </div>
+          ) : !suggestion.hasIssues && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-blue-800 font-medium">
+                  {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
+                </p>
+                <button
+                  onClick={async () => {
+                    if (suggestion.originalText) {
+                      await navigator.clipboard.writeText(suggestion.originalText);
+                      setShowCopyFeedback(true);
+                      setTimeout(() => setShowCopyFeedback(false), 2000);
+
+                      await log("text_copied", {
+                        action: "copy",
+                        newText: suggestion.originalText,
+                      });
+                    }
+                  }}
+                  className="ml-3 inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-700 bg-white hover:bg-blue-50 border border-blue-300 rounded-md transition-colors"
+                >
+                  <svg
+                    className="w-3.5 h-3.5 mr-1.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
+                  {showCopyFeedback
+                    ? isJapanese
+                      ? "コピーしました！"
+                      : "Copied!"
+                    : labels.copyToClipboard}
+                </button>
+              </div>
             </div>
           )}
 
@@ -281,9 +303,10 @@ export function ToneSuggestion({
             </button>
           </div> */}
 
-          {/* 新: アクションボタン */}
+          {/* アクションボタン */}
           <div className="flex items-center justify-start space-x-3 pt-3">
-            {!hasAcceptedSuggestion && (
+            {/* hasIssuesがtrueで、suggestionがある場合のみ「反映」ボタンを表示 */}
+            {suggestion.hasIssues && suggestion.suggestion && !hasAcceptedSuggestion && (
               <button
                 onClick={onAccept}
                 className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors shadow-sm"
@@ -304,41 +327,46 @@ export function ToneSuggestion({
                 {labels.accept}
               </button>
             )}
-            <button
-              onClick={async () => {
-                if (suggestion.suggestion) {
-                  await navigator.clipboard.writeText(suggestion.suggestion);
-                  setShowCopyFeedback(true);
-                  setTimeout(() => setShowCopyFeedback(false), 2000);
 
-                  // ログ記録
-                  await log("text_copied", {
-                    action: "copy",
-                    newText: suggestion.suggestion,
-                  });
-                }
-              }}
-              className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors relative"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* hasIssuesがtrueで、suggestionがある場合のみコピーボタンを表示 */}
+            {suggestion.hasIssues && suggestion.suggestion && (
+              <button
+                onClick={async () => {
+                  if (suggestion.suggestion) {
+                    await navigator.clipboard.writeText(suggestion.suggestion);
+                    setShowCopyFeedback(true);
+                    setTimeout(() => setShowCopyFeedback(false), 2000);
+
+                    await log("text_copied", {
+                      action: "copy",
+                      newText: suggestion.suggestion,
+                    });
+                  }
+                }}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-slate-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors relative"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                />
-              </svg>
-              {showCopyFeedback
-                ? isJapanese
-                  ? "コピーしました！"
-                  : "Copied!"
-                : labels.copyToClipboard}
-            </button>
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                {showCopyFeedback
+                  ? isJapanese
+                    ? "コピーしました！"
+                    : "Copied!"
+                  : labels.copyToClipboard}
+              </button>
+            )}
+
+            {/* 戻すボタン */}
             {hasAcceptedSuggestion && onRevert && (
               <button
                 onClick={onRevert}
@@ -366,125 +394,6 @@ export function ToneSuggestion({
     );
   }
 
-  // ポップアップ版（現在使用していないのでそのまま残す）
-  return (
-    <div
-      className="fixed z-50"
-      style={{
-        bottom: "20px",
-        right: "20px",
-        width: "320px",
-      }}
-    >
-      <div className="bg-slack-white rounded-lg shadow-slack-lg border border-slack-border modal-appear">
-        <div className="p-4">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-              <h3 className="text-slack-darkgray font-semibold text-sm">
-                {labels.title}
-              </h3>
-            </div>
-            <button
-              onClick={onDismiss}
-              className="text-slack-gray hover:text-slack-darkgray transition-colors p-1 rounded hover:bg-slack-lightgray"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          {/* Why this message needs improvement */}
-          <div className="mb-3">
-            <h4 className="text-sm font-medium text-slack-red mb-2 flex items-center">
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {labels.issues}
-            </h4>
-            <ul className="space-y-1">
-              {suggestion.issues.map((issue, index) => (
-                <li
-                  key={index}
-                  className="text-xs text-slack-gray leading-relaxed pl-1"
-                >
-                  • {issue}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Suggested improvement */}
-          <div className="mb-3">
-            <h4 className="text-sm font-medium text-slack-green mb-2 flex items-center">
-              <svg
-                className="w-4 h-4 mr-1"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {labels.suggestion}
-            </h4>
-            <div className="bg-slack-lightgray rounded-lg p-3 border border-slack-green/30">
-              <p className="text-slack-darkgray text-sm leading-relaxed">
-                "{suggestion.suggestion}"
-              </p>
-            </div>
-          </div>
-
-          {/* Brief reasoning */}
-          {suggestion.reasoning && (
-            <div className="mb-3">
-              <p className="text-xs text-slack-gray leading-relaxed">
-                <span className="font-medium text-slack-darkgray">
-                  {labels.why}
-                </span>{" "}
-                {suggestion.reasoning}
-              </p>
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex items-center justify-end space-x-2 mt-4">
-            <button
-              onClick={onDismiss}
-              className="px-3 py-1.5 text-xs text-slack-gray hover:text-slack-darkgray border border-slack-border rounded-md transition-colors hover:bg-slack-lightgray"
-            >
-              {labels.ignore}
-            </button>
-            <button
-              onClick={onAccept}
-              className="px-4 py-1.5 text-xs font-medium text-white bg-slack-green hover:bg-green-600 rounded-md transition-colors"
-            >
-              {labels.accept}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  // ポップアップ版は使用しない
+  return null;
 }
