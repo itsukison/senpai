@@ -2,8 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ToneCheck - Professional Writing Assistant",
-  description: "Check your writing tone and professionalism in real-time",
+  title: "SenpAI Sensei",
+  description: "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ",
 };
 
 export default function RootLayout({
