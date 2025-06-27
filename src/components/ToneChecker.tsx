@@ -227,11 +227,12 @@ const analyzeText = useCallback(
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-visible">
+    <div className="flex-1 flex flex-col h-full overflow-visible p-2">
       {/* Responsive Grid Container */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0 max-h-[calc(100vh-140px)]">
+
         {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px]">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px] h-full">
           {/* Context Header */}
           <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
             <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
@@ -252,9 +253,9 @@ const analyzeText = useCallback(
         </div>
 
         {/* Right Side Container - Message Input and Suggestions stacked vertically */}
-        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0">
+        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0 h-full">
           {/* Message Input - Top of right side */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-[200px]">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-[40%] min-h-[250px] max-h-[400px]">
             {/* Header */}
             <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
               <div className="flex items-center justify-between">
@@ -368,7 +369,7 @@ const analyzeText = useCallback(
           </div>
 
           {/* Suggestion Box - Bottom of right side */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-0">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-[300px]">
             <div className="flex-1 flex flex-col min-h-0">
               {suggestion ? (
                 <ToneSuggestion
