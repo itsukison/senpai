@@ -68,9 +68,8 @@ export default function Home() {
           </div>
         </div>
       </div>
-
       {/* Main Content - Flex container that takes remaining space */}
-      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white mb-14">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white mb-4 min-h-0">
         <ToneChecker isJapanese={isJapanese} />
       </div>
 

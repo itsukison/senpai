@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-spotify-black font-spotify">{children}</body>
+      <body className="bg-white font-spotify">{children}</body>
     </html>
   );
 }

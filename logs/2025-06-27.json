@@ -1,0 +1,244 @@
+[
+  {
+    "timestamp": "2025-06-27T10:35:27.649Z",
+    "sessionId": "session_1751019676728_qrxr6ss7r",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "明るいトーンで感謝の気持ちを伝えていて素晴らしいです！",
+        "improvement_points": "感謝の表現が非常に良く、ポジティブな雰囲気を醸し出しています。具体的な進捗も明示されており、相手に安心感を与えています。",
+        "suggestion": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！",
+        "reasoning": "",
+        "issue_pattern": []
+      },
+      "processingTime": 3936
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:35:51.474Z",
+    "sessionId": "session_1751019676728_qrxr6ss7r",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n\nまだまだあるでしかし",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "とても明確で感謝の気持ちが伝わるメッセージですね。相手への配慮が感じられます。",
+        "improvement_points": "感謝の表現が豊かで、相手に対する配慮がしっかりと伝わっています。また、具体的な行動予定が示されているため、相手も安心できる内容です。",
+        "suggestion": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n\nまだまだあるでしかし",
+        "reasoning": "",
+        "issue_pattern": []
+      },
+      "processingTime": 4540
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:36:09.768Z",
+    "sessionId": "session_1751019676728_qrxr6ss7r",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n\nめっちゃ困ってんねんけど？",
+      "issue_pattern": [
+        "PoorFollowup"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "お忙しい中、ありがとうございます！進捗についての報告も助かります。困っている状況も理解しました。",
+        "improvement_points": "感情的な表現を具体的な指示に置き換え、相手にどのようにサポートできるかを示すことで、より効果的なコミュニケーションが可能になります。また、困っている状況についても具体的に伝えることで、相手に理解を促すことが重要です。",
+        "suggestion": "@相手の名前\nありがとうございます！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時に処理していきます。\n\nただ、今少し困っていることがあるので、もしお時間があればお話しできればと思います。どのようにサポートできるか、一緒に考えてみましょう。",
+        "reasoning": "感情的な表現を具体的な指示や依頼に変えることで、相手にとって行動しやすくなります。また、困っている状況を明確に伝えることで、相手がその問題に対して理解を示しやすくなり、より建設的なコミュニケーションが生まれます。",
+        "issue_pattern": [
+          "PoorFollowup"
+        ]
+      },
+      "processingTime": 6742
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:36:10.286Z",
+    "sessionId": "session_1751019676728_qrxr6ss7r",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n\nめっちゃ困ってんねんけど？",
+      "issue_pattern": [
+        "RudeFeedback"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "お忙しい中、しっかりとご対応いただきありがとうございます。困っている状況を理解しました。",
+        "improvement_points": "感情的な表現を具体的な指示や質問に変えることで、相手に理解を促し、協力を得やすくします。また、困っている状態を伝える際には、もう少し具体的な内容を加えると、相手が適切にサポートしやすくなります。",
+        "suggestion": "@相手の名前\nありがとうございます！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時に処理していきます。\n\nただ、実は少し困っていることがあるので、もしお時間があれば相談させていただけますか？具体的には、〇〇の件についてお力を貸していただけると助かります。",
+        "reasoning": "感情的な表現を具体的な指示や質問に変えることで、相手に理解を促し、協力を得やすくします。また、困っている状態を伝える際には、もう少し具体的な内容を加えると、相手が適切にサポートしやすくなります。",
+        "issue_pattern": [
+          "RudeFeedback"
+        ]
+      },
+      "processingTime": 6596
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:42:17.224Z",
+    "sessionId": "session_1751019676728_qrxr6ss7r",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "\n\n\n\n\n\n",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n４\nめっちゃ困ってんねんけど？\n６\n７\n８\n９\n０\n１\n２\n３\n４\n５",
+      "issue_pattern": [
+        "PoorFollowup",
+        "Ambiguous"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "ご連絡ありがとうございます。進捗状況についての共有は大切ですね。状況をもう少し明確にすることで、相手も理解しやすくなります。",
+        "improvement_points": "メッセージの内容が一部不明瞭で、特に困っている状況について具体的な説明が不足しています。また、次のステップについても明確に指示することで、相手が理解しやすくなります。",
+        "suggestion": "@相手名\nありがとうございます！\nガイドとパンフレットはそれで十分かと思います。\n残りの処理は月曜日の訪問時に行いますが、実は少し困っている点があります。具体的には、どの部分でサポートが必要かを教えていただけますか？\nお手数をおかけしますが、よろしくお願いします。",
+        "reasoning": "メッセージは感謝の意を表していますが、困っている点が具体的に示されていないため、相手がどのようにサポートできるかが不明です。また、次のステップを明確にすることで、相手が行動しやすくなります。",
+        "issue_pattern": [
+          "PoorFollowup",
+          "Ambiguous"
+        ]
+      },
+      "processingTime": 11256
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:45:45.243Z",
+    "sessionId": "session_1751021133676_5jqla2z04",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n４\nめっちゃ困ってんねんけど？\n６\n７\n８\n９\n０\n１\n２\n３\n４\n５",
+      "issue_pattern": [
+        "UnclearInfo"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "状況を共有していただき、ありがとうございます。困っている点について、もう少し具体的に教えていただければと思います。",
+        "improvement_points": "メッセージの中で、感情が伝わる部分があり、良いですが、具体的な困りごとが不明瞭です。相手に理解してもらうために、どのように困っているのか具体的に説明することが重要です。また、数字の羅列は意味が伝わりにくいので、削除するか説明を加えると良いでしょう。",
+        "suggestion": "ありがとうございます！！\nガイドとパンフはそれで十分かと思います。\n残りは月曜日に訪問時処理していきます！！\n\nところで、現在の状況について少し困っていることがあります。具体的には、どの部分で問題が発生しているのか教えていただけますか？\nお手数ですが、よろしくお願いします。",
+        "reasoning": "具体的な困りごとを明確にすることで、相手が理解しやすくなり、適切なサポートを受けることができます。また、感情を表現することは大切ですが、具体的な内容がないと受け手が混乱する可能性があります。",
+        "issue_pattern": [
+          "UnclearInfo"
+        ]
+      },
+      "processingTime": 7454
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:52:03.454Z",
+    "sessionId": "session_1751020789582_6xdupu8zl",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "テキトーにググったら、シュレッダーあるよってアイコンついてましたけど、シュレッダーご用意あったりするんですかね？",
+      "issue_pattern": [
+        "UnclearRequest"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "シュレッダーの有無についての確認ですね。少し曖昧な表現が含まれているので、明確に質問することをお勧めします。",
+        "improvement_points": "質問の意図を明確にし、相手が理解しやすいように具体的に伝えることが重要です。また、相手に行動を促すような表現にすることで、よりスムーズなコミュニケーションが図れます。",
+        "suggestion": "シュレッダーについてお伺いしたいのですが、オフィスにシュレッダーはご用意されていますでしょうか？\n\nもしあれば、どのように利用できるかも教えていただけると助かります。",
+        "reasoning": "具体的な質問をすることで、相手が答えやすくなり、コミュニケーションが円滑になります。また、シュレッダーの利用方法についても尋ねることで、相手の負担を軽減し、より良い情報を得ることができます。",
+        "issue_pattern": [
+          "UnclearRequest"
+        ]
+      },
+      "processingTime": 4417
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:52:38.924Z",
+    "sessionId": "session_1751020789582_6xdupu8zl",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "中澤 俊紀 P\n  31 minutes ago\nハンドシュレッターも2000円であります。少しいいのなら一万円（電動） (edited) \n\n\n\n\n\n\nにっしー(西孝幸)\n  30 minutes ago\nシュレッターもコーポで見ておくので、少しお待ちを！",
+      "originalMessage": "\nテキトーにググったら、シュレッダーあるよってアイコンついてましたけど、シュレッダーご用意あったりするんですかね？",
+      "issue_pattern": [
+        "UnclearRequest"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "シュレッダーの確認をされているのですね。具体的な情報を求める姿勢が良いと思います。",
+        "improvement_points": "依頼内容が不明瞭であるため、具体的にシュレッダーの有無を確認する形にすると良いでしょう。また、相手が答えやすいように質問を明確にすることが重要です。",
+        "suggestion": "@にっしーさん\nシュレッダーの件ですが、コーポにシュレッダーがあるか確認していただけますか？\n\nもしあれば、どのタイプのシュレッダーかも教えていただけると助かります。よろしくお願いします！",
+        "reasoning": "具体的な確認依頼をすることで、相手が答えやすくなります。また、相手に対して感謝の気持ちを表すことで、より良いコミュニケーションが促進されるでしょう。",
+        "issue_pattern": [
+          "UnclearRequest"
+        ]
+      },
+      "processingTime": 4131
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:52:43.446Z",
+    "sessionId": "session_1751020789582_6xdupu8zl",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "中澤 俊紀 P\n  31 minutes ago\nハンドシュレッターも2000円であります。少しいいのなら一万円（電動） (edited) \n\n\n\n\n\n\nにっしー(西孝幸)\n  30 minutes ago\nシュレッターもコーポで見ておくので、少しお待ちを！",
+      "originalMessage": "\nテキトーにググったら、シュレッダーあるよってアイコンついてましたけど、シュレッダーご用意あったりするんですかね？",
+      "issue_pattern": [
+        "UnclearRequest"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "シュレッダーの件についての質問ですね。もう少し具体的にお伝えすると、相手も答えやすくなるかもしれません。",
+        "improvement_points": "質問の意図を明確にすることで、相手が答えやすくなります。また、具体的な情報を求めることで、よりスムーズなコミュニケーションが可能になります。",
+        "suggestion": "@にっしーさん\nシュレッダーについてですが、コーポにご用意があるか確認していただけますか？\n\nネットで見かけたアイコンが気になったので、具体的な情報を教えていただけると助かります。",
+        "reasoning": "相手が答えやすいように具体的な情報を求めることで、コミュニケーションが円滑になります。また、メンションを使うことで、相手に直接的なアプローチができ、より効果的なやり取りが期待できます。",
+        "issue_pattern": [
+          "UnclearRequest"
+        ]
+      },
+      "processingTime": 7349
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:52:58.112Z",
+    "sessionId": "session_1751020789582_6xdupu8zl",
+    "language": "ja",
+    "event": "suggestion_accepted",
+    "data": {
+      "action": "accept",
+      "previousText": "\nテキトーにググったら、シュレッダーあるよってアイコンついてましたけど、シュレッダーご用意あったりするんですかね？",
+      "newText": "@にっしーさん\nシュレッダーについてですが、コーポにご用意があるか確認していただけますか？\n\nネットで見かけたアイコンが気になったので、具体的な情報を教えていただけると助かります。"
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-27T10:52:59.163Z",
+    "sessionId": "session_1751021523472_hh5h9jjfq",
+    "language": "ja",
+    "event": "text_copied",
+    "data": {
+      "action": "copy",
+      "newText": "@にっしーさん\nシュレッダーについてですが、コーポにご用意があるか確認していただけますか？\n\nネットで見かけたアイコンが気になったので、具体的な情報を教えていただけると助かります。"
+    },
+    "ipAddress": "::1"
+  }
+]
