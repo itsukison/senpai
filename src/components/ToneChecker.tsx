@@ -14,8 +14,9 @@ interface ToneAnalysis {
   reasoning: string;
   ai_receipt?: string;
   improvement_points?: string;
-  issue_pattern?: string[];      // 追加
-  detected_mentions?: string[];  // 追加
+  detailed_analysis?: string;    // 新規追加
+  issue_pattern?: string[];
+  detected_mentions?: string[];
 }
 
 interface ToneCheckerProps {
@@ -35,6 +36,30 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [isUserInitiatedAnalysis, setIsUserInitiatedAnalysis] = useState(false); // ユーザーがボタンを押したか  
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>();
+
+  // 関係性セレクター用のstate
+  const [hierarchy, setHierarchy] = useState('peer');
+  const [social_distance, setSocialDistance] = useState('neutral');
+
+  // 距離のサブテキスト
+  const getDistanceSubtext = () => {
+    const subtextMap: { [key: string]: string } = isJapanese
+      ? {
+          'close': '日常的に交流',
+          'somewhat_close': '定期的に交流',
+          'neutral': '業務上の関係',
+          'somewhat_distant': '限定的な接点',
+          'distant': '最小限の接点'
+        }
+      : {
+          'close': 'Daily interaction',
+          'somewhat_close': 'Regular interaction',
+          'neutral': 'Professional relation',
+          'somewhat_distant': 'Limited contact',
+          'distant': 'Minimal contact'
+        };
+    return subtextMap[social_distance] || '';
+  };
 
 // Debounced analysis function - analyze full text
 const analyzeText = useCallback(
@@ -60,8 +85,17 @@ const analyzeText = useCallback(
         user_draft: textToAnalyze,
         thread_context: threadContext,
         language: isJapanese ? "japanese" : "english",
+        hierarchy: hierarchy,
+        social_distance: social_distance,
       };
-      console.log("APIリクエスト:", requestBody);
+      
+      // 送信データの詳細をログ出力
+      console.log("=== APIリクエスト詳細 ===");
+      console.log("language:", requestBody.language);
+      console.log("hierarchy:", requestBody.hierarchy);
+      console.log("social_distance:", requestBody.social_distance);
+      console.log("thread_context長さ:", requestBody.thread_context.length);
+      console.log("完全なリクエストボディ:", JSON.stringify(requestBody, null, 2));
 
       const response = await fetch("/api/check-tone", {
         method: "POST",
@@ -74,11 +108,22 @@ const analyzeText = useCallback(
       console.log("APIレスポンスステータス:", response.status);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("APIエラーレスポンス:", errorText);
         throw new Error("Failed to analyze text");
       }
 
       const analysis: ToneAnalysis = await response.json();
-      console.log("APIレスポンス内容:", analysis);
+      
+      // レスポンスの詳細をログ出力
+      console.log("=== APIレスポンス詳細 ===");
+      console.log("hasIssues:", analysis.hasIssues);
+      console.log("issue_pattern:", analysis.issue_pattern);
+      console.log("ai_receipt:", analysis.ai_receipt);
+      console.log("improvement_points:", analysis.improvement_points);
+      console.log("detailed_analysis:", analysis.detailed_analysis);
+      console.log("suggestion長さ:", analysis.suggestion?.length || 0);
+      console.log("完全なレスポンス:", JSON.stringify(analysis, null, 2));
 
       // 変更後
       await log("analysis_completed", {
@@ -100,11 +145,23 @@ const analyzeText = useCallback(
       try {
         const result = await createConvo({
           input: textToAnalyze,
-          feedback: analysis.suggestion || ""
+          feedback: analysis.suggestion || "",
+          hierarchy: hierarchy,
+          social_distance: social_distance,
+          language: isJapanese ? "japanese" : "english",
+          thread_context: threadContext,
+          issue_pattern: analysis.issue_pattern || [],
+          has_issues: analysis.hasIssues,
+          ai_receipt: analysis.ai_receipt || "",
+          improvement_points: analysis.improvement_points || "",
+          detailed_analysis: analysis.detailed_analysis || "",
+          reasoning: analysis.reasoning || "",
+          detected_mentions: analysis.detected_mentions || [],
+          timestamp: new Date().toISOString()
         });
         
         if (result) {
-          console.log("Successfully logged to Supabase");
+          console.log("Successfully logged to Supabase with full data");
         } else {
           console.warn("Failed to log to Supabase, but continuing with analysis");
         }
@@ -129,7 +186,7 @@ const analyzeText = useCallback(
       console.log("=== 解析終了 ===");
     }
   },
-  [threadContext, isJapanese, log, isAnalyzing, currentAnalyzingText]
+  [threadContext, isJapanese, log, isAnalyzing, currentAnalyzingText, hierarchy, social_distance]
 );
 
   // Handle text change with debouncing
@@ -226,6 +283,102 @@ const analyzeText = useCallback(
     analyzing: isJapanese ? "分析中......" : "Analyzing...",
   };
 
+  // レスポンシブなセレクターコンポーネント
+  const RelationshipSelector = () => {
+    const hierarchyOptionsWithDetails = isJapanese
+      ? [
+          { value: 'junior', label: '後輩・部下' },
+          { value: 'peer', label: '同僚・対等' },
+          { value: 'senior', label: '目上のかた' }
+        ]
+      : [
+          { value: 'junior', label: 'Junior' },
+          { value: 'peer', label: 'Peer' },
+          { value: 'senior', label: 'Senior' }
+        ];
+
+    const distanceOptionsArray = isJapanese
+      ? [
+          { value: 'close', label: '近い' },
+          { value: 'somewhat_close', label: 'やや近' },
+          { value: 'neutral', label: '標準' },
+          { value: 'somewhat_distant', label: 'やや遠' },
+          { value: 'distant', label: '遠い' }
+        ]
+      : [
+          { value: 'close', label: 'Close' },
+          { value: 'somewhat_close', label: 'Rather Close' },
+          { value: 'neutral', label: 'Neutral' },
+          { value: 'somewhat_distant', label: 'Rather Distant' },
+          { value: 'distant', label: 'Distant' }
+        ];
+
+    return (
+      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
+          {/* 宛先セクション */}
+          <div className="flex-1 flex flex-col sm:flex-col">
+            {/* PC版: ラベル上 / モバイル版: ラベル左 */}
+            <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
+              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+                {isJapanese ? '宛先' : 'To'}
+              </p>
+              <div className="flex space-x-1.5 flex-1 w-full">
+                {hierarchyOptionsWithDetails.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setHierarchy(option.value)}
+                    className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:h-auto ${
+                      hierarchy === option.value
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
+                    }`}
+                  >
+                    <p className="text-[10px] font-semibold">
+                      {option.label}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="hidden sm:block w-px bg-purple-200" />
+
+          {/* 距離セクション */}
+          <div className="flex-1 flex flex-col sm:flex-col">
+            {/* PC版: ラベル上 / モバイル版: ラベル左 */}
+            <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
+              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+                {isJapanese ? '距離' : 'Distance'}
+              </p>
+              <div className="bg-white rounded-lg p-0.5 shadow-inner flex space-x-0.5 flex-1 w-full">
+                {distanceOptionsArray.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setSocialDistance(option.value)}
+                    className={`flex-1 py-1 px-1.5 rounded-md text-[10px] font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:h-auto ${
+                      social_distance === option.value
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : 'text-purple-700 hover:bg-purple-50'
+                    }`}
+                  >
+                    <span className="block">{option.label}</span>
+                    {social_distance === option.value && (
+                      <span className="block text-[8px] opacity-80 mt-0.5 whitespace-nowrap">
+                        {getDistanceSubtext()}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex-1 flex flex-col h-full overflow-visible p-2">
       {/* Responsive Grid Container */}
@@ -274,6 +427,9 @@ const analyzeText = useCallback(
                 </div>
               </div>
             </div>
+
+            {/* 関係性セレクター */}
+            <RelationshipSelector />
 
             {/* Text Area */}
             <div className="relative flex-1 flex flex-col min-h-0">

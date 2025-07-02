@@ -1,0 +1,1165 @@
+[
+  {
+    "timestamp": "2025-07-02T15:30:16.809Z",
+    "sessionId": "session_1751470195424_9xmrq5c80",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日の会議の件、A案で進めたいので、関係者への展開をお願いします。",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "シンプルに伝えたい内容をまとめようとされたのですね。ただ、もう少し具体的に示したいお気持ちが伝わってきます。",
+        "improvement_points": "依頼の目的や具体的な対象者、期限を明示することで、相手は迅速かつ正確に対応できるようになります。",
+        "suggestion": "お疲れ様です。\n先日の会議の件ですが、A案で進めたいと考えています。\nつきましては、関係者の皆様に【■■■■ ここに【具体的な展開内容や方法】を補足してください。例：メールで資料を共有し、来週中にフィードバックをいただくよう案内】をお願いします。",
+        "reasoning": "依頼の目的や具体的な行動指示が曖昧で、受け手の行動を迷わせるため、VagueIntentと判断した。",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8228
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T15:30:18.634Z",
+    "sessionId": "session_1751470195424_9xmrq5c80",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日の会議の件、A案で進めたいので、関係者への展開をお願いします。",
+      "issue_pattern": [
+        "VagueIntent",
+        "MissingContext",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "簡潔に伝えようとされている中で、相手にどう伝わるか気を遣うのは大変ですよね。",
+        "improvement_points": "依頼の背景や目的を補足し、具体的な対象者や内容を明示することで、相手の理解と行動が促進されます。また、挨拶や感謝を添えることで、協力的な印象を与えやすくなります。",
+        "suggestion": "お疲れ様です。\n\n先日の会議で話し合った件について、A案で進めたいと考えています。\nつきましては、関係者の皆様にこの方針を共有していただけますでしょうか。\nお手数をおかけしますが、よろしくお願いいたします。",
+        "reasoning": "依頼の目的や対象が曖昧で行動が取りづらく、挨拶や感謝がないため心理的負担が増すと判断したため。",
+        "issue_pattern": [
+          "VagueIntent",
+          "MissingContext",
+          "Impolite"
+        ]
+      },
+      "processingTime": 9580
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T15:31:11.020Z",
+    "sessionId": "session_1751470244609_3r5flt9zw",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、すみません、今担当しているタスク、ちょっと厳しいです…。",
+      "issue_pattern": [
+        "VagueIntent",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司に対して難しい状況を伝えるのは、気を遣う場面ですよね。何とか状況を理解してもらいたいけれど、どう表現すればいいか迷っているお気持ちが伝わってきます。",
+        "improvement_points": "具体的な課題や困難な点を伝えることで、上司は的確な支援がしやすくなります。丁寧な言葉遣いや感謝の表現を加えることで、良好なコミュニケーションが促進されます。",
+        "suggestion": "@上司さん\n\nいつもお世話になっております。現在担当しているタスクについてですが、進捗が思わしくなく、少し厳しい状況です。お忙しいところ恐縮ですが、一度ご相談させていただけますでしょうか？ご助言いただけると大変助かります。",
+        "reasoning": "依頼の意図が曖昧（VagueIntent）で、かつ呼びかけがややぶっきらぼう（Impolite）なため、受け手の負担が増すと判断した。",
+        "issue_pattern": [
+          "VagueIntent",
+          "Impolite"
+        ]
+      },
+      "processingTime": 13926
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:39:58.916Z",
+    "sessionId": "session_1751474361638_o6545rrlv",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 部下: 先日の〇〇の件、無事完了しました！",
+      "originalMessage": "@部下さん、早速の対応ありがとう！本当に助かりました。素晴らしい仕事ぶりです。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "部下の迅速な対応に感謝し、称賛する素晴らしいメッセージですね。良好な関係構築に役立ちます。",
+        "improvement_points": "感謝と称賛がバランスよく含まれており、そのまま使って問題ありません。今後もこのようなポジティブフィードバックを積極的に活用すると良いでしょう。",
+        "suggestion": "@部下さん、早速の対応ありがとう！本当に助かりました。素晴らしい仕事ぶりです。",
+        "reasoning": "No issues; positive, clear appreciation expressed.",
+        "issue_pattern": []
+      },
+      "processingTime": 5985
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:39:59.830Z",
+    "sessionId": "session_1751474361638_o6545rrlv",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 部下: 先日の〇〇の件、無事完了しました！",
+      "originalMessage": "@部下さん、早速の対応ありがとう！本当に助かりました。素晴らしい仕事ぶりです。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "部下の迅速な対応に感謝し、称賛を伝える素敵なメッセージですね。良好な関係構築に役立ちます。",
+        "improvement_points": "感謝と称賛がバランス良く含まれており、このまま使うことで部下のやる気をさらに引き出せます。",
+        "suggestion": "@部下さん、早速の対応ありがとう！本当に助かりました。素晴らしい仕事ぶりです。",
+        "reasoning": "No issues; positive, clear appreciation message.",
+        "issue_pattern": []
+      },
+      "processingTime": 5566
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:40:53.652Z",
+    "sessionId": "session_1751474435685_naphyru96",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、ちょっとご相談したいことがあるのですが、今よろしいでしょうか。例の件でして…。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司に相談したいが、具体的な内容が曖昧で伝わりにくい状況ですね。相手にスムーズに理解してもらうため、もう少し具体的に伝えると良いでしょう。",
+        "improvement_points": "相談したい内容の概要や背景を具体的に示し、上司が内容を把握しやすいようにしましょう。また、「例の件」など曖昧な表現は避けることが重要です。",
+        "suggestion": "@上司、お忙しいところ恐れ入ります。〇〇についてご相談したいことがあるのですが、今お時間をいただけますでしょうか？\n[■■■■ ここに【相談内容の具体的な説明】を補足してください。例：先日お話ししたプロジェクトの進捗についてです。 ■■■■]",
+        "reasoning": "曖昧な表現で内容不明、MissingContextとVagueIntent",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8596
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:40:54.772Z",
+    "sessionId": "session_1751474435685_naphyru96",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、ちょっとご相談したいことがあるのですが、今よろしいでしょうか。例の件でして…。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司に相談したいが、内容が曖昧で伝わりにくい状況ですね。具体的に伝えることでスムーズな対応が期待できます。",
+        "improvement_points": "相談内容の概要や目的を具体的に示し、上司が内容を理解しやすいようにしましょう。例えば、「〇〇の件についてご相談したい」など、簡潔な説明を加えることが効果的です。",
+        "suggestion": "@上司さん\n\nお疲れ様です。〇〇の件についてご相談したいことがあるのですが、今お時間をいただけますでしょうか？",
+        "reasoning": "曖昧な表現で内容不明、対応困難",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 7740
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:41:42.059Z",
+    "sessionId": "session_1751474484317_gentanot4",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 同僚: この機能、実装が大変そうなので、今回は見送りにしませんか？",
+      "originalMessage": "いや、それはユーザーが一番求めている機能だから、絶対に入れるべきです。大変なのは分かりますが、そこを頑張るのが我々の仕事でしょう。",
+      "issue_pattern": [
+        "HarshTone"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "同僚の提案に対して強く反論したいお気持ちが伝わってきます。その熱意を保ちつつ、協力的な関係を維持する表現を考えましょう。",
+        "improvement_points": "断定的な表現を和らげ、相手の意見に共感を示す一言を加えましょう。その上で、ユーザーのニーズの重要性を伝え、協力的に課題解決を目指す姿勢を示すと良いです。",
+        "suggestion": "確かに実装は大変そうですね。そのご懸念もよく分かります。ただ、ユーザーからの要望が非常に高い機能でもあるので、何とか実現できる方法を一緒に考えてみませんか？お互いに協力して乗り越えられればと思います。",
+        "reasoning": "強い断定表現で感情コストが高い",
+        "issue_pattern": [
+          "HarshTone"
+        ]
+      },
+      "processingTime": 10328
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:41:43.943Z",
+    "sessionId": "session_1751474484317_gentanot4",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 同僚: この機能、実装が大変そうなので、今回は見送りにしませんか？",
+      "originalMessage": "いや、それはユーザーが一番求めている機能だから、絶対に入れるべきです。大変なのは分かりますが、そこを頑張るのが我々の仕事でしょう。",
+      "issue_pattern": [
+        "HarshTone"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "同僚の意見に対して強い意見を持っていることが伝わります。その熱意を保ちつつ、より協力的な表現にすると議論が建設的になります。",
+        "improvement_points": "断定的な表現を和らげ、相手の意見に配慮しつつ自分の考えを伝えると、協力的な雰囲気が生まれます。感情的な対立を避け、共通の目標に向かう姿勢を示しましょう。",
+        "suggestion": "同僚さん\n\nご意見ありがとうございます。確かに実装は大変そうですが、ユーザーにとって非常に重要な機能だと思います。難しさを踏まえつつ、どうすれば実現できるか、一緒に検討していければと思います。よろしくお願いします。",
+        "reasoning": "強い断定表現が感情的コストを増大させるため。",
+        "issue_pattern": [
+          "HarshTone"
+        ]
+      },
+      "processingTime": 10112
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:42:38.904Z",
+    "sessionId": "session_1751474535156_h3b96rjby",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "16:00] 営業担当: @ユーザーさん（開発担当）、クライアントから緊急の問い合わせです。「昨日からシステムにログインできない」とのこと。至急、原因調査をお願いできますか？",
+      "originalMessage": "今、別件の緊急リリース作業中で、すぐには見れません。1時間後くらいになります。",
+      "issue_pattern": [
+        "Impolite",
+        "MissingAcknowledgment"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "緊急対応中で手が離せない状況を伝えたいお気持ち、よくわかります。ただ、相手への配慮も少し加えると、より円滑なコミュニケーションになりますね。",
+        "improvement_points": "感謝と謝罪を添え、対応開始時間と今後の連絡予定を伝えると、相手に配慮した誠実な印象を与えられます。",
+        "suggestion": "営業担当さん\n\nお問い合わせをお伝えいただきありがとうございます。現在、別件の緊急リリース作業中のため、すぐに対応できず申し訳ありません。約1時間後には調査を開始できる見込みです。\n進捗があり次第、随時ご連絡いたしますので、よろしくお願いいたします。",
+        "reasoning": "謝意欠如と配慮不足で印象悪化を防ぐため",
+        "issue_pattern": [
+          "Impolite",
+          "MissingAcknowledgment"
+        ]
+      },
+      "processingTime": 11440
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:42:39.465Z",
+    "sessionId": "session_1751474535156_h3b96rjby",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "16:00] 営業担当: @ユーザーさん（開発担当）、クライアントから緊急の問い合わせです。「昨日からシステムにログインできない」とのこと。至急、原因調査をお願いできますか？",
+      "originalMessage": "今、別件の緊急リリース作業中で、すぐには見れません。1時間後くらいになります。",
+      "issue_pattern": [
+        "Impolite",
+        "MissingAcknowledgment"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "緊急対応中で手が離せない状況を伝えつつ、相手への配慮も必要な難しい場面ですね。",
+        "improvement_points": "感謝の気持ちを伝え、事情説明を丁寧にし、対応開始の目安時間を明確に伝えましょう。可能であれば、対応後の報告も約束すると良い印象です。",
+        "suggestion": "@営業担当さん\n\nお問い合わせいただきありがとうございます。現在、別件の緊急リリース作業中のため、すぐには対応できませんが、約1時間後には原因調査を開始できる見込みです。対応が完了次第、改めてご報告いたしますので、よろしくお願いいたします。",
+        "reasoning": "感謝欠如と配慮不足で印象悪化のため改善必要",
+        "issue_pattern": [
+          "Impolite",
+          "MissingAcknowledgment"
+        ]
+      },
+      "processingTime": 10703
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:43:10.433Z",
+    "sessionId": "session_1751474581165_eejroatji",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日の会議の件、A案で進めたいので、関係者への展開をお願いします。",
+      "issue_pattern": [
+        "MissingContext",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "会議の決定事項を速やかに共有したいという意図が伝わりますが、もう少し背景説明と丁寧さを加えるとより良いですね。",
+        "improvement_points": "・「先日の会議の件」や「A案」の具体的内容を補足する。\n・挨拶や感謝の言葉を加え、丁寧な依頼にする。",
+        "suggestion": "お疲れ様です。\n\n先日の会議でご検討いただいた[■■■■ ここに【A案の具体的内容】を補足してください。例：新製品の販売戦略案 ■■■■]について、こちらの案で進めたいと考えております。\nつきましては、関係者の皆様へ展開していただけますと幸いです。ご対応のほど、よろしくお願いいたします。",
+        "reasoning": "不明瞭な指示と丁寧さ不足で認識コスト増大",
+        "issue_pattern": [
+          "MissingContext",
+          "Impolite"
+        ]
+      },
+      "processingTime": 7524
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:43:15.188Z",
+    "sessionId": "session_1751474581165_eejroatji",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日の会議の件、A案で進めたいので、関係者への展開をお願いします。",
+      "issue_pattern": [
+        "MissingContext",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "指示の意図は伝わりますが、背景説明がなく、もう少し丁寧な表現が望ましいですね。",
+        "improvement_points": "・「先日の会議の件」や「A案」の具体的内容を補足する。\n・感謝や丁寧な言い回しを加え、依頼のトーンを柔らかくする。\n・可能であれば展開の期限や方法を明示する。",
+        "suggestion": "お疲れ様です。\n\n先日の会議で話し合った【A案の具体内容】について、こちらの案で進めたいと考えています。\nつきましては、関係者の皆様に展開をお願いできますでしょうか。\n\nお忙しいところ恐れ入りますが、ご対応のほどよろしくお願いいたします。\n\n[■■■■ ここに【A案の具体的な内容や展開先の関係者、期限など】を補足してください。例：『新製品の販売計画に関する内容で、営業部とマーケティング部に本日中に共有をお願いします』 ■■■■]",
+        "reasoning": "不明確な指示と丁寧さ不足で改善必要",
+        "issue_pattern": [
+          "MissingContext",
+          "Impolite"
+        ]
+      },
+      "processingTime": 10076
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:43:49.033Z",
+    "sessionId": "session_1751474605178_px8um1x63",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、すみません、今担当しているタスク、ちょっと厳しいです…。",
+      "issue_pattern": [
+        "VagueIntent",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司にタスクの難しさを伝えたいお気持ち、よく分かります。ただ、もう少し具体的に状況を共有すると、より建設的なサポートが得られやすくなります。",
+        "improvement_points": "具体的にどの部分が厳しいのかを伝え、支援をお願いする姿勢を示しましょう。また、冒頭に簡単な挨拶や感謝の言葉を入れると、より丁寧な印象になります。",
+        "suggestion": "@上司さん\n\nお疲れ様です。現在担当しているタスクについてですが、[■■■■ ここに【具体的にどの部分が厳しいのか、問題点や課題】を補足してください。例：納期が迫っているため、追加のリソースが必要です。 ■■■■]。\nもし可能であれば、ご助言やサポートをいただけますと大変助かります。よろしくお願いいたします。",
+        "reasoning": "曖昧な表現と丁寧さ不足で伝わりにくい。",
+        "issue_pattern": [
+          "VagueIntent",
+          "Impolite"
+        ]
+      },
+      "processingTime": 10105
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T16:43:50.110Z",
+    "sessionId": "session_1751474605178_px8um1x63",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、すみません、今担当しているタスク、ちょっと厳しいです…。",
+      "issue_pattern": [
+        "VagueIntent",
+        "Impolite",
+        "MissingAcknowledgment"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司にタスクの難しさを伝えたいが、もう少し具体的で丁寧な表現が必要ですね。",
+        "improvement_points": "感謝を伝え、具体的な課題を説明し、協力や相談の姿勢を示すことで、上司との信頼関係を保ちつつ問題解決に繋げられます。",
+        "suggestion": "@上司さん\n\nいつもお世話になっております。現在担当しているタスクについてですが、一部の部分で進捗が思わしくなく、少し厳しい状況です。\n具体的には[■■■■ ここに【どの部分が厳しいのか具体的な内容】を補足してください。例：納期までの時間が足りない、技術的に難しい点がある等 ■■■■]。\nお手すきの際に、一度相談させていただけますと幸いです。ご指導のほどよろしくお願いいたします。",
+        "reasoning": "曖昧で丁寧さ欠如、感謝も不足",
+        "issue_pattern": [
+          "VagueIntent",
+          "Impolite",
+          "MissingAcknowledgment"
+        ]
+      },
+      "processingTime": 12917
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T17:00:17.167Z",
+    "sessionId": "session_1751474605178_px8um1x63",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "\"件名：資料作成の件\n\n小林さん\n来週の会議用の資料、早めに作ってください。\n以上。\"",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "ご依頼内容は明確ですが、もう少し丁寧な表現と具体的な指示があると、より良いコミュニケーションになりますね。",
+        "improvement_points": "丁寧な言葉遣いを心がけ、具体的な納期や資料の内容を補足しましょう。感謝の気持ちも伝えると、協力的な関係が築けます。",
+        "suggestion": "件名：来週会議用資料の作成のお願い\n\n小林さん\n\nお疲れ様です。来週の会議に向けて、資料の作成をお願いしたくご連絡しました。\nお手数ですが、[■■■■ ここに【具体的な納期（例：〇月〇日〇時まで）】を補足してください。 ■■■■]までにご準備いただけますと幸いです。\n資料のポイントは[■■■■ ここに【資料の具体的な内容や重点項目】を補足してください。 ■■■■]です。\nご不明点があればお知らせください。いつもありがとうございます。よろしくお願いいたします。",
+        "reasoning": "命令的で曖昧、丁寧さと具体性が不足",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 12799
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T17:00:18.177Z",
+    "sessionId": "session_1751474605178_px8um1x63",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "\"件名：資料作成の件\n\n小林さん\n来週の会議用の資料、早めに作ってください。\n以上。\"",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "簡潔に依頼されていますが、もう少し丁寧さと具体性を加えることで、より良いコミュニケーションになりますね。",
+        "improvement_points": "・挨拶や感謝の言葉を入れて丁寧にする。\n・資料作成の具体的な期限や目的を明示する。\n・依頼の背景や重要性を簡単に伝える。",
+        "suggestion": "件名：来週の会議用資料作成のお願い\n\n小林さん\n\nお疲れ様です。来週の会議に向けて使用する資料の作成をお願いしたくご連絡しました。\nお忙しいところ恐縮ですが、【■■■■ ここに【具体的な期限（例：〇月〇日〇時まで）】を補足してください。 ■■■■】までにご準備いただけますでしょうか。\n資料のポイントは【■■■■ ここに【資料の内容や目的の簡単な説明】を補足してください。 ■■■■】です。\nご対応いただけると大変助かります。よろしくお願いいたします。",
+        "reasoning": "命令的で具体性欠如、丁寧さ不足のため",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 12170
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T17:06:12.557Z",
+    "sessionId": "session_1751475957227_ku3whwyai",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、ちょっとご相談したいことがあるのですが、今よろしいでしょうか。あの件でして…。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司に相談したいが、具体的な内容が伝わらず、どう切り出せばよいか迷われている状況ですね。",
+        "improvement_points": "相談内容の概要や目的を簡潔に示し、相手が話す準備をしやすいようにしましょう。また、曖昧な表現は避け、具体的に伝えることが重要です。",
+        "suggestion": "@上司、お疲れ様です。〇〇についてご相談したいことがあるのですが、今お時間をいただけますでしょうか？",
+        "reasoning": "曖昧な表現で内容不明、具体化が必要",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8261
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T17:06:12.651Z",
+    "sessionId": "session_1751475957227_ku3whwyai",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "@上司、ちょっとご相談したいことがあるのですが、今よろしいでしょうか。あの件でして…。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司に相談を持ちかけたいが、具体的な内容や背景が曖昧で伝わりづらい状況ですね。より明確にすることでスムーズなコミュニケーションが期待できます。",
+        "improvement_points": "「あの件」ではなく、相談内容の概要や目的を具体的に示しましょう。また、相談の重要度や希望する対応時間も伝えると、相手が対応しやすくなります。",
+        "suggestion": "@上司、お疲れ様です。ご相談したい件がございます。〇〇の件についてで、[■■■■ ここに【具体的な相談内容の概要】を補足してください。例：プロジェクトの進捗について確認したいことがあります。 ■■■■] 今お時間をいただけると幸いです。",
+        "reasoning": "曖昧な指示と背景不足で理解困難（MissingContext, VagueIntent）",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 7322
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:22:16.494Z",
+    "sessionId": "session_1751480525162_5hqlsaym1",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "ご依頼内容を承知し、対応期限も明確に伝えられていて、丁寧で適切な返信です。",
+        "improvement_points": "このままお使いいただけます。丁寧で明確な返信文です。",
+        "suggestion": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+        "reasoning": "明確かつ丁寧で問題なし。",
+        "issue_pattern": []
+      },
+      "processingTime": 6599
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:22:16.839Z",
+    "sessionId": "session_1751480525162_5hqlsaym1",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "依頼内容の了承と期限内対応の意志が明確に伝わる、適切な返信ですね。",
+        "improvement_points": "特に改善の必要はありません。このままご使用いただけます。",
+        "suggestion": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+        "reasoning": "No issues; clear and polite confirmation with deadline.",
+        "issue_pattern": []
+      },
+      "processingTime": 8073
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:23:23.595Z",
+    "sessionId": "session_1751480590392_h4vhk81zw",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "明日までにこの資料、修正しといて。",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "依頼の期限は明確ですが、依頼内容がややぶっきらぼうで、何をどう修正すべきかが不明確です。",
+        "improvement_points": "修正すべきポイントを明確にし、丁寧な表現に変えることが重要です。",
+        "suggestion": "お疲れ様です。明日までに、この資料の[■■■■ 欠落: 修正箇所 ■■■■]を修正していただけますでしょうか。お手数をおかけしますが、よろしくお願いいたします。",
+        "reasoning": "Impolite tone and missing specific 'What' info.",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8025
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:23:26.495Z",
+    "sessionId": "session_1751480590392_h4vhk81zw",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "明日までにこの資料、修正しといて。",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "修正依頼ですが、もう少し丁寧な表現と具体的な指示があるとより良いですね。",
+        "improvement_points": "・丁寧な言葉遣いにする\n・修正対象の資料名や修正内容を明示する\n・必要に応じて修正の目的や優先度を伝える",
+        "suggestion": "お疲れ様です。\n\n恐れ入りますが、明日までに「[■■■■ 欠落: 資料名 ■■■■]」の修正をお願いできますでしょうか？\n具体的には、[■■■■ 欠落: 修正内容 ■■■■]を対応いただけると助かります。\n\nお忙しいところ恐縮ですが、よろしくお願いいたします。",
+        "reasoning": "命令形かつ情報不足で不親切。",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 10283
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:24:20.689Z",
+    "sessionId": "session_1751480648977_fe5opp8wa",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日のA社との会議ですが、議事録を関係者に共有しておいていただけますか。",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "議事録の共有依頼ですが、誰にいつまでに共有するかが明確でないため、相手が対応しやすい指示にしたいですね。",
+        "improvement_points": "共有先の具体的な対象者と、いつまでに共有してほしいかを明記しましょう。",
+        "suggestion": "お疲れ様です。先日のA社との会議の議事録について、関係者の皆様（具体的には[■■■■ 欠落: 共有先 ■■■■]）に、[■■■■ 欠落: 期限 ■■■■]までに共有していただけますでしょうか。\n\nお手数ですが、ご確認のほどよろしくお願いいたします。",
+        "reasoning": "Missing 2 critical slots: who and when.",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 10135
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:24:27.124Z",
+    "sessionId": "session_1751480648977_fe5opp8wa",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日のA社との会議ですが、議事録を関係者に共有しておいていただけますか。",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "議事録共有の依頼ですが、誰にいつまでに共有すべきかが明確でないため、受け手が対応しづらい状況です。",
+        "improvement_points": "共有先の具体的な対象者と、共有期限を明示しましょう。これにより、依頼内容が明確になり、スムーズな対応が期待できます。",
+        "suggestion": "お疲れ様です。先日のA社との会議の議事録について、関係者の皆様（具体的な共有先）に、[■■■■ いつまでに共有するか ■■■■]までに共有をお願いいたします。\n\nお手数ですが、ご確認のほどよろしくお願いいたします。",
+        "reasoning": "依頼の対象と期限が不明瞭。",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 14580
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:24:57.595Z",
+    "sessionId": "session_1751480683980_o6ewqpufs",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "例のプロジェクトの件、例の資料を更新して、展開してください。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "プロジェクトや資料の具体名がなく、誰にいつまでに展開するかも不明確ですね。",
+        "improvement_points": "以下のポイントを補足し、明確で実行可能な指示にしましょう。\n・プロジェクト名\n・資料名\n・展開先（誰に）\n・期限",
+        "suggestion": "お疲れ様です。例のプロジェクトの資料更新と展開について、以下の点をご確認のうえ、ご対応をお願いいたします。\n\n--- Missing Info ---\n• プロジェクト名: [■■■■ 欠落: プロジェクト名 ■■■■]\n• 資料名: [■■■■ 欠落: 資料名 ■■■■]\n• 展開先: [■■■■ 欠落: 展開先 ■■■■]\n• 期限: [■■■■ 欠落: 期限 ■■■■]\n---------------------\n\nご確認のほど、よろしくお願いいたします。",
+        "reasoning": "複数の重要情報が欠落し指示が不明確。",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8698
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:25:01.548Z",
+    "sessionId": "session_1751480683980_o6ewqpufs",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "例のプロジェクトの件、例の資料を更新して、展開してください。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "プロジェクト名や資料の詳細、展開先や期限が不明確で、相手が具体的に動きづらい状況ですね。",
+        "improvement_points": "プロジェクト名、資料名、展開先、期限の4点を具体的に補足することで、依頼の明確さと実行可能性が大きく向上します。",
+        "suggestion": "お疲れ様です。〇〇プロジェクトの〇〇資料を更新し、関係者の皆様に展開をお願いします。\n\nお手数ですが、以下の点をご確認・ご追記いただけますでしょうか。\n\n--- Missing Info ---\n• プロジェクト名: [■■■■]\n• 資料名: [■■■■]\n• 展開先（誰に）: [■■■■]\n• 期限（いつまでに）: [■■■■]\n---------------------\n\nご確認のほど、よろしくお願いいたします。",
+        "reasoning": "複数の重要情報が欠落し、指示が不明確。",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 11037
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:25:51.974Z",
+    "sessionId": "session_1751480727825_z5tn9swdb",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 上司: @ユーザーさん、急で申し訳ないんだけど、明日の15時から入っているB社との定例、代わりにファシリテーターお願いできないかな？",
+      "originalMessage": "すみません、明日の15時はクライアントとの最重要プレゼンと完全に重複しており、対応不可能です。",
+      "issue_pattern": [
+        "HarshTone"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "代役を頼まれたが断る際、理由は明確でもやや強い表現になっていますね。",
+        "improvement_points": "断りの表現を柔らかくし、感謝や申し訳なさを伝え、代替案やサポートの意思を示しましょう。",
+        "suggestion": "お疲れ様です。ご依頼いただきありがとうございます。申し訳ありませんが、明日の15時はクライアントとの最重要プレゼンと重なっており、代わりに対応することが難しい状況です。\nもしよろしければ、他の時間帯でお手伝いできることがあればお知らせください。ご理解のほど、よろしくお願いいたします。",
+        "reasoning": "断り表現が強すぎるため柔らかく改善。",
+        "issue_pattern": [
+          "HarshTone"
+        ]
+      },
+      "processingTime": 9548
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:26:15.783Z",
+    "sessionId": "session_1751480755903_khpwxts8x",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 上司: @ユーザーさん、急で申し訳ないんだけど、明日の15時から入っているB社との定例、代わりにファシリテーターお願いできないかな？",
+      "originalMessage": "すみません、明日の15時はクライアントとの最重要プレゼンと完全に重複しており、対応不可能です。",
+      "issue_pattern": [
+        "HarshTone"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "上司からの急な依頼に対し、断りの意志をはっきり伝えていますね。その強い表現が少し冷たく感じられるかもしれません。",
+        "improvement_points": "感謝と申し訳なさを伝えた上で、断りの理由を丁寧に説明し、可能であれば代替案や今後の協力意志を示しましょう。",
+        "suggestion": "@上司さん\n\n急なご依頼ありがとうございます。大変申し訳ないのですが、明日の15時はクライアントとの最重要プレゼンと重なっており、対応が難しい状況です。\n\nもし他に調整可能な方がいらっしゃれば、ご検討いただけますと幸いです。何か別の形でお手伝いできることがあれば、ぜひお知らせください。",
+        "reasoning": "断りの表現が強く、トーンを和らげる必要あり。",
+        "issue_pattern": [
+          "HarshTone"
+        ]
+      },
+      "processingTime": 8381
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:26:16.826Z",
+    "sessionId": "session_1751480755903_khpwxts8x",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 上司: @ユーザーさん、急で申し訳ないんだけど、明日の15時から入っているB社との定例、代わりにファシリテーターお願いできないかな？",
+      "originalMessage": "すみません、明日の15時はクライアントとの最重要プレゼンと完全に重複しており、対応不可能です。",
+      "issue_pattern": [
+        "HarshTone"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "代役依頼に対して断る理由を明確に伝えていますが、少し強い印象を与える表現です。",
+        "improvement_points": "・断る理由は明確にしつつ、表現を柔らかくする。\n・感謝や申し訳なさを伝える。\n・可能であれば代替案や今後のフォローを示す。",
+        "suggestion": "@上司さん\n\nご依頼ありがとうございます。申し訳ありませんが、明日の15時はクライアントとの最重要プレゼンと重なっており、代役を務めることが難しい状況です。\n\nもし他にサポートできることがあれば、ぜひお知らせください。引き続きよろしくお願いいたします。",
+        "reasoning": "断り表現が強く、柔らかくする必要あり。",
+        "issue_pattern": [
+          "HarshTone"
+        ]
+      },
+      "processingTime": 7316
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:26:57.334Z",
+    "sessionId": "session_1751480798253_21vv27adq",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 田中さん: C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ないでしょうか？ご確認をお願いします。",
+      "originalMessage": "はい、その件、問題ありません。A案で進めてください。",
+      "issue_pattern": [
+        "MissingContext"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "承認の意図は伝わりますが、「その件」が具体的でないため、相手に少し分かりづらいかもしれません。",
+        "improvement_points": "「その件」を具体的に「C社の新機能開発プロジェクトのA案」などと書き換えることで、より明確で誤解のない承認メッセージになります。",
+        "suggestion": "はい、C社の新機能開発プロジェクトのA案で問題ありません。こちらで進めてください。",
+        "reasoning": "指示語「その件」が具体性不足で誤解リスクあり。",
+        "issue_pattern": [
+          "MissingContext"
+        ]
+      },
+      "processingTime": 7728
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:26:58.035Z",
+    "sessionId": "session_1751480798253_21vv27adq",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 田中さん: C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ないでしょうか？ご確認をお願いします。",
+      "originalMessage": "はい、その件、問題ありません。A案で進めてください。",
+      "issue_pattern": [
+        "MissingContext"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "「その件」が何を指すのかが曖昧で、相手に伝わりにくい表現です。",
+        "improvement_points": "「その件」という曖昧な表現を避け、具体的な案件名や内容を明記しましょう。",
+        "suggestion": "はい、C社の新機能開発プロジェクトのA案で問題ありません。こちらで進めてください。",
+        "reasoning": "指示語「その件」が具体性欠如。",
+        "issue_pattern": [
+          "MissingContext"
+        ]
+      },
+      "processingTime": 6193
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:28:37.142Z",
+    "sessionId": "session_1751480798253_21vv27adq",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 田中さん: C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ないでしょうか？ご確認をお願いします。",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [
+        "MissingContext"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "依頼内容が具体的に示されていないため、対応範囲が不明確です。",
+        "improvement_points": "対応する具体的な内容を明記し、誰が見ても分かりやすい表現にしましょう。",
+        "suggestion": "承知いたしました。C社の新機能開発プロジェクトのA案についてのご依頼、本日17時までに対応いたします。",
+        "reasoning": "Missing specific reference to 'ご依頼の件'.",
+        "issue_pattern": [
+          "MissingContext"
+        ]
+      },
+      "processingTime": 5100
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:28:55.290Z",
+    "sessionId": "session_1751480928482_9tvov8uga",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "ご依頼内容を理解し、期限も明確に伝えられている丁寧な返信ですね。",
+        "improvement_points": "このまま問題なくご使用いただけます。丁寧で明確な表現です。",
+        "suggestion": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+        "reasoning": "No issues; clear and polite.",
+        "issue_pattern": []
+      },
+      "processingTime": 3283
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:37:16.029Z",
+    "sessionId": "session_1751481428004_hxh6ucvnh",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "ご依頼内容をきちんと理解し、期限を明確に伝えた丁寧な返信ですね。",
+        "improvement_points": "簡潔で丁寧な表現ができており、このまま問題なく使用可能です。",
+        "suggestion": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+        "reasoning": "明確かつ丁寧で問題なし。",
+        "issue_pattern": []
+      },
+      "processingTime": 4955
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:37:17.503Z",
+    "sessionId": "session_1751481428004_hxh6ucvnh",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+      "issue_pattern": [],
+      "aiResponse": {
+        "hasIssues": false,
+        "ai_receipt": "簡潔で丁寧な返信で、依頼内容に対する対応意思が明確に伝わっています。",
+        "improvement_points": "簡潔かつ丁寧な表現で問題ありません。このままご使用いただけます。",
+        "suggestion": "承知いたしました。ご依頼の件、本日17時までに対応いたします。",
+        "reasoning": "Clear and polite confirmation with no issues.",
+        "issue_pattern": []
+      },
+      "processingTime": 4440
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:37:58.356Z",
+    "sessionId": "session_1751481428004_hxh6ucvnh",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "明日までにこの資料、修正しといて。",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "指示が簡潔ですが、もう少し丁寧さと具体性を加えることで、相手により良い印象を与えられますね。",
+        "improvement_points": "・丁寧な依頼表現にする\n・修正内容や対象の資料を具体的に示す\n・感謝や労いの言葉を添えることで、相手のモチベーション向上に繋がる",
+        "suggestion": "〇〇さん\n\nお疲れ様です。\n明日までに、〇〇の資料の〇〇部分を修正していただけますでしょうか？\nお忙しいところ恐れ入りますが、よろしくお願いいたします。",
+        "reasoning": "命令口調と曖昧な指示で感情的・行動コスト発生",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8086
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:38:00.561Z",
+    "sessionId": "session_1751481428004_hxh6ucvnh",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "明日までにこの資料、修正しといて。",
+      "issue_pattern": [
+        "Impolite",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "短く直接的な依頼ですが、もう少し丁寧さと具体性を加えると、受け手にとって分かりやすく、協力的な印象になりますね。",
+        "improvement_points": "丁寧な言葉遣いと具体的な指示を加え、感謝の気持ちを伝えましょう。また、修正のポイントや対象資料を明確にすることで、相手の理解と協力を得やすくなります。",
+        "suggestion": "〇〇さん\n\nお疲れ様です。お手数ですが、明日までにこちらの資料の以下の点を修正していただけますでしょうか？\n\n・修正箇所の具体的な内容（例：誤字の訂正、データの更新など）\n\nもしご不明点があればお知らせください。よろしくお願いいたします。\n\n--- Missing Info ---\n• **どの資料のことか**: [■■■■]\n• **修正すべき具体的な内容**: [■■■■]\n---------------------",
+        "reasoning": "命令的かつ具体性不足で誤解や不快感を招くため。",
+        "issue_pattern": [
+          "Impolite",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 8365
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:38:31.663Z",
+    "sessionId": "session_1751481496557_0xhjdjdrn",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "先日のA社との会議ですが、議事録を関係者に共有しておいていただけますか。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "先日の会議の議事録共有依頼ですが、誰に、いつまでに共有するかが明確でないため、受け手が迷う可能性がありますね。",
+        "improvement_points": "会議の日時、共有すべき具体的な関係者、共有期限を明示することで、依頼がより明確で実行しやすくなります。",
+        "suggestion": "お疲れ様です。\n\n先日のA社との会議（[開催日を記入してください]）の議事録について、以下の点をご確認のうえ、関係者の皆様に共有していただけますでしょうか。\n\n--- Missing Info ---\n• **会議の開催日**: [■■■■]\n• **共有する関係者の具体的な範囲**: [■■■■]\n• **共有期限**: [■■■■]\n---------------------\n\nお手数ですが、ご確認のほどよろしくお願いいたします。",
+        "reasoning": "依頼の対象と期限が不明瞭で行動困難",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 7655
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:39:47.769Z",
+    "sessionId": "session_1751481575174_v145hp255",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "例のプロジェクトの件、例の資料を更新して、展開してください。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "「例の〜」という表現は、具体的な対象が不明確で、相手が混乱しやすい状況ですね。明確に伝えることが重要です。",
+        "improvement_points": "具体的なプロジェクト名や資料名、更新内容、展開先、期限を明示すると、相手が迷わず行動できる明確な依頼になります。",
+        "suggestion": "〇〇さん\n\nお疲れ様です。\n〇〇プロジェクトの△△資料について、最新情報を反映して更新をお願いします。\n更新後は、関係者の皆様にメールで展開していただけますでしょうか。\nお手数ですが、〇月〇日までにご対応いただけると助かります。よろしくお願いいたします。",
+        "reasoning": "曖昧な指示と不明確な依頼内容で認識コスト高い",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 9078
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:39:48.406Z",
+    "sessionId": "session_1751481575174_v145hp255",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "例のプロジェクトの件、例の資料を更新して、展開してください。",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "ご依頼の内容が抽象的で、受け手が具体的に何をすべきか判断しづらい状況ですね。明確な指示にするために、もう少し詳しく整理しましょう。",
+        "improvement_points": "具体的なプロジェクト名、資料名、更新内容、展開先、期限などを補足し、誰が何をいつまでにするのかを明確にしましょう。これにより、依頼の受け手がスムーズに対応可能になります。",
+        "suggestion": "〇〇さん\n\nお疲れ様です。〇〇プロジェクトの件ですが、添付の〇〇資料を最新版に更新していただき、その後、関係者にメールで展開をお願いします。\n\nお手数ですが、以下の点についてご確認の上、メッセージに追記していただけますでしょうか。\n\n--- Missing Info ---\n• **具体的なプロジェクト名**: [■■■■]\n• **更新すべき資料名**: [■■■■]\n• **更新内容の詳細**: [■■■■]\n• **展開先（誰に送るか）**: [■■■■]\n• **対応期限**: [■■■■]\n---------------------\n\nご確認のほど、よろしくお願いいたします。",
+        "reasoning": "曖昧な指示で文脈不足。具体化が必要。",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 11371
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:40:31.181Z",
+    "sessionId": "session_1751481612472_i9tvnr4pv",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 上司: @ユーザーさん、急で申し訳ないんだけど、明日の15時から入っているB社との定例、代わりにファシリテーターお願いできないかな？",
+      "originalMessage": "すみません、明日の15時はクライアントとの最重要プレゼンと完全に重複しており、対応不可能です。",
+      "issue_pattern": [
+        "Impolite",
+        "MissingAcknowledgment"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "急なお願いを断らなければならず、申し訳ないお気持ちと、重要なプレゼンとの調整の難しさが伝わってきます。相手への配慮を加えつつ、協力的な姿勢も示しましょう。",
+        "improvement_points": "感謝の言葉を添え、断る理由を丁寧に説明しましょう。さらに、代替案やフォローアップの提案を加えることで、協力的な印象を与えられます。",
+        "suggestion": "@上司さん\n\nお声がけいただきありがとうございます。大変申し訳ありませんが、明日の15時はクライアントとの最重要プレゼンと重なっており、対応が難しい状況です。\n\nもしよろしければ、(1) B社の定例に詳しい〇〇さんに代理をお願いする、(2) 会議の議事録を最優先で確認し、必要なフォローを行う、という方法を検討しておりますが、ご意見いただけますと幸いです。",
+        "reasoning": "断りつつ協力提案が必要なため介入レベル3",
+        "issue_pattern": [
+          "Impolite",
+          "MissingAcknowledgment"
+        ]
+      },
+      "processingTime": 9227
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:40:33.643Z",
+    "sessionId": "session_1751481612472_i9tvnr4pv",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[10:00] 上司: @ユーザーさん、急で申し訳ないんだけど、明日の15時から入っているB社との定例、代わりにファシリテーターお願いできないかな？",
+      "originalMessage": "すみません、明日の15時はクライアントとの最重要プレゼンと完全に重複しており、対応不可能です。",
+      "issue_pattern": [
+        "Impolite",
+        "MissingAcknowledgment"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "急なお願いを断るのは気が重いですよね。上司の期待に応えたい気持ちと、ご自身の重要な予定との板挟みで悩んでいるお気持ち、よくわかります。",
+        "improvement_points": "感謝の意を伝え、断る理由を丁寧に説明しましょう。そして、具体的な代替案やフォローの提案を加えると、より協力的で前向きな印象になります。",
+        "suggestion": "@上司さん\n\nお声がけいただきありがとうございます。明日の15時はクライアントとの最重要プレゼンと重なっており、対応が難しい状況です。\n\nもしよろしければ、(1) B社の件に詳しい〇〇さんに代理をお願いする、(2) 会議の議事録を最優先で確認し、必要なフォローを行う、という方法を提案させていただきますが、いかがでしょうか？",
+        "reasoning": "断り方が冷たく感謝・代替案不足",
+        "issue_pattern": [
+          "Impolite",
+          "MissingAcknowledgment"
+        ]
+      },
+      "processingTime": 9550
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:41:20.030Z",
+    "sessionId": "session_1751481661559_7fb9te0jq",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 田中さん: C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ないでしょうか？ご確認をお願いします。",
+      "originalMessage": "はい、その件、問題ありません。A案で進めてください。",
+      "issue_pattern": [
+        "MissingContext"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "簡潔に了承の意を示されていますが、「その件」が何を指すかが不明瞭で、受け手に確認の負担をかける可能性があります。",
+        "improvement_points": "「その件」という曖昧な指示語を具体的な案件名や内容に置き換え、誰が読んでもすぐに理解できるようにしましょう。",
+        "suggestion": "田中さん\n\nお疲れ様です。C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ありません。A案で進めてください。",
+        "reasoning": "曖昧な指示語「その件」が文脈不足を招くため",
+        "issue_pattern": [
+          "MissingContext"
+        ]
+      },
+      "processingTime": 10292
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T18:41:23.686Z",
+    "sessionId": "session_1751481661559_7fb9te0jq",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "[14:00] 田中さん: C社の新機能開発プロジェクトの件ですが、現状のA案で進めて問題ないでしょうか？ご確認をお願いします。",
+      "originalMessage": "はい、その件、問題ありません。A案で進めてください。",
+      "issue_pattern": [
+        "MissingContext"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "簡潔に了承を伝えていますが、「その件」が何を指すかが明確でないため、受け手が混乱する可能性があります。",
+        "improvement_points": "「その件」という曖昧な表現を避け、具体的に「C社の新機能開発プロジェクトの件」などと明示しましょう。これにより、相手がすぐに内容を理解でき、安心して対応できます。",
+        "suggestion": "田中さん\n\nお疲れ様です。C社の新機能開発プロジェクトの件、問題ありません。A案で進めてください。",
+        "reasoning": "曖昧な指示語「その件」で文脈不足と判断",
+        "issue_pattern": [
+          "MissingContext"
+        ]
+      },
+      "processingTime": 11912
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-02T19:30:45.814Z",
+    "sessionId": "session_1751481680059_a8yqn2sxn",
+    "language": "ja",
+    "event": "detailed_analysis_toggled",
+    "data": {
+      "action": "expand",
+      "previousText": "はい、その件、問題ありません。A案で進めてください。",
+      "newText": "田中さん\n\nお疲れ様です。C社の新機能開発プロジェクトの件、問題ありません。A案で進めてください。"
+    },
+    "ipAddress": "::1"
+  }
+]

@@ -2,17 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useLogging } from "@/hooks/useLogging";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ToneAnalysis {
   hasIssues: boolean;
   originalText: string;
   suggestion: string | null;
   reasoning: string;
-  ai_receipt?: string; // 新規追加フィールド
-  improvement_points?: string; // 新規追加フィールド
+  ai_receipt?: string;
+  improvement_points?: string;
+  detailed_analysis?: string;  // 新規追加
   issue_pattern?: string[];
   detected_mentions?: string[];
-  // issuesフィールドは削除
 }
 
 interface ToneSuggestionProps {
@@ -38,6 +39,7 @@ export function ToneSuggestion({
 }: ToneSuggestionProps) {
   // showCopyFeedback state をコンポーネントのトップレベルで定義
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
+  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
   const { log } = useLogging(isJapanese ? "ja" : "en"); // log取得用
 
   // Handle escape key to close popup
@@ -171,7 +173,6 @@ export function ToneSuggestion({
           )} */}
 
           {/* 改善ポイント - 黄色背景 */}
-          {/* バックエンドが対応するまでは issues を結合して表示 */}
           {suggestion.hasIssues ? (
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-slate-700">
@@ -181,6 +182,41 @@ export function ToneSuggestion({
                 <p className="text-sm text-slate-700 leading-relaxed">
                   {suggestion.improvement_points}
                 </p>
+                
+                {/* 詳細分析のアコーディオン */}
+                {suggestion.detailed_analysis && (
+                  <div className="mt-3">
+                    <button
+                      onClick={async () => {
+                        const newState = !showDetailedAnalysis;
+                        setShowDetailedAnalysis(newState);
+                        
+                        // ログ記録
+                        await log("detailed_analysis_toggled", {
+                          action: newState ? "expand" : "collapse",
+                          previousText: suggestion.originalText,
+                          newText: suggestion.suggestion || undefined
+                        });
+                      }}
+                      className="flex items-center gap-1 text-xs font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
+                    >
+                      <span>{isJapanese ? "もっと詳しく学習する" : "Learn more"}</span>
+                      {showDetailedAnalysis ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </button>
+                    
+                    {showDetailedAnalysis && (
+                      <div className="mt-2 pt-2 border-t border-yellow-300">
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                          {suggestion.detailed_analysis}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ) : (

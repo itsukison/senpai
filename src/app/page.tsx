@@ -11,13 +11,20 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slack-white flex flex-col">
+    <div className="min-h-screen bg-white flex flex-col">
       {/* Navigation Bar */}
       <nav className="bg-white border-b border-slate-200 shadow-sm backdrop-blur-md flex-shrink-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
-              SenpAI<span className="text-purple-800"> Sensei</span>
+            <div className="flex items-center gap-4">
+              <div className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
+                SenpAI<span className="text-purple-800"> Sensei</span>
+              </div>
+              <div className="hidden sm:block text-xs sm:text-sm text-slate-600 font-medium">
+                {isJapanese
+                  ? "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ。"
+                  : "AI-enhanced workplace messaging. Professional communication that moves teams forward."}
+              </div>
             </div>
 
             {/* Language Toggle */}
@@ -52,24 +59,9 @@ export default function Home() {
           </div>
         </div>
       </nav>
-
-      {/* Title and Description */}
-      <div className="bg-white flex-shrink-0 mt-7 mb-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
-              SenpAI<span className="text-purple-800"> Sensei</span>
-            </h1>
-            <p className="text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed font-bold px-4">
-              {isJapanese
-                ? "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ。"
-                : "AI-enhanced workplace messaging. Professional communication that moves teams forward."}
-            </p>
-          </div>
-        </div>
-      </div>
+      {/* Title and Description セクションを完全に削除 */}
       {/* Main Content - Flex container that takes remaining space */}
-      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-1 sm:py-2 bg-white mb-4 min-h-0">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white mb-4 min-h-0 mt-4">
         <ToneChecker isJapanese={isJapanese} />
       </div>
 
