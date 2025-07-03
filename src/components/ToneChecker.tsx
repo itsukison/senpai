@@ -32,6 +32,8 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
   const [acceptedSuggestionText, setAcceptedSuggestionText] = useState(""); // 反映した提案のテキスト
+  const [isTransitioning, setIsTransitioning] = useState(false); // アニメーション状態
+  const [showSuggestionArea, setShowSuggestionArea] = useState(false); // 提案エリアの表示状態
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -99,6 +101,27 @@ const analyzeText = useCallback(
     if (!canAnalyze) {
       return;
     }
+
+    // アニメーション開始
+    setIsTransitioning(true);
+    setShowSuggestionArea(true);
+    
+    // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
+    setSuggestion({
+      hasIssues: true,  // デフォルトでtrueと仮定
+      originalText: userDraft,
+      suggestion: null,
+      reasoning: '',
+      ai_receipt: '',
+      improvement_points: '',
+      detailed_analysis: '',
+      issue_pattern: [],
+      detected_mentions: []
+    });
+    
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 500);
 
     // 既存の解析をキャンセル
     if (abortControllerRef.current) {
@@ -242,6 +265,16 @@ const analyzeText = useCallback(
     }
   };
 
+  // 提案の編集を処理
+  const handleSuggestionEdit = (newText: string) => {
+    if (suggestion) {
+      setSuggestion({
+        ...suggestion,
+        suggestion: newText
+      });
+    }
+  };
+
     // Accept suggestion
     const acceptSuggestion = async () => {
       if (suggestion?.suggestion) {
@@ -286,6 +319,7 @@ const analyzeText = useCallback(
   const dismissSuggestion = () => {
     setSuggestion(null);
     setAnalysisState('analyzed');
+    setShowSuggestionArea(false);
   };
 
   // ========== ここに言語切り替えの検知を追加 ==========
@@ -491,127 +525,140 @@ const analyzeText = useCallback(
         {/* Right Side Container - Message Input and Suggestions stacked vertically */}
         <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0 h-full">
           {/* Message Input - Top of right side */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-[40%] min-h-[250px] max-h-[400px]">
-            {/* Header */}
-            <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
-                  {labels.writeTitle}
-                </h3>
-                <div className="flex items-center space-x-2 sm:space-x-3">
-                  {analysisState === 'analyzing' && (
-                    <div className="flex items-center space-x-1 sm:space-x-2">
-                      <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-xs sm:text-sm font-medium text-purple-700">
-                        {labels.analyzing}
-                      </span>
-                    </div>
-                  )}
+          <div className={`transition-all duration-500 ${
+            isTransitioning && analysisState === 'analyzing' 
+              ? 'opacity-0 -translate-y-4' 
+              : 'opacity-100 translate-y-0'
+          } ${showSuggestionArea ? 'hidden' : 'block'}`}>
+            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-[40%] min-h-[250px] max-h-[400px]">
+              {/* Header */}
+              <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
+                    {labels.writeTitle}
+                  </h3>
+                  <div className="flex items-center space-x-2 sm:space-x-3">
+                    {analysisState === 'analyzing' && (
+                      <div className="flex items-center space-x-1 sm:space-x-2">
+                        <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-xs sm:text-sm font-medium text-purple-700">
+                          {labels.analyzing}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* 関係性セレクター */}
-            <RelationshipSelector />
+              {/* 関係性セレクター */}
+              <RelationshipSelector />
 
-            {/* Text Area */}
-            <div className="relative flex-1 flex flex-col min-h-0">
-              <Textarea
-                ref={textareaRef}
-                value={userDraft}
-                onChange={(e) => handleTextChange(e.target.value)}
-                placeholder={labels.writePlaceholder}
-                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-full pb-12"
-                style={{ fontFamily: "Inter, sans-serif" }}
-              />
+              {/* Text Area */}
+              <div className="relative flex-1 flex flex-col min-h-0">
+                <Textarea
+                  ref={textareaRef}
+                  value={userDraft}
+                  onChange={(e) => handleTextChange(e.target.value)}
+                  placeholder={labels.writePlaceholder}
+                  className="flex-1 resize-none border-0 rounded-none focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-full pb-12"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                />
 
-              {/* Slack風送信ボタン */}
-              <div className="absolute bottom-2 right-4">
+                {/* Slack風送信ボタン */}
+                <div className="absolute bottom-2 right-4">
 
-                <button
-                  onClick={() => {
-                    if (!canAnalyze) return;
-                    
-                    // 既に解析済みの場合（反映後の有意でない変更）
-                    if (hasAcceptedSuggestion && !hasSignificantChange()) {
-                      return;
+                  <button
+                    onClick={() => {
+                      if (!canAnalyze) return;
+                      
+                      // 既に解析済みの場合（反映後の有意でない変更）
+                      if (hasAcceptedSuggestion && !hasSignificantChange()) {
+                        return;
+                      }
+                      
+                      // 解析を実行
+                      analyzeText();
+                    }}
+
+                    disabled={!canAnalyze || (hasAcceptedSuggestion && !hasSignificantChange())}
+                    className={`
+                      p-2 rounded-md transition-all duration-200
+                      ${canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
+                        ? analysisState === 'analyzed'
+                          ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
+                          : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
+                             ${userDraft.length > 50 && analysisState === 'ready' ? 'pulse-animation' : ''}`  // 解析可能
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
+                      }
+                    `}
+                    title={
+                      getTotalTextLength() < 8
+                        ? isJapanese 
+                          ? `もう少しテキストを入力してください（あと${8 - getTotalTextLength()}文字）` 
+                          : `Please enter more text (${8 - getTotalTextLength()} more characters needed)`
+                        : hasAcceptedSuggestion && !hasSignificantChange()
+                          ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
+                          : analysisState === 'analyzed'
+                            ? isJapanese ? "解析済み" : "Already analyzed"
+                            : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
                     }
-                    
-                    // 解析を実行
-                    analyzeText();
-                  }}
-
-                  disabled={!canAnalyze || (hasAcceptedSuggestion && !hasSignificantChange())}
-                  className={`
-                    p-2 rounded-md transition-all duration-200
-                    ${canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
-                      ? analysisState === 'analyzed'
-                        ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
-                        : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
-                           ${userDraft.length > 50 && analysisState === 'ready' ? 'pulse-animation' : ''}`  // 解析可能
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
-                    }
-                  `}
-                  title={
-                    getTotalTextLength() < 8
-                      ? isJapanese 
-                        ? `もう少しテキストを入力してください（あと${8 - getTotalTextLength()}文字）` 
-                        : `Please enter more text (${8 - getTotalTextLength()} more characters needed)`
-                      : hasAcceptedSuggestion && !hasSignificantChange()
-                        ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
-                        : analysisState === 'analyzed'
-                          ? isJapanese ? "解析済み" : "Already analyzed"
-                          : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
-                  }
-                >
-                  {analysisState === 'analyzing' ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <svg 
-                      className={`w-5 h-5 transform transition-transform duration-200 ${
-                        canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
-                          ? analysisState === 'analyzed'
-                            ? 'rotate-0'  // 解析済み
-                            : 'rotate-90'  // 解析可能
-                          : 'rotate-45'  // 無効
-                      }`}
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      {analysisState === 'analyzed' && canAnalyze ? (
-                        // チェックマークアイコン（解析済み）
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M5 13l4 4L19 7" 
-                        />
-                      ) : (
-                        // 紙飛行機アイコン（通常）
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
-                        />
-                      )}
-                    </svg>
-                  )}
-                </button>
+                  >
+                    {analysisState === 'analyzing' ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <svg 
+                        className={`w-5 h-5 transform transition-transform duration-200 ${
+                          canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
+                            ? analysisState === 'analyzed'
+                              ? 'rotate-0'  // 解析済み
+                              : 'rotate-90'  // 解析可能
+                            : 'rotate-45'  // 無効
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        {analysisState === 'analyzed' && canAnalyze ? (
+                          // チェックマークアイコン（解析済み）
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M5 13l4 4L19 7" 
+                          />
+                        ) : (
+                          // 紙飛行機アイコン（通常）
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                          />
+                        )}
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Suggestion Box - Bottom of right side */}
-          <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col flex-1 min-h-[300px]">
+          <div className={`bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col ${
+            showSuggestionArea ? 'flex-1' : 'flex-1 min-h-[300px]'
+          } ${
+            showSuggestionArea && isTransitioning 
+              ? 'animate-in slide-in-from-bottom duration-500' 
+              : ''
+          }`}>
             <div className="flex-1 flex flex-col min-h-0">
-              {suggestion ? (
+              {suggestion && showSuggestionArea ? (
                 <ToneSuggestion
                   suggestion={suggestion}
                   onAccept={() => acceptSuggestion()}
                   onDismiss={dismissSuggestion}
                   onRevert={() => revertToOriginal()}
+                  onSuggestionEdit={handleSuggestionEdit}
                   hasAcceptedSuggestion={hasAcceptedSuggestion}
                   position={{ top: 0, left: 0 }}
                   isJapanese={isJapanese}
