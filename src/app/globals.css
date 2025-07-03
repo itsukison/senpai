@@ -164,3 +164,16 @@ textarea:focus-visible {
     @apply bg-background text-foreground;
   }
 }
+/* Gentle pulse animation for analyze button */
+@keyframes gentle-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+  }
+  50% { 
+    box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.2);
+  }
+}
+
+.pulse-animation {
+  animation: gentle-pulse 2s infinite;
+}

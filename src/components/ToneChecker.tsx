@@ -27,15 +27,13 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [userDraft, setUserDraft] = useState("");
   const { log } = useLogging(isJapanese ? "ja" : "en"); // log保存用
   const [threadContext, setThreadContext] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisState, setAnalysisState] = useState<'ready' | 'analyzing' | 'analyzed'>('ready');
   const [suggestion, setSuggestion] = useState<ToneAnalysis | null>(null);
-  const [lastAnalyzedText, setLastAnalyzedText] = useState("");
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
-  const [currentAnalyzingText, setCurrentAnalyzingText] = useState<string>("");
-  const [isUserInitiatedAnalysis, setIsUserInitiatedAnalysis] = useState(false); // ユーザーがボタンを押したか  
+  const [acceptedSuggestionText, setAcceptedSuggestionText] = useState(""); // 反映した提案のテキスト
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -61,28 +59,61 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     return subtextMap[social_distance] || '';
   };
 
+// 合計文字数を取得
+  const getTotalTextLength = () => {
+    return threadContext.trim().length + userDraft.trim().length;
+  };
+
+  // 解析可能かどうか
+  const canAnalyze = getTotalTextLength() >= 8;
+
+  // 文字列の編集距離を簡易的に計算
+  const getEditDistance = (str1: string, str2: string): number => {
+    const lengthDiff = Math.abs(str1.length - str2.length);
+    const commonLength = Math.min(str1.length, str2.length);
+    let differences = 0;
+    
+    for (let i = 0; i < commonLength; i++) {
+      if (str1[i] !== str2[i]) differences++;
+    }
+    
+    return lengthDiff + differences;
+  };
+
+  // 有意な変更があるかどうか
+  const hasSignificantChange = () => {
+    if (!hasAcceptedSuggestion || !acceptedSuggestionText) return true;
+    
+    const editDistance = getEditDistance(userDraft, acceptedSuggestionText);
+    return editDistance > 5;
+  };
+
 // Debounced analysis function - analyze full text
 const analyzeText = useCallback(
-  async (textToAnalyze: string) => {
+  async () => {
     console.log("=== 解析開始 ===");
-    console.log("入力文字数:", textToAnalyze.length);
-    console.log("入力内容:", textToAnalyze);
+    console.log("合計文字数:", getTotalTextLength());
+    console.log("user_draft:", userDraft);
+    console.log("thread_context長さ:", threadContext.length);
     
-    if (!textToAnalyze.trim() || textToAnalyze.length < 15) {
-      setSuggestion(null);
+    if (!canAnalyze) {
       return;
     }
 
-    // 既に同じテキストを解析中の場合は何もしない
-    if (isAnalyzing && currentAnalyzingText === textToAnalyze) return;
+    // 既存の解析をキャンセル
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
 
-    setIsAnalyzing(true);
-    setCurrentAnalyzingText(textToAnalyze);
+    // 新しいAbortControllerを作成
+    abortControllerRef.current = new AbortController();
+    
+    setAnalysisState('analyzing');
     const startTime = Date.now();
 
     try {
       const requestBody = {
-        user_draft: textToAnalyze,
+        user_draft: userDraft,  // textToAnalyze を userDraft に変更
         thread_context: threadContext,
         language: isJapanese ? "japanese" : "english",
         hierarchy: hierarchy,
@@ -103,6 +134,7 @@ const analyzeText = useCallback(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
+        signal: abortControllerRef.current.signal,
       });
 
       console.log("APIレスポンスステータス:", response.status);
@@ -128,7 +160,7 @@ const analyzeText = useCallback(
       // 変更後
       await log("analysis_completed", {
         context: threadContext,
-        originalMessage: textToAnalyze,
+        originalMessage: userDraft,
         issue_pattern: analysis.issue_pattern || [],  // 追加
         aiResponse: {
           hasIssues: analysis.hasIssues,
@@ -144,7 +176,7 @@ const analyzeText = useCallback(
       // Log analysis data to Supabase
       try {
         const result = await createConvo({
-          input: textToAnalyze,
+          input: userDraft,
           feedback: analysis.suggestion || "",
           hierarchy: hierarchy,
           social_distance: social_distance,
@@ -176,41 +208,38 @@ const analyzeText = useCallback(
       setSuggestion(analysis);
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
 
-      setLastAnalyzedText(textToAnalyze);
-    } catch (error) {
+
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('解析がキャンセルされました');
+        return;
+      }
       console.error("エラー詳細:", error);
       setSuggestion(null);
     } finally {
-      setIsAnalyzing(false);
-      setIsUserInitiatedAnalysis(false); // 解析終了時にリセット
+      setAnalysisState('analyzed');
       console.log("=== 解析終了 ===");
     }
   },
-  [threadContext, isJapanese, log, isAnalyzing, currentAnalyzingText, hierarchy, social_distance]
+  [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze]
 );
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
     setUserDraft(value);
     
-    // Clear existing timeout
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    // 解析済みの場合、ready状態に戻す
+    if (analysisState === 'analyzed') {
+      setAnalysisState('ready');
     }
 
-    // 反映ボタンが押された後の編集では自動解析しない
-    if (hasAcceptedSuggestion) {
-      // テキストが変更されたら反映状態をリセット（でも自動解析はしない）
-      if (value !== suggestion?.suggestion) {
+    // 反映ボタンが押された後の編集
+    if (hasAcceptedSuggestion && value !== acceptedSuggestionText) {
+      if (hasSignificantChange()) {
         setHasAcceptedSuggestion(false);
+        setAcceptedSuggestionText("");
       }
-      return; // 自動解析しない
     }
-
-    // Set new timeout for analysis
-    timeoutRef.current = setTimeout(() => {
-      analyzeText(value);
-    }, 3000); // 3 seconds delay
   };
 
     // Accept suggestion
@@ -220,8 +249,9 @@ const analyzeText = useCallback(
         setOriginalText(userDraft);
         // 全文を置換
         setUserDraft(suggestion.suggestion);
-        setLastAnalyzedText(suggestion.suggestion);
+        setAcceptedSuggestionText(suggestion.suggestion);
         setHasAcceptedSuggestion(true);
+        setAnalysisState('analyzed');
         textareaRef.current?.focus();
 
         // ログ記録
@@ -237,8 +267,9 @@ const analyzeText = useCallback(
   const revertToOriginal = async () => {
     if (originalText) {
       setUserDraft(originalText);
-      setLastAnalyzedText(originalText);
+      setAnalysisState('ready');
       setHasAcceptedSuggestion(false);
+      setAcceptedSuggestionText("");
       setOriginalText("");
       textareaRef.current?.focus();
 
@@ -254,18 +285,50 @@ const analyzeText = useCallback(
   // Dismiss suggestion
   const dismissSuggestion = () => {
     setSuggestion(null);
-    // Mark current text as analyzed to avoid re-analyzing
-    setLastAnalyzedText(userDraft);
+    setAnalysisState('analyzed');
   };
 
-  // Cleanup timeout on unmount
+  // ========== ここに言語切り替えの検知を追加 ==========
+  // 言語切り替えを検知
+  useEffect(() => {
+    setAnalysisState('ready');
+  }, [isJapanese]);
+
+  // 各種設定変更を検知
+  useEffect(() => {
+    if (analysisState === 'analyzed') {
+      setAnalysisState('ready');
+    }
+  }, [threadContext, hierarchy, social_distance]);
+  // ========== 言語切り替えの検知ここまで ==========
+
+  // Cleanup abort controller on unmount
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
       }
     };
   }, []);
+
+
+  // ========== ここにショートカットキーの実装を追加 ==========
+  // ショートカットキーの実装
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (canAnalyze && analysisState === 'ready' && (!hasAcceptedSuggestion || hasSignificantChange())) {
+          analyzeText();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [canAnalyze, analysisState, hasAcceptedSuggestion, analyzeText]);
+  // ========== ショートカットキーの実装ここまで ==========
+
 
   const labels = {
     contextTitle: isJapanese
@@ -278,8 +341,8 @@ const analyzeText = useCallback(
       ? "投稿予定のメッセージを書く"
       : "Write your message",
     writePlaceholder: isJapanese
-      ? "ここに、これから相手に送ろうとしているメッセージを入力してください。　入力が進むと、自動的にAIの解析が始まります。"
-      : "Start typing your message here... We'll help you make it more professional and respectful.",
+      ? "ここに、これから相手に送ろうとしているメッセージを入力してください。　入力後、右下の送信/解析ボタンをクリックしてください。"
+      : "Start typing your message here... Click the analyze button when ready.",
     analyzing: isJapanese ? "分析中......" : "Analyzing...",
   };
 
@@ -327,7 +390,17 @@ const analyzeText = useCallback(
                 {hierarchyOptionsWithDetails.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setHierarchy(option.value)}
+                    onClick={() => {
+  setHierarchy(option.value);
+  // 解析中の場合はキャンセル
+  if (analysisState === 'analyzing' && abortControllerRef.current) {
+    abortControllerRef.current.abort();
+  }
+  // 解析済みの場合、ready状態に戻す
+  if (analysisState === 'analyzed') {
+    setAnalysisState('ready');
+  }
+}}
                     className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:h-auto ${
                       hierarchy === option.value
                         ? 'bg-purple-600 text-white shadow-sm'
@@ -356,7 +429,17 @@ const analyzeText = useCallback(
                 {distanceOptionsArray.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => setSocialDistance(option.value)}
+                    onClick={() => {
+                      setSocialDistance(option.value);
+                      // 解析中の場合はキャンセル
+                      if (analysisState === 'analyzing' && abortControllerRef.current) {
+                        abortControllerRef.current.abort();
+                      }
+                      // 解析済みの場合、ready状態に戻す
+                      if (analysisState === 'analyzed') {
+                        setAnalysisState('ready');
+                      }
+                    }}
                     className={`flex-1 py-1 px-1.5 rounded-md text-[10px] font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:h-auto ${
                       social_distance === option.value
                         ? 'bg-purple-600 text-white shadow-sm'
@@ -416,7 +499,7 @@ const analyzeText = useCallback(
                   {labels.writeTitle}
                 </h3>
                 <div className="flex items-center space-x-2 sm:space-x-3">
-                  {isAnalyzing && (
+                  {analysisState === 'analyzing' && (
                     <div className="flex items-center space-x-1 sm:space-x-2">
                       <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
                       <span className="text-xs sm:text-sm font-medium text-purple-700">
@@ -438,7 +521,7 @@ const analyzeText = useCallback(
                 value={userDraft}
                 onChange={(e) => handleTextChange(e.target.value)}
                 placeholder={labels.writePlaceholder}
-                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full pb-12"
+                className="flex-1 resize-none border-0 rounded-none focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-full pb-12"
                 style={{ fontFamily: "Inter, sans-serif" }}
               />
 
@@ -447,51 +530,47 @@ const analyzeText = useCallback(
 
                 <button
                   onClick={() => {
-                    if (userDraft.trim().length < 15) return;
+                    if (!canAnalyze) return;
                     
-                    // 既に解析済みで同じテキストの場合
-                    if (!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft) {
-                      return; // 何もしない
-                    }
-                    
-                    // ユーザーがボタンを押したことを記録
-                    setIsUserInitiatedAnalysis(true);
-                    
-                    // 既に解析中の場合は、フラグを立てるだけ
-                    if (isAnalyzing && currentAnalyzingText === userDraft) {
+                    // 既に解析済みの場合（反映後の有意でない変更）
+                    if (hasAcceptedSuggestion && !hasSignificantChange()) {
                       return;
                     }
                     
                     // 解析を実行
-                    analyzeText(userDraft);
+                    analyzeText();
                   }}
 
-                  disabled={userDraft.trim().length < 15}
+                  disabled={!canAnalyze || (hasAcceptedSuggestion && !hasSignificantChange())}
                   className={`
                     p-2 rounded-md transition-all duration-200
-                    ${userDraft.trim().length >= 15
-                      ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
+                    ${canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
+                      ? analysisState === 'analyzed'
                         ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
-                        : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md'  // 通常
+                        : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
+                           ${userDraft.length > 50 && analysisState === 'ready' ? 'pulse-animation' : ''}`  // 解析可能
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
                     }
                   `}
                   title={
-                    userDraft.trim().length < 15
-                      ? isJapanese ? "15文字以上入力してください" : "Enter at least 15 characters"
-                      : !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
-                        ? isJapanese ? "解析済み" : "Already analyzed"
-                        : isJapanese ? "メッセージを解析" : "Analyze message"
+                    getTotalTextLength() < 8
+                      ? isJapanese 
+                        ? `もう少しテキストを入力してください（あと${8 - getTotalTextLength()}文字）` 
+                        : `Please enter more text (${8 - getTotalTextLength()} more characters needed)`
+                      : hasAcceptedSuggestion && !hasSignificantChange()
+                        ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
+                        : analysisState === 'analyzed'
+                          ? isJapanese ? "解析済み" : "Already analyzed"
+                          : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
                   }
                 >
-                  {/* ユーザーがボタンを押した場合のみローディング表示 */}
-                  {isAnalyzing && isUserInitiatedAnalysis ? (
+                  {analysisState === 'analyzing' ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <svg 
                       className={`w-5 h-5 transform transition-transform duration-200 ${
-                        userDraft.trim().length >= 15 
-                          ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
+                        canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange())
+                          ? analysisState === 'analyzed'
                             ? 'rotate-0'  // 解析済み
                             : 'rotate-90'  // 解析可能
                           : 'rotate-45'  // 無効
@@ -500,7 +579,7 @@ const analyzeText = useCallback(
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
                     >
-                      {!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft && userDraft.trim().length >= 15 ? (
+                      {analysisState === 'analyzed' && canAnalyze ? (
                         // チェックマークアイコン（解析済み）
                         <path 
                           strokeLinecap="round" 
