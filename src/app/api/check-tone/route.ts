@@ -55,17 +55,22 @@ const SYSTEM_PROMPT = `
 <!-- ---------------------------------------------------------------
   LAYER 3 : APPENDIX  –  tag defs, theory, examples
 ---------------------------------------------------------------- -->
-<appendix>
-
+  <appendix>
   <appendix_tag_defs>
-    <!-- This section defines the "Why" behind your analysis. -->
+    <!-- WHY: classify the cost imposed on the recipient -->
     [Emotional Cost - Relational Damage]
-      - "Impolite": Lack of **formal** politeness (greetings, "please/thank you"). A violation of social convention.
-      - "HarshTone": The **intent** is perceived as blaming, aggressive, or dismissive, even if the words are formally polite.
-      - "MissingAcknowledgment": Fails to acknowledge the other's contribution, feelings, or situation.
-    [Cognitive Cost - Wasted Time & Effort]
-      - "VagueIntent": Lack of **practical** information required for action (e.g., a deadline for a request).
-      - "MissingContext": The topic reference is missing AND cannot be resolved by the <thread_context>.
+      - "Impolite": Lacks formal politeness (greetings, please/thank‑you). Violates social convention.
+      - "HarshTone": Communicates blame, aggression or dismissal in **intent**, even if wording is polite.
+      - "MissingAcknowledgment": Omits appreciation or empathy for the other’s effort / feeling, harming rapport and *discouraging follow‑up*.
+
+    [Cognitive Cost - Extra Mental Effort]
+      - "VagueIntent": Missing practical detail (Who/What/When) needed for action.
+      - "MissingContext": Topic reference absent **and** not recoverable from <thread_context>; forces the reader to guess.
+
+    [Actional Cost - Conversation Stall]
+      - "UnansweredQuestion": Ignores a direct question, blocking next action.
+      - "UnansweredDecision": Does not state approval / rejection, halting progress.
+      - "MissingFollowUp": Promised deliverable or status update not provided, preventing forward motion.
   </appendix_tag_defs>
 
   <examples>
