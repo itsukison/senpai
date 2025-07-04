@@ -573,9 +573,10 @@ const analyzeText = useCallback(
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-visible p-2">
+
+    <div className="flex-1 flex flex-col overflow-visible p-2">
       {/* Responsive Grid Container */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0 max-h-[calc(100vh-140px)]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 min-h-[500px] lg:min-h-0 max-h-[calc(100vh-140px)]">
 
         {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px] h-full">
@@ -597,17 +598,15 @@ const analyzeText = useCallback(
                 }
               }}
               placeholder={labels.contextPlaceholder}
-              className={`resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-purple-500 text-xs sm:text-sm leading-relaxed transition-all duration-300 overflow-y-auto px-3 py-2 ${
+              className={`flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-purple-500 text-xs sm:text-sm leading-relaxed transition-all duration-300 overflow-y-auto px-3 py-2 bg-white text-gray-900 ${
                 // モバイルでの高さ制御
                 analysisState === 'analyzed' 
-                  ? 'h-20 sm:h-full' // 解析後：モバイル3行、PC全高
-                  : threadContext 
-                    ? 'h-32 sm:h-full' // 入力あり：モバイル5行、PC全高
-                    : 'h-32 sm:h-full' // デフォルト：モバイル5行、PC全高
+                  ? 'min-h-[60px] sm:min-h-full' 
+                  : 'min-h-[120px] sm:min-h-full'
               }`}
               style={{ 
                 fontFamily: "Inter, sans-serif",
-                minHeight: analysisState === 'analyzed' && window.innerWidth < 640 ? '60px' : '120px'
+                minHeight: '120px'
               }}
             />
           </div>

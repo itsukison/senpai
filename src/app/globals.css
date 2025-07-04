@@ -36,6 +36,25 @@ a {
   html {
     color-scheme: dark;
   }
+  /* 明示的に背景色を維持 */
+  body {
+    background-color: #ffffff !important;
+    color: #1d1c1d !important;
+  }
+}
+
+/* スマホ版での背景色を確実に設定 */
+@media (max-width: 640px) {
+  body,
+  html {
+    background-color: #ffffff !important;
+  }
+  
+  /* テキストエリアの背景も明示的に設定 */
+  textarea {
+    background-color: #ffffff !important;
+    -webkit-appearance: none;
+  }
 }
 
 /* Custom scrollbar for Slack theme */

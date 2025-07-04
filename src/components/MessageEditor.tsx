@@ -272,7 +272,7 @@ export function MessageEditor({
       </div>
 
       {/* Text Area */}
-      <div className="relative flex flex-col">
+      <div className="relative flex flex-col flex-1 min-h-[150px]">
         <textarea
           ref={textareaRef}
           value={text}
@@ -291,9 +291,9 @@ export function MessageEditor({
           }}
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
-          className={`resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pb-12 pt-3 transition-all duration-300 overflow-y-auto ${
+          className={`flex-1 resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pb-12 pt-3 transition-all duration-300 overflow-y-auto ${
             isTransitioning ? 'opacity-80' : ''
-          } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white'}`}
+          } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
           style={{ 
             fontFamily: "Inter, sans-serif",
             minHeight: '120px', // 5行相当の最小高さ
@@ -302,7 +302,7 @@ export function MessageEditor({
         />
 
         {/* 送信ボタン */}
-        <div className="absolute bottom-2 right-4">
+        <div className="absolute bottom-2 right-2 sm:right-4 z-10">
           <button
             onClick={onAnalyze}
             disabled={!shouldEnableAnalyze()}
