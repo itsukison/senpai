@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLogging } from "@/hooks/useLogging";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { MessageEditor } from "./MessageEditor";
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -33,6 +34,7 @@ interface ToneSuggestionProps {
   onReanalyze?: () => void;
   externalChanges?: boolean;  // thread_contextや言語の変更フラグ
   analysisState?: 'ready' | 'analyzing' | 'analyzed';
+  animationPhase?: 'input' | 'transitioning' | 'suggestion';  // 追加
 }
 
 export function ToneSuggestion({
@@ -51,6 +53,8 @@ export function ToneSuggestion({
   onSocialDistanceChange,
   onReanalyze,
   externalChanges = false,
+  analysisState = 'ready',
+  animationPhase = 'suggestion',  // 追加
 }: ToneSuggestionProps) {
   // showCopyFeedback state をコンポーネントのトップレベルで定義
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
@@ -392,7 +396,9 @@ export function ToneSuggestion({
           </div>
 
           {/* AI Receipt - 共感的な受け止め（背景色なし） */}
-          <div className="text-sm text-slate-700 leading-relaxed min-h-[40px]">
+          <div className={`text-sm text-slate-700 leading-relaxed min-h-[40px] transition-all duration-500 ${
+            animationPhase === 'suggestion' ? 'opacity-100' : 'opacity-0'
+          }`} style={{ transitionDelay: animationPhase === 'suggestion' ? '200ms' : '0ms' }}>
             {(suggestion.ai_receipt || suggestion.reasoning) ? (
               suggestion.ai_receipt || suggestion.reasoning
             ) : (
@@ -409,16 +415,18 @@ export function ToneSuggestion({
               <h4 className="text-sm font-semibold text-slate-700">
                 {labels.improvementTitle}
               </h4>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-h-[80px]">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-h-[80px] relative">
                 {suggestion.improvement_points ? (
                   <p className="text-sm text-slate-700 leading-relaxed">
                     {suggestion.improvement_points}
                   </p>
                 ) : (
-                  <div className="space-y-2">
-                    <div className="h-4 bg-yellow-200 rounded animate-pulse w-3/4"></div>
-                    <div className="h-4 bg-yellow-200 rounded animate-pulse w-full"></div>
-                    <div className="h-4 bg-yellow-200 rounded animate-pulse w-5/6"></div>
+                  <div className="flex items-center justify-center h-16">
+                    <div className="flex space-x-2">
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
                   </div>
                 )}
                 
@@ -489,180 +497,7 @@ export function ToneSuggestion({
               </div>
             )}
             
-            {/* 編集可能なテキストエリアとして表示（共通） */}
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-              <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
-                <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
-                  投稿予定のメッセージ（編集可能）
-                </h3>
-              </div>
-              
-              {/* RelationshipSelector */}
-              <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5 mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
-                  {/* 宛先セクション */}
-                  <div className="flex-1 flex flex-col sm:flex-col">
-                    <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
-                      <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
-                        {isJapanese ? '宛先' : 'To'}
-                      </p>
-                      <div className="flex space-x-1.5 flex-1 w-full">
-                        {(isJapanese
-                          ? [
-                              { value: 'junior', label: '後輩・部下' },
-                              { value: 'peer', label: '同僚・対等' },
-                              { value: 'senior', label: '目上のかた' }
-                            ]
-                          : [
-                              { value: 'junior', label: 'Junior' },
-                              { value: 'peer', label: 'Peer' },
-                              { value: 'senior', label: 'Senior' }
-                            ]
-                        ).map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => onHierarchyChange?.(option.value)}
-                            disabled={!suggestion.suggestion || isTransitioning}
-                            className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
-                              hierarchy === option.value
-                                ? 'bg-purple-600 text-white shadow-sm'
-                                : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
-                            } ${(!suggestion.suggestion || isTransitioning) ? 'opacity-60 cursor-not-allowed' : ''}`}
-                          >
-                            <p className="text-[10px] sm:text-xs font-semibold">
-                              {option.label}
-                            </p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="hidden sm:block w-px bg-purple-200" />
-
-                  {/* 距離セクション */}
-                  <div className="flex-1 flex flex-col sm:flex-col">
-                    <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
-                      <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
-                        {isJapanese ? '距離' : 'Distance'}
-                      </p>
-                      <div className="flex space-x-1.5 flex-1 w-full">
-                        {(isJapanese
-                          ? [
-                              { value: 'close', label: '近い' },
-                              { value: 'somewhat_close', label: 'やや近' },
-                              { value: 'neutral', label: '標準' },
-                              { value: 'somewhat_distant', label: 'やや遠' },
-                              { value: 'distant', label: '遠い' }
-                            ]
-                          : [
-                              { value: 'close', label: 'Close' },
-                              { value: 'somewhat_close', label: 'Rather Close' },
-                              { value: 'neutral', label: 'Neutral' },
-                              { value: 'somewhat_distant', label: 'Rather Distant' },
-                              { value: 'distant', label: 'Distant' }
-                            ]
-                        ).map((option) => (
-                          <button
-                            key={option.value}
-                            onClick={() => onSocialDistanceChange?.(option.value)}
-                            disabled={!suggestion.suggestion || isTransitioning}
-                            className={`flex-1 py-1 px-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
-                              socialDistance === option.value
-                                ? 'bg-purple-600 text-white shadow-sm'
-                                : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
-                            } ${(!suggestion.suggestion || isTransitioning) ? 'opacity-60 cursor-not-allowed' : ''}`}
-                          >
-                            <span className="block">{option.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* テキストエリア */}
-              <div className="relative flex-1 flex flex-col min-h-0">
-                <textarea
-                  value={isShowingOriginal 
-                    ? suggestion.originalText 
-                    : (suggestion.hasIssues 
-                      ? (isTransitioning ? displayText : (currentText || displayText || ''))
-                      : suggestion.originalText)
-                  }
-                  onChange={(e) => {
-                    if (!isShowingOriginal && !isTransitioning) {
-                      handleTextEdit(e.target.value);
-                    }
-                  }}
-                  disabled={suggestion.hasIssues ? (!suggestion.suggestion || isShowingOriginal || isTransitioning) : false}
-                  className={`flex-1 resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-40 pb-12 px-4 disabled:bg-gray-50 disabled:text-gray-500 ${
-                    isTransitioning ? 'transition-opacity duration-300' : ''
-                  }`}
-                  style={{ fontFamily: "Inter, sans-serif" }}
-                  placeholder="ここに改善案が表示されます。このエリアは、直接編集が可能です。"
-                />
-                
-                {/* 送信ボタン */}
-                <div className="absolute bottom-2 right-4">
-                  <button
-                    onClick={handleReanalyze}
-                    disabled={!canReanalyze()}
-                    className={`p-2 rounded-md transition-all duration-200 ${
-                      canReanalyze()
-                        ? isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
-                          ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
-                          : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md'  // 解析可能
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
-                    }`}
-                    title={
-                      !suggestion.suggestion 
-                        ? isJapanese ? "解析中..." : "Analyzing..."
-                        : isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
-                          ? isJapanese ? "解析済み" : "Already analyzed"
-                          : isJapanese ? "メッセージを解析" : "Analyze message"
-                    }
-                  >
-                    {isTransitioning ? (
-                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                    ) : (
-                      <svg 
-                        className={`w-5 h-5 ${
-                          isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
-                            ? 'rotate-0'  // 解析済み
-                            : 'rotate-90'  // 解析可能
-                        }`}
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        {isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal ? (
-                          // チェックマークアイコン（解析済み）
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M5 13l4 4L19 7" 
-                          />
-                        ) : (
-                          // 紙飛行機アイコン（通常）
-                          <path 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
-                            strokeWidth={2} 
-                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
-                          />
-                        )}
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* MessageEditorは親コンポーネントで管理するため削除 */}
           </div>
 
           {/* アクションボタン */}
