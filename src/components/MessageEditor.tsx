@@ -30,6 +30,12 @@ interface MessageEditorProps {
     settings: { hierarchy: string; socialDistance: string; };
   }>;
   onHistorySelect?: (index: number) => void;
+  // トグル機能用の新規追加
+  originalText?: string;
+  suggestionText?: string;
+  isShowingOriginal?: boolean;
+  onToggleOriginal?: () => void;
+  hasEditedOriginal?: boolean;
 }
 
 export function MessageEditor({
@@ -53,6 +59,11 @@ export function MessageEditor({
   externalChanges = false,
   analysisHistory = [],
   onHistorySelect,
+  originalText,
+  suggestionText,
+  isShowingOriginal = false,
+  onToggleOriginal,
+  hasEditedOriginal = false,
 }: MessageEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [hasTextChanged, setHasTextChanged] = useState(false);
@@ -158,9 +169,9 @@ export function MessageEditor({
   };
 
 return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+    <div className={`bg-white shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300 ${mode === 'suggestion' ? '' : 'rounded-xl overflow-hidden'}`}>
       {/* Header */}
-      <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
+      <div className="px-4 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
         <div className="flex items-center justify-between">
           <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
             {title || (mode === 'input' ? labels.writeTitle : labels.suggestionTitle)}
@@ -205,12 +216,12 @@ return (
       </div>
 
       {/* 関係性セレクター */}
-      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5">
+      <div className="bg-purple-50 px-4 py-2.5">
         <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
           {/* 宛先セクション */}
           <div className="flex-1 flex flex-col sm:flex-col">
             <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
-              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 min-w-[32px]">
                 {labels.to}
               </p>
               <div className="flex space-x-1.5 flex-1 w-full">
@@ -241,7 +252,7 @@ return (
           {/* 距離セクション */}
           <div className="flex-1 flex flex-col sm:flex-col">
             <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
-              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+              <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 min-w-[32px]">
                 {labels.distance}
               </p>
               <div className="flex space-x-1.5 flex-1 w-full">
@@ -272,7 +283,7 @@ return (
         </div>
       </div>
 
-{/* Text Area */}
+      {/* Text Area */}
       <div className="relative">
         <textarea
           ref={textareaRef}
@@ -285,73 +296,135 @@ return (
           }}
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
-          className={`w-full resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-12 transition-all duration-300 ${
+          className={`w-full resize-y border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-12 transition-all duration-300 ${
             isTransitioning ? 'opacity-80' : ''
           } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
           rows={5}
           style={{ 
-            fontFamily: "Inter, sans-serif"
+            fontFamily: "Inter, sans-serif",
+            minHeight: "120px",
+            maxHeight: "70vh"
           }}
         />
 
-        {/* 送信ボタン */}
-        <div className="absolute bottom-2 right-4 z-10">
-          <button
-            onClick={onAnalyze}
-            disabled={!shouldEnableAnalyze()}
-            className={`p-2 rounded-md transition-all duration-200 ${
-              shouldEnableAnalyze()
-                ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                  ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'
-                  : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
-                     ${text.length > 50 && analysisState === 'ready' && mode === 'input' ? 'pulse-animation' : ''}`
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-            title={
-              !canAnalyze
-                ? isJapanese 
-                  ? `もう少しテキストを入力してください` 
-                  : `Please enter more text`
-                : hasAcceptedSuggestion && !hasSignificantChange && mode === 'input'
-                  ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
-                  : analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                    ? isJapanese ? "解析済み" : "Already analyzed"
-                    : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
-            }
-          >
-            {analysisState === 'analyzing' ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <svg 
-                className={`w-5 h-5 transform transition-transform duration-200 ${
-                  shouldEnableAnalyze()
-                    ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                      ? 'rotate-0'
-                      : 'rotate-90'
-                    : 'rotate-45'
-                }`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                {analysisState === 'analyzed' && shouldEnableAnalyze() && !hasTextChanged && !externalChanges ? (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7" 
-                  />
-                ) : (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
-                  />
+        {/* ボタンエリア */}
+        <div className="absolute bottom-2 left-4 right-4 z-10 flex items-center justify-between">
+          {/* 左側：トグルボタン */}
+          <div>
+            {mode === 'suggestion' && onToggleOriginal && (
+              <>
+                {!isShowingOriginal && suggestionText && (
+                  <button
+                    onClick={onToggleOriginal}
+                    className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
+                  >
+                    ← {isJapanese ? "オリジナルに戻す" : "Show original"}
+                  </button>
                 )}
-              </svg>
+                {isShowingOriginal && (
+                  <button
+                    onClick={onToggleOriginal}
+                    className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
+                  >
+                    {hasEditedOriginal 
+                      ? (isJapanese ? "← 編集中の文章に戻す" : "← Back to edited")
+                      : (isJapanese ? "提案を見る →" : "Show suggestion →")}
+                  </button>
+                )}
+              </>
             )}
-          </button>
+          </div>
+
+          {/* 右側：既存のボタン */}
+          <div className="flex items-center gap-2">
+            {/* コピーボタン（suggestion modeの時は常に表示） */}
+            {mode === 'suggestion' && (
+              <button
+                onClick={async () => {
+                  if (text) {
+                    await navigator.clipboard.writeText(text);
+                    // TODO: コピー完了のフィードバック
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white text-sm shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <span className="text-xs sm:text-sm">
+                  {isJapanese ? "クリップボードにコピー" : "Copy to clipboard"}
+                </span>
+                <svg 
+                  className="w-4 h-4"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
+                  />
+                </svg>
+              </button>
+            )}
+
+            {/* 送信/解析ボタン */}
+            <button
+              onClick={onAnalyze}
+              disabled={!shouldEnableAnalyze()}
+              className={`p-2 rounded-md transition-all duration-200 ${
+                shouldEnableAnalyze()
+                  ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                    ? 'bg-green-500 hover:bg-green-600 text-white shadow-sm'
+                    : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
+                       ${text.length > 50 && analysisState === 'ready' && mode === 'input' ? 'pulse-animation' : ''}`
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              title={
+                !canAnalyze
+                  ? isJapanese 
+                    ? `もう少しテキストを入力してください` 
+                    : `Please enter more text`
+                  : hasAcceptedSuggestion && !hasSignificantChange && mode === 'input'
+                    ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
+                    : analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                      ? isJapanese ? "解析済み" : "Already analyzed"
+                      : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
+              }
+            >
+              {analysisState === 'analyzing' ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg 
+                  className={`w-5 h-5 transform transition-transform duration-200 ${
+                    shouldEnableAnalyze()
+                      ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                        ? 'rotate-0'
+                        : 'rotate-90'
+                      : 'rotate-45'
+                  }`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  {analysisState === 'analyzed' && shouldEnableAnalyze() && !hasTextChanged && !externalChanges ? (
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M5 13l4 4L19 7" 
+                    />
+                  ) : (
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                    />
+                  )}
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

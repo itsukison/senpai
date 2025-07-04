@@ -46,6 +46,9 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [isShowingRandomText, setIsShowingRandomText] = useState(false); // ランダムテキスト表示中
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false); // 詳細分析の表示状態
   const [showRandomTextFlag, setShowRandomTextFlag] = useState(false); // ランダムテキスト開始フラグ
+  const [isContextOpen, setIsContextOpen] = useState(false); // Context Inputの開閉状態（モバイル・タブレット用）
+  const [isShowingOriginal, setIsShowingOriginal] = useState(false); // オリジナル表示状態
+  const [editedOriginalText, setEditedOriginalText] = useState(""); // 編集されたオリジナルテキスト
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -128,7 +131,7 @@ const analyzeText = useCallback(
       // 3. dismissSuggestion内のタイマー（1200ms）
       // これらのタイミングがずれると、アニメーションが競合します。
       
-      // アニメーション完了（2秒に統一）
+      // アニメーション完了（1秒に修正）
       setTimeout(() => {
         setAnimationPhase('suggestion');
         setIsTransitioning(false);
@@ -153,6 +156,10 @@ const analyzeText = useCallback(
         }
       }, 600);
     }
+    
+    // トグル状態のリセット
+    setIsShowingOriginal(false);
+    setEditedOriginalText("");
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
     setSuggestion({
@@ -182,8 +189,15 @@ const analyzeText = useCallback(
     const startTime = Date.now();
 
     try {
+      // 現在表示されているテキストを取得
+      const currentText = showSuggestionArea 
+        ? (isShowingOriginal 
+          ? (editedOriginalText || suggestion?.originalText || userDraft)
+          : (suggestion?.suggestion || userDraft))
+        : userDraft;
+
       const requestBody = {
-        user_draft: userDraft,  // textToAnalyze を userDraft に変更
+        user_draft: currentText,  // 現在表示されているテキストを送信
         thread_context: threadContext,
         language: isJapanese ? "japanese" : "english",
         hierarchy: hierarchy,
@@ -304,8 +318,13 @@ const analyzeText = useCallback(
       console.log("=== 解析終了 ===");
     }
   },
-  [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze]
+  [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze, showSuggestionArea, isShowingOriginal, editedOriginalText, suggestion]
 );
+
+  // トグル機能の実装
+  const handleToggleOriginal = () => {
+    setIsShowingOriginal(!isShowingOriginal);
+  };
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
@@ -316,6 +335,11 @@ const analyzeText = useCallback(
     
     setUserDraft(value);
     setDisplayText(value);
+    
+    // オリジナル表示中の編集を記録
+    if (isShowingOriginal) {
+      setEditedOriginalText(value);
+    }
     
     // 解析済みの場合、ready状態に戻す
     if (analysisState === 'analyzed') {
@@ -338,6 +362,26 @@ const analyzeText = useCallback(
         ...suggestion,
         suggestion: newText
       });
+      // 再解析可能にする
+      if (analysisState === 'analyzed') {
+        setAnalysisState('ready');
+      }
+    }
+  };
+
+  // 編集時のテキスト処理を統一
+  const handleEditInSuggestionMode = (value: string) => {
+    if (isShowingOriginal) {
+      // オリジナル表示中はeditedOriginalTextを更新
+      setEditedOriginalText(value);
+    } else {
+      // 提案表示中はsuggestionを更新
+      handleSuggestionEdit(value);
+    }
+    
+    // 再解析可能にする
+    if (analysisState === 'analyzed') {
+      setAnalysisState('ready');
     }
   };
 
@@ -401,6 +445,9 @@ const analyzeText = useCallback(
       setIsFirstAnalysis(true); // リセット
       setIsReanalyzing(false);
       setShowRandomTextFlag(false); // フラグもリセット
+      // トグル関連の状態もリセット
+      setIsShowingOriginal(false);
+      setEditedOriginalText("");
     }, 1200);
   };
 
@@ -597,44 +644,108 @@ const analyzeText = useCallback(
 
     <div className="flex-1 flex flex-col overflow-visible p-2">
       {/* Responsive Grid Container */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 min-h-[500px] lg:min-h-0 max-h-[calc(100vh-140px)]">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 lg:min-h-0 max-h-[calc(100vh-140px)]">
 
-        {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px] h-full">
-          {/* Context Header */}
-          <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
-            <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
-              {labels.contextTitle}
-            </h3>
+        {/* Context Input - Accordion on mobile/tablet, normal on desktop */}
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 lg:flex lg:flex-col lg:col-span-1 lg:h-full">
+          {/* モバイル・タブレット用アコーディオン */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setIsContextOpen(!isContextOpen)}
+              className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-purple-50 hover:bg-purple-100 transition-colors flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <svg
+                  className={`w-4 h-4 text-purple-700 transition-transform ${
+                    isContextOpen ? 'rotate-90' : ''
+                  }`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+                <h3 className="text-sm sm:text-base font-semibold text-purple-800">
+                  {labels.contextTitle}
+                </h3>
+                <span className="text-xs text-purple-600 ml-2">
+                  {isJapanese ? "（任意）" : "(Optional)"}
+                </span>
+              </div>
+              {threadContext && !isContextOpen && (
+                <span className="text-xs text-purple-600">
+                  {isJapanese ? "入力済み" : "Added"}
+                </span>
+              )}
+            </button>
+
+            {/* アコーディオンコンテンツ */}
+            <div
+              className={`grid transition-[grid-template-rows] duration-300 ${
+                isContextOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              }`}
+            >
+              <div className="overflow-hidden">
+                <textarea
+                  value={threadContext}
+                  onChange={(e) => {
+                    setThreadContext(e.target.value);
+                    if (showSuggestionArea && analysisState === 'analyzed') {
+                      setExternalChanges(true);
+                    }
+                  }}
+                  placeholder={labels.contextPlaceholder}
+                  className="w-full resize-none border-0 border-t border-purple-200 focus-visible:ring-2 focus-visible:ring-purple-500 text-xs sm:text-sm leading-relaxed transition-all duration-300 overflow-y-auto px-4 py-3 bg-white text-gray-900 h-[120px]"
+                  style={{ 
+                    fontFamily: "Inter, sans-serif"
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Context Text Area */}
-          <div className="relative flex-1 flex flex-col min-h-0">
-            <textarea
-              value={threadContext}
-              onChange={(e) => {
-                setThreadContext(e.target.value);
-                if (showSuggestionArea && analysisState === 'analyzed') {
-                  setExternalChanges(true);
-                }
-              }}
-              placeholder={labels.contextPlaceholder}
-              className={`flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-purple-500 text-xs sm:text-sm leading-relaxed transition-all duration-300 overflow-y-auto px-3 py-2 bg-white text-gray-900 ${
-                // モバイルでの高さ制御
-                analysisState === 'analyzed' 
-                  ? 'min-h-[60px] sm:min-h-full' 
-                  : 'min-h-[120px] sm:min-h-full'
-              }`}
-              style={{ 
-                fontFamily: "Inter, sans-serif",
-                minHeight: '120px'
-              }}
-            />
+          {/* PC版通常表示 */}
+          <div className="hidden lg:flex lg:flex-col lg:h-full">
+            {/* Context Header */}
+            <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
+              <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
+                {labels.contextTitle}
+              </h3>
+            </div>
+
+            {/* Context Text Area */}
+            <div className="relative flex-1 flex flex-col min-h-0">
+              <textarea
+                value={threadContext}
+                onChange={(e) => {
+                  setThreadContext(e.target.value);
+                  if (showSuggestionArea && analysisState === 'analyzed') {
+                    setExternalChanges(true);
+                  }
+                }}
+                placeholder={labels.contextPlaceholder}
+                className={`flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-purple-500 text-xs sm:text-sm leading-relaxed transition-all duration-300 overflow-y-auto px-3 py-2 bg-white text-gray-900 ${
+                  // モバイルでの高さ制御
+                  analysisState === 'analyzed' 
+                    ? 'min-h-[60px] sm:min-h-full' 
+                    : 'min-h-[120px] sm:min-h-full'
+                }`}
+                style={{ 
+                  fontFamily: "Inter, sans-serif",
+                  minHeight: '120px'
+                }}
+              />
+            </div>
           </div>
         </div>
 
         {/* Right Side Container - Message Input and Suggestions */}
-        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
+        <div className="lg:col-span-2">
           {/* 統合コンテナ - 常に存在 */}
           <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl overflow-hidden">
             {/* 解析結果部分 - 常にDOMに存在、高さで制御 */}
@@ -825,10 +936,12 @@ const analyzeText = useCallback(
             <MessageEditor
                 mode={showSuggestionArea ? "suggestion" : "input"}
                 text={showSuggestionArea 
-                  ? (isShowingRandomText || !suggestion?.suggestion ? displayText : suggestion.suggestion)
+                  ? (isShowingOriginal 
+                    ? (editedOriginalText || suggestion?.originalText || "") 
+                    : (isShowingRandomText || !suggestion?.suggestion ? displayText : suggestion.suggestion))
                   : userDraft
                 }
-                onTextChange={handleTextChange}
+                onTextChange={showSuggestionArea ? handleEditInSuggestionMode : handleTextChange}
                 hierarchy={hierarchy}
                 socialDistance={social_distance}
                 onHierarchyChange={(value) => {
@@ -876,6 +989,12 @@ const analyzeText = useCallback(
                   : undefined
                 }
                 externalChanges={externalChanges}
+                // トグル機能用の新規props
+                originalText={suggestion?.originalText}
+                suggestionText={suggestion?.suggestion || undefined}
+                isShowingOriginal={isShowingOriginal}
+                onToggleOriginal={handleToggleOriginal}
+                hasEditedOriginal={!!editedOriginalText}
               />
           </div>
         </div>

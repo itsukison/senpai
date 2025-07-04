@@ -313,3 +313,13 @@ textarea::-webkit-scrollbar-thumb:hover {
   transition-duration: 1000ms;
   transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
+
+/* リサイズハンドルのカスタマイズ */
+.resize-handle-large::-webkit-resizer {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23999" d="M10 12l-2-2h4l-2 2zm0-5l-2-2h4l-2 2z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+}
+
