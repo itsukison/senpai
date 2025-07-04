@@ -284,3 +284,32 @@ textarea::-webkit-scrollbar-thumb:hover {
 .animate-gentle-slide {
   animation: gentle-slide-down 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* カスタムアニメーション */
+@keyframes gentle-slide-down {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  10% {
+    transform: translateY(2px) scale(0.995);
+  }
+  90% {
+    transform: translateY(14px) scale(0.99);
+  }
+  100% {
+    transform: translateY(16px) scale(0.99);
+    opacity: 0.95;
+  }
+}
+
+.animate-gentle-slide {
+  animation: gentle-slide-down 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* 提案エリアのアニメーション専用クラス */
+.suggestion-area-transition {
+  transition-property: grid-template-rows, opacity, transform;
+  transition-duration: 1000ms;
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}

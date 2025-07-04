@@ -142,7 +142,7 @@ const analyzeText = useCallback(
             setShowRandomTextFlag(true);
           }
         }, 800); // 0.8秒の短い待機
-      }, 2000); // CSS transitionと同期（2秒）
+      }, 1000); // CSS transitionと同期（1秒）
     }
     // モバイルの場合、スクロール調整（初回のみ）
     if (!isReanalysis && window.innerWidth < 768) {
@@ -640,7 +640,7 @@ const analyzeText = useCallback(
             {/* 解析結果部分 - 常にDOMに存在、高さで制御 */}
             {/* grid-rowsトリック: 0frから1frへの変化で自然な高さアニメーション */}
             <div 
-              className={`grid transition-[grid-template-rows,opacity,transform] duration-[2500ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
+              className={`grid suggestion-area-transition ${
                 showSuggestionArea ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
               }`}
               style={{
