@@ -94,18 +94,18 @@ export function MessageEditor({
   const getDistanceSubtext = () => {
     const subtextMap: { [key: string]: string } = isJapanese
       ? {
-          'close': '日常的に交流',
-          'somewhat_close': '定期的に交流',
-          'neutral': '業務上の関係',
-          'somewhat_distant': '限定的な接点',
-          'distant': '最小限の接点'
+          'very_close': '仲間・相棒★',
+          'close': '心理的安全',
+          'neutral': '一般的な職場',
+          'distant': '社外や他部門',
+          'very_distant': 'かなり遠い'
         }
       : {
-          'close': 'Daily interaction',
-          'somewhat_close': 'Regular interaction',
-          'neutral': 'Professional relation',
-          'somewhat_distant': 'Limited contact',
-          'distant': 'Minimal contact'
+          'very_close': 'Inner Circle★',
+          'close': 'Safe Space',
+          'neutral': 'Workplace Std.',
+          'distant': 'Cross-Unit',
+          'very_distant': 'Protocol'
         };
     return subtextMap[socialDistance] || '';
   };
@@ -138,18 +138,18 @@ export function MessageEditor({
 
   const distanceOptions = isJapanese
     ? [
-        { value: 'close', label: '近い' },
-        { value: 'somewhat_close', label: 'やや近' },
-        { value: 'neutral', label: '標準' },
-        { value: 'somewhat_distant', label: 'やや遠' },
-        { value: 'distant', label: '遠い' }
+        { value: 'very_close', label: '親密' },
+        { value: 'close', label: '仲間感' },
+        { value: 'neutral', label: '職場標準' },
+        { value: 'distant', label: '距離あり' },
+        { value: 'very_distant', label: '儀礼的' }
       ]
     : [
-        { value: 'close', label: 'Close' },
-        { value: 'somewhat_close', label: 'Rather Close' },
-        { value: 'neutral', label: 'Neutral' },
-        { value: 'somewhat_distant', label: 'Rather Distant' },
-        { value: 'distant', label: 'Distant' }
+        { value: 'very_close', label: 'Close!' },
+        { value: 'close', label: 'Friendly' },
+        { value: 'neutral', label: 'Standard' },
+        { value: 'distant', label: 'Distant' },
+        { value: 'very_distant', label: 'Formal' }
       ];
 
   // 解析可能かどうかの判定
@@ -225,28 +225,40 @@ return (
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 min-w-[32px]">
                 {labels.distance}
               </p>
-              <div className="flex space-x-1 flex-1 w-full">
-                {distanceOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => onSocialDistanceChange(option.value)}
-                    disabled={isTransitioning}
-                    className={`group relative flex-1 py-1 px-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
-                      socialDistance === option.value
-                        ? 'bg-purple-600 text-white shadow-sm'
-                        : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
-                    } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''}`}
-                  >
-                    {/* ホバー時の背景アニメーション */}
-                    <div className="absolute inset-0 bg-purple-100 rounded-lg opacity-0 group-hover:opacity-50 transition-opacity duration-200" />
-                    <span className="relative block sm:font-semibold">{option.label}</span>
-                    {socialDistance === option.value && (
-                      <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap">
-                        {getDistanceSubtext()}
-                      </span>
-                    )}
-                  </button>
-                ))}
+              <div className="relative flex flex-1 w-full">
+                {/* スライドインジケーター */}
+                <div 
+                  className="absolute inset-y-0 bg-purple-600 rounded-lg transition-all duration-300 ease-out z-10"
+                  style={{
+                    width: `${100 / distanceOptions.length}%`,
+                    transform: `translateX(${distanceOptions.findIndex(opt => opt.value === socialDistance) * 100}%)`
+                  }}
+                />
+                
+                {/* セグメントボタン */}
+                <div className="flex flex-1 bg-white border border-purple-200 rounded-lg overflow-hidden relative">
+                  {distanceOptions.map((option, index) => (
+                    <button
+                      key={option.value}
+                      onClick={() => onSocialDistanceChange(option.value)}
+                      disabled={isTransitioning}
+                      className={`relative flex-1 py-1 px-2 text-[11px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
+                        socialDistance === option.value
+                          ? 'text-white'
+                          : 'text-purple-700 hover:bg-purple-50'
+                      } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''} ${
+                        index !== distanceOptions.length - 1 ? 'border-r border-purple-200' : ''
+                      }`}
+                    >
+                      <span className="relative block sm:font-semibold">{option.label}</span>
+                      {socialDistance === option.value && (
+                        <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap">
+                          {getDistanceSubtext()}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
