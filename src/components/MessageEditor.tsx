@@ -157,10 +157,10 @@ export function MessageEditor({
     }
   };
 
-  return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col" style={{ minHeight: '320px' }}>
+return (
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
       {/* Header */}
-      <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
+      <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
         <div className="flex items-center justify-between">
           <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
             {title || (mode === 'input' ? labels.writeTitle : labels.suggestionTitle)}
@@ -211,7 +211,7 @@ export function MessageEditor({
       </div>
 
       {/* 関係性セレクター */}
-      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5">
+      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5 mx-4 mt-4">
         <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
           {/* 宛先セクション */}
           <div className="flex-1 flex flex-col sm:flex-col">
@@ -278,97 +278,88 @@ export function MessageEditor({
         </div>
       </div>
 
-      {/* Text Area */}
-      <div className="relative flex-1 flex flex-col p-4 pt-2" style={{ minHeight: '200px' }}>
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => {
-            if (isEditable && !isTransitioning) {
-              onTextChange(e.target.value);
-              setHasTextChanged(true);
-            }
-          }}
-          onInput={(e) => {
-            // 自動高さ調整（デスクトップのみ）
-            if (typeof window !== 'undefined' && window.innerWidth >= 640) {
-              const target = e.target as HTMLTextAreaElement;
-              target.style.height = 'auto';
-              const newHeight = Math.min(target.scrollHeight, 400);
-              target.style.height = `${newHeight}px`;
-            }
-          }}
-          placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
-          disabled={!isEditable || isTransitioning}
-          className={`w-full resize-none border-0 rounded-md focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-3 py-2 transition-all duration-300 overflow-y-auto ${
-            isTransitioning ? 'opacity-80' : ''
-          } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
-          style={{ 
-            fontFamily: "Inter, sans-serif",
-            minHeight: '120px', // 5行相当の最小高さ
-            maxHeight: '400px',  // 最大高さ制限
-            height: '120px' // 初期高さを明示的に設定
-          }}
-        />
+{/* Text Area */}
+      <div className="p-4">
+        <div className="relative">
+          <textarea
+            ref={textareaRef}
+            value={text}
+            onChange={(e) => {
+              if (isEditable && !isTransitioning) {
+                onTextChange(e.target.value);
+                setHasTextChanged(true);
+              }
+            }}
+            placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
+            disabled={!isEditable || isTransitioning}
+            className={`w-full resize-none border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-xs sm:text-sm leading-relaxed px-4 py-3 pb-12 transition-all duration-300 ${
+              isTransitioning ? 'opacity-80' : ''
+            } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
+            rows={5}
+            style={{ 
+              fontFamily: "Inter, sans-serif"
+            }}
+          />
 
-        {/* 送信ボタン */}
-        <div className="absolute bottom-4 right-4 z-10">
-          <button
-            onClick={onAnalyze}
-            disabled={!shouldEnableAnalyze()}
-            className={`p-2 rounded-md transition-all duration-200 ${
-              shouldEnableAnalyze()
-                ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                  ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'
-                  : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
-                     ${text.length > 50 && analysisState === 'ready' && mode === 'input' ? 'pulse-animation' : ''}`
-                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            }`}
-            title={
-              !canAnalyze
-                ? isJapanese 
-                  ? `もう少しテキストを入力してください` 
-                  : `Please enter more text`
-                : hasAcceptedSuggestion && !hasSignificantChange && mode === 'input'
-                  ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
-                  : analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                    ? isJapanese ? "解析済み" : "Already analyzed"
-                    : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
-            }
-          >
-            {analysisState === 'analyzing' ? (
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <svg 
-                className={`w-5 h-5 transform transition-transform duration-200 ${
-                  shouldEnableAnalyze()
-                    ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
-                      ? 'rotate-0'
-                      : 'rotate-90'
-                    : 'rotate-45'
-                }`}
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-              >
-                {analysisState === 'analyzed' && shouldEnableAnalyze() && !hasTextChanged && !externalChanges ? (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7" 
-                  />
-                ) : (
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
-                  />
-                )}
-              </svg>
-            )}
-          </button>
+          {/* 送信ボタン */}
+          <div className="absolute bottom-2 right-2 z-10">
+            <button
+              onClick={onAnalyze}
+              disabled={!shouldEnableAnalyze()}
+              className={`p-2 rounded-md transition-all duration-200 ${
+                shouldEnableAnalyze()
+                  ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                    ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'
+                    : `bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md
+                       ${text.length > 50 && analysisState === 'ready' && mode === 'input' ? 'pulse-animation' : ''}`
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
+              title={
+                !canAnalyze
+                  ? isJapanese 
+                    ? `もう少しテキストを入力してください` 
+                    : `Please enter more text`
+                  : hasAcceptedSuggestion && !hasSignificantChange && mode === 'input'
+                    ? isJapanese ? "変更が少ないため再解析不要" : "No significant changes to analyze"
+                    : analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                      ? isJapanese ? "解析済み" : "Already analyzed"
+                      : isJapanese ? "メッセージを解析 (Ctrl+Enter)" : "Analyze message (Ctrl+Enter)"
+              }
+            >
+              {analysisState === 'analyzing' ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <svg 
+                  className={`w-5 h-5 transform transition-transform duration-200 ${
+                    shouldEnableAnalyze()
+                      ? analysisState === 'analyzed' && !hasTextChanged && !externalChanges
+                        ? 'rotate-0'
+                        : 'rotate-90'
+                      : 'rotate-45'
+                  }`}
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  {analysisState === 'analyzed' && shouldEnableAnalyze() && !hasTextChanged && !externalChanges ? (
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M5 13l4 4L19 7" 
+                    />
+                  ) : (
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                    />
+                  )}
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

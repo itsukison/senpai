@@ -613,10 +613,10 @@ const analyzeText = useCallback(
         </div>
 
         {/* Right Side Container - Message Input and Suggestions */}
-        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0 h-full">
+        <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
           {/* 統合コンテナ - 常に表示、拡張アニメーション */}
-          <div className={`bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-1000 flex flex-col ${
-            showSuggestionArea ? 'flex-1' : 'h-auto'
+          <div className={`bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-1000 ${
+            showSuggestionArea ? '' : ''
           }`}>
             {/* 解析後の追加要素（上部） */}
             {showSuggestionArea && suggestion && (
