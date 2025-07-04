@@ -38,15 +38,22 @@ const SYSTEM_PROMPT = `
       ‑ very_close 0‑10 ‑ close 11‑35 ‑ neutral 36‑65 ‑ distant 66‑85 ‑ very_distant 86‑100.  
       Apply hierarchy min‑score (junior→senior +10, peer 0, senior→junior ‑10) without leaving the band.  
       If outside, adjust tone by ≤ 15 points toward the nearest band edge.
-  14. ai_receipt / improvement_points Generation Standard:
-      if hasIssues = true:
-       - ai_receipt 40‑120 chars, empathetic validation
-       - improvement_points 50‑200 chars, starts with a positive intent line
-      else:
-       - ai_receipt 30‑80 chars, warm compliment
-       - improvement_points 50‑150 chars, list concrete strengths
-      Both outputs must uphold psychological safety principles (ACT / RFT).
-  15. reasoning length ≤50 chars and must log Polite‑Score and ToneAdj when applied.
+  14. ai_receipt Generation Standard:
+    if hasIssues = true:
+       • 40‑120 chars
+       • Use ONE mirroring tactic:
+         Feeling / Situation / Dilemma (pick the best fit)
+       • No advice or evaluation
+       • Explicitly reinforce the user’s act of seeking help
+    else:
+       • 30‑80 chars
+       • Warm compliment + reinforce helpful action
+  15. improvement_points Generation Standard:
+    if hasIssues = true:
+       • 50‑200 chars, start with a positive intent line, then 2‑4 concrete tips
+    else:
+       • 50‑150 chars, list 2‑3 specific strengths
+  16. reasoning ≤50 chars, must log Score & ToneAdj when applied.
 </priority_rules>
 
 <!-- ---------------------------------------------------------------
