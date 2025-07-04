@@ -21,11 +21,18 @@ interface ToneSuggestionProps {
   onAccept: () => void;
   onDismiss: () => void;
   onRevert?: () => void;
-  onSuggestionEdit?: (text: string) => void;  // 追加
+  onSuggestionEdit?: (text: string) => void;
   hasAcceptedSuggestion?: boolean;
   position: { top: number; left: number };
   isJapanese: boolean;
   isEmbedded?: boolean;
+  hierarchy?: string;
+  socialDistance?: string;
+  onHierarchyChange?: (value: string) => void;
+  onSocialDistanceChange?: (value: string) => void;
+  onReanalyze?: () => void;
+  externalChanges?: boolean;  // thread_contextや言語の変更フラグ
+  analysisState?: 'ready' | 'analyzing' | 'analyzed';
 }
 
 export function ToneSuggestion({
@@ -38,6 +45,12 @@ export function ToneSuggestion({
   position,
   isJapanese,
   isEmbedded = false,
+  hierarchy = 'peer',
+  socialDistance = 'neutral',
+  onHierarchyChange,
+  onSocialDistanceChange,
+  onReanalyze,
+  externalChanges = false,
 }: ToneSuggestionProps) {
   // showCopyFeedback state をコンポーネントのトップレベルで定義
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
@@ -45,8 +58,75 @@ export function ToneSuggestion({
   const [isShowingOriginal, setIsShowingOriginal] = useState(false); // 追加：オリジナルを表示中かどうか
   const [displayText, setDisplayText] = useState<string>(''); // 表示用テキスト
   const [isTransitioning, setIsTransitioning] = useState(false); // テキスト変化中かどうか
+  const [isAnalyzed, setIsAnalyzed] = useState(false); // 解析済みかどうか
+  
+  // 編集検知用のstate
+  const [currentText, setCurrentText] = useState<string>('');
+  const [hasTextChanged, setHasTextChanged] = useState(false);
+  const [initialHierarchy, setInitialHierarchy] = useState(hierarchy);
+  const [initialSocialDistance, setInitialSocialDistance] = useState(socialDistance);
+  
   const { log } = useLogging(isJapanese ? "ja" : "en"); // log取得用
 
+  // suggestionが更新されたら解析済み状態を更新
+  useEffect(() => {
+    if (suggestion.suggestion) {
+      setIsAnalyzed(true);
+      setCurrentText(suggestion.suggestion);
+      setInitialHierarchy(hierarchy);
+      setInitialSocialDistance(socialDistance);
+      setHasTextChanged(false);
+    }
+  }, [suggestion.suggestion, hierarchy, socialDistance]);
+
+  // 文字列の編集距離を簡易的に計算
+  const getEditDistance = (str1: string, str2: string): number => {
+    const lengthDiff = Math.abs(str1.length - str2.length);
+    const commonLength = Math.min(str1.length, str2.length);
+    let differences = 0;
+    
+    for (let i = 0; i < commonLength; i++) {
+      if (str1[i] !== str2[i]) differences++;
+    }
+    
+    return lengthDiff + differences;
+  };
+
+  // 有意な変更があるかどうか
+  const hasSignificantChange = () => {
+    if (!currentText || !suggestion.suggestion) return false;
+    const editDistance = getEditDistance(currentText, suggestion.suggestion);
+    return editDistance > 5;
+  };
+
+  // 関係性が変更されたかどうか
+  const hasRelationshipChanged = () => {
+    return hierarchy !== initialHierarchy || socialDistance !== initialSocialDistance;
+  };
+
+  // 再解析が可能かどうか
+  const canReanalyze = () => {
+    if (!suggestion.suggestion || isTransitioning) return false;
+    if (isShowingOriginal) return true; // オリジナル表示時は常に有効
+    return hasTextChanged || hasRelationshipChanged() || externalChanges;
+  };
+
+  // テキスト編集時の処理
+  const handleTextEdit = (newText: string) => {
+    setCurrentText(newText);
+    setHasTextChanged(hasSignificantChange());
+    if (onSuggestionEdit) {
+      onSuggestionEdit(newText);
+    }
+  };
+
+  // 再解析時の処理
+  const handleReanalyze = () => {
+    if (onReanalyze && canReanalyze()) {
+      setIsAnalyzed(false);
+      onReanalyze();
+    }
+  };
 
 // テキストの段階的変化を実装
   useEffect(() => {
@@ -63,7 +143,7 @@ export function ToneSuggestion({
     const generateRandomText = (baseText: string): string => {
       const lines = baseText.split('\n');
       const randomChars = isJapanese 
-        ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン会議資料確認共有関係者様連絡報告検討案件対応業務作業完了予定本日明日今週来週以降担当部署課長部長様方皆様御中心理的安全性話助挑新0000000001111111111ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?'
+        ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン会議資料確認共有関係者様連絡報告検討案件対応業務作業完了予定本日明日今週来週以降担当部署課長部長様方皆様御中ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?'
         : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?αβγδεζηθικλμνξοπρστυφχψωÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ';
       
       return lines.map(line => {
@@ -79,12 +159,12 @@ export function ToneSuggestion({
       }).join('\n');
     };
 
-// 部分的にランダムな文字を生成する関数
+    // 部分的にランダムな文字を生成する関数
     const generatePartialRandomText = (baseText: string, progress: number): string => {
       const lines = baseText.split('\n');
       const randomChars = isJapanese 
-        ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン会議資料確認共有関係者様連絡報告検討案件対応業務作業完了予定本日明日今週来週以降担当部署課長部長様方皆様御中心理的安全性話助挑新0000000001111111111ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?'
-        : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?αβγδεζηθικλμνξοπρστυφχψωÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ';
+        ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン会議資料確認共有関係者様連絡報告検討案件対応業務作業完了予定本日明日今週来週以降担当部署課長部長様方皆様御中ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?αβγδεζηθικλμνξοπρστυφχψω';
       
       return lines.map((line, lineIndex) => {
         if (!line) return line;
@@ -138,8 +218,8 @@ export function ToneSuggestion({
             } else {
               // まだランダムな文字
               const randomChars = isJapanese 
-                ? 'あいうえおかきくけこさしすせそたちつてとなにぬねの'
-                : 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのアイウエオカキクケコ会議資料確認共有連絡報告'
+                : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
               return randomChars[Math.floor(Math.random() * randomChars.length)];
             }
           }).join('');
@@ -198,13 +278,13 @@ export function ToneSuggestion({
         
         continuousAnimate();
       }, 2000);
-
+      
       return () => {
         clearTimeout(startTimer);
-        if (animationFrame) {
+        if (animationFrame !== undefined) {
           cancelAnimationFrame(animationFrame);
         }
-        if (transitionTimer) {
+        if (transitionTimer !== undefined) {
           clearTimeout(transitionTimer);
         }
       };
@@ -222,7 +302,6 @@ export function ToneSuggestion({
 
   // Handle escape key to close popup
   useEffect(() => {
-    // const [showCopyFeedback, setShowCopyFeedback] = useState(false);  // ここから移動
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onDismiss();
@@ -417,25 +496,172 @@ export function ToneSuggestion({
                   投稿予定のメッセージ（編集可能）
                 </h3>
               </div>
-              <textarea
-                value={isShowingOriginal 
-                  ? suggestion.originalText 
-                  : (suggestion.hasIssues 
-                    ? (isTransitioning ? displayText : (suggestion.suggestion || displayText || ''))
-                    : suggestion.originalText)
-                }
-                onChange={(e) => {
-                  if (onSuggestionEdit && !isShowingOriginal && !isTransitioning) {
-                    onSuggestionEdit(e.target.value);
+              
+              {/* RelationshipSelector */}
+              <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
+                  {/* 宛先セクション */}
+                  <div className="flex-1 flex flex-col sm:flex-col">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
+                      <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+                        {isJapanese ? '宛先' : 'To'}
+                      </p>
+                      <div className="flex space-x-1.5 flex-1 w-full">
+                        {(isJapanese
+                          ? [
+                              { value: 'junior', label: '後輩・部下' },
+                              { value: 'peer', label: '同僚・対等' },
+                              { value: 'senior', label: '目上のかた' }
+                            ]
+                          : [
+                              { value: 'junior', label: 'Junior' },
+                              { value: 'peer', label: 'Peer' },
+                              { value: 'senior', label: 'Senior' }
+                            ]
+                        ).map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => onHierarchyChange?.(option.value)}
+                            disabled={!suggestion.suggestion || isTransitioning}
+                            className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
+                              hierarchy === option.value
+                                ? 'bg-purple-600 text-white shadow-sm'
+                                : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
+                            } ${(!suggestion.suggestion || isTransitioning) ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          >
+                            <p className="text-[10px] sm:text-xs font-semibold">
+                              {option.label}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="hidden sm:block w-px bg-purple-200" />
+
+                  {/* 距離セクション */}
+                  <div className="flex-1 flex flex-col sm:flex-col">
+                    <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
+                      <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
+                        {isJapanese ? '距離' : 'Distance'}
+                      </p>
+                      <div className="flex space-x-1.5 flex-1 w-full">
+                        {(isJapanese
+                          ? [
+                              { value: 'close', label: '近い' },
+                              { value: 'somewhat_close', label: 'やや近' },
+                              { value: 'neutral', label: '標準' },
+                              { value: 'somewhat_distant', label: 'やや遠' },
+                              { value: 'distant', label: '遠い' }
+                            ]
+                          : [
+                              { value: 'close', label: 'Close' },
+                              { value: 'somewhat_close', label: 'Rather Close' },
+                              { value: 'neutral', label: 'Neutral' },
+                              { value: 'somewhat_distant', label: 'Rather Distant' },
+                              { value: 'distant', label: 'Distant' }
+                            ]
+                        ).map((option) => (
+                          <button
+                            key={option.value}
+                            onClick={() => onSocialDistanceChange?.(option.value)}
+                            disabled={!suggestion.suggestion || isTransitioning}
+                            className={`flex-1 py-1 px-1.5 rounded-lg text-[10px] sm:text-xs font-semibold transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
+                              socialDistance === option.value
+                                ? 'bg-purple-600 text-white shadow-sm'
+                                : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
+                            } ${(!suggestion.suggestion || isTransitioning) ? 'opacity-60 cursor-not-allowed' : ''}`}
+                          >
+                            <span className="block">{option.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* テキストエリア */}
+              <div className="relative flex-1 flex flex-col min-h-0">
+                <textarea
+                  value={isShowingOriginal 
+                    ? suggestion.originalText 
+                    : (suggestion.hasIssues 
+                      ? (isTransitioning ? displayText : (currentText || displayText || ''))
+                      : suggestion.originalText)
                   }
-                }}
-                disabled={suggestion.hasIssues ? (!suggestion.suggestion || isShowingOriginal || isTransitioning) : false}
-                className={`w-full resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-40 p-4 disabled:bg-gray-50 disabled:text-gray-500 ${
-                  isTransitioning ? 'transition-opacity duration-300' : ''
-                }`}
-                style={{ fontFamily: "Inter, sans-serif" }}
-                placeholder="ここに改善案が表示されます。このエリアは、直接編集が可能です。"
-              />
+                  onChange={(e) => {
+                    if (!isShowingOriginal && !isTransitioning) {
+                      handleTextEdit(e.target.value);
+                    }
+                  }}
+                  disabled={suggestion.hasIssues ? (!suggestion.suggestion || isShowingOriginal || isTransitioning) : false}
+                  className={`flex-1 resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed h-40 pb-12 px-4 disabled:bg-gray-50 disabled:text-gray-500 ${
+                    isTransitioning ? 'transition-opacity duration-300' : ''
+                  }`}
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                  placeholder="ここに改善案が表示されます。このエリアは、直接編集が可能です。"
+                />
+                
+                {/* 送信ボタン */}
+                <div className="absolute bottom-2 right-4">
+                  <button
+                    onClick={handleReanalyze}
+                    disabled={!canReanalyze()}
+                    className={`p-2 rounded-md transition-all duration-200 ${
+                      canReanalyze()
+                        ? isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
+                          ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
+                          : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md'  // 解析可能
+                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
+                    }`}
+                    title={
+                      !suggestion.suggestion 
+                        ? isJapanese ? "解析中..." : "Analyzing..."
+                        : isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
+                          ? isJapanese ? "解析済み" : "Already analyzed"
+                          : isJapanese ? "メッセージを解析" : "Analyze message"
+                    }
+                  >
+                    {isTransitioning ? (
+                      <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                    ) : (
+                      <svg 
+                        className={`w-5 h-5 ${
+                          isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal
+                            ? 'rotate-0'  // 解析済み
+                            : 'rotate-90'  // 解析可能
+                        }`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        {isAnalyzed && !hasTextChanged && !hasRelationshipChanged() && !externalChanges && !isShowingOriginal ? (
+                          // チェックマークアイコン（解析済み）
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M5 13l4 4L19 7" 
+                          />
+                        ) : (
+                          // 紙飛行機アイコン（通常）
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                          />
+                        )}
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -478,44 +704,44 @@ export function ToneSuggestion({
             <div className="flex items-center gap-3">
               {/* コピーボタン */}
               <button
-                  onClick={async () => {
-                    const textToCopy = isShowingOriginal 
-                      ? suggestion.originalText 
-                      : (suggestion.suggestion || suggestion.originalText);
-                    
-                    if (textToCopy) {
-                      await navigator.clipboard.writeText(textToCopy);
-                      setShowCopyFeedback(true);
-                      setTimeout(() => setShowCopyFeedback(false), 2000);
+                onClick={async () => {
+                  const textToCopy = isShowingOriginal 
+                    ? suggestion.originalText 
+                    : (currentText || suggestion.suggestion || suggestion.originalText);
+                  
+                  if (textToCopy) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    setShowCopyFeedback(true);
+                    setTimeout(() => setShowCopyFeedback(false), 2000);
 
-                      await log("text_copied", {
-                        action: "copy",
-                        newText: textToCopy,
-                      });
-                    }
-                  }}
-                  disabled={suggestion.hasIssues ? (!suggestion.suggestion && !isShowingOriginal) : false}
-                  className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors relative disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    await log("text_copied", {
+                      action: "copy",
+                      newText: textToCopy,
+                    });
+                  }
+                }}
+                disabled={suggestion.hasIssues ? (!suggestion.suggestion && !isShowingOriginal) : false}
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors relative disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <svg
-                    className="w-4 h-4 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
-                  {showCopyFeedback
-                    ? isJapanese
-                      ? "コピーしました！"
-                      : "Copied!"
-                    : labels.copyToClipboard}
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                {showCopyFeedback
+                  ? isJapanese
+                    ? "コピーしました！"
+                    : "Copied!"
+                  : labels.copyToClipboard}
+              </button>
             </div>
           </div>
         </div>

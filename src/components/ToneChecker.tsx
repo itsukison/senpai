@@ -34,6 +34,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [acceptedSuggestionText, setAcceptedSuggestionText] = useState(""); // 反映した提案のテキスト
   const [isTransitioning, setIsTransitioning] = useState(false); // アニメーション状態
   const [showSuggestionArea, setShowSuggestionArea] = useState(false); // 提案エリアの表示状態
+  const [externalChanges, setExternalChanges] = useState(false); // 外部変更フラグ
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -105,6 +106,7 @@ const analyzeText = useCallback(
     // アニメーション開始
     setIsTransitioning(true);
     setShowSuggestionArea(true);
+    setExternalChanges(false); // 外部変更フラグをリセット
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
     setSuggestion({
@@ -326,6 +328,9 @@ const analyzeText = useCallback(
   // 言語切り替えを検知
   useEffect(() => {
     setAnalysisState('ready');
+    if (showSuggestionArea) {
+      setExternalChanges(true);
+    }
   }, [isJapanese]);
 
   // 各種設定変更を検知
@@ -435,13 +440,13 @@ const analyzeText = useCallback(
     setAnalysisState('ready');
   }
 }}
-                    className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:h-auto ${
+                    className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
                       hierarchy === option.value
                         ? 'bg-purple-600 text-white shadow-sm'
                         : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
                     }`}
                   >
-                    <p className="text-[10px] font-semibold">
+                    <p className="text-[10px] sm:text-xs font-semibold">
                       {option.label}
                     </p>
                   </button>
@@ -459,7 +464,7 @@ const analyzeText = useCallback(
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
                 {isJapanese ? '距離' : 'Distance'}
               </p>
-              <div className="bg-white rounded-lg p-0.5 shadow-inner flex space-x-0.5 flex-1 w-full">
+              <div className="flex space-x-1.5 flex-1 w-full">
                 {distanceOptionsArray.map((option) => (
                   <button
                     key={option.value}
@@ -474,15 +479,15 @@ const analyzeText = useCallback(
                         setAnalysisState('ready');
                       }
                     }}
-                    className={`flex-1 py-1 px-1.5 rounded-md text-[10px] font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:h-auto ${
+                    className={`flex-1 py-1 px-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
                       social_distance === option.value
                         ? 'bg-purple-600 text-white shadow-sm'
-                        : 'text-purple-700 hover:bg-purple-50'
+                        : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
                     }`}
                   >
-                    <span className="block">{option.label}</span>
+                    <span className="block sm:font-semibold">{option.label}</span>
                     {social_distance === option.value && (
-                      <span className="block text-[8px] opacity-80 mt-0.5 whitespace-nowrap">
+                      <span className="hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap">
                         {getDistanceSubtext()}
                       </span>
                     )}
@@ -514,7 +519,12 @@ const analyzeText = useCallback(
           <div className="relative flex-1 flex flex-col min-h-0">
             <Textarea
               value={threadContext}
-              onChange={(e) => setThreadContext(e.target.value)}
+              onChange={(e) => {
+                setThreadContext(e.target.value);
+                if (showSuggestionArea && analysisState === 'analyzed') {
+                  setExternalChanges(true);
+                }
+              }}
               placeholder={labels.contextPlaceholder}
               className="flex-1 resize-none border-0 rounded-none focus-visible:ring-2 focus-visible:ring-slack-blue text-xs sm:text-sm leading-relaxed h-full"
               style={{ fontFamily: "Inter, sans-serif" }}
@@ -663,6 +673,13 @@ const analyzeText = useCallback(
                   position={{ top: 0, left: 0 }}
                   isJapanese={isJapanese}
                   isEmbedded={true}
+                  hierarchy={hierarchy}
+                  socialDistance={social_distance}
+                  onHierarchyChange={setHierarchy}
+                  onSocialDistanceChange={setSocialDistance}
+                  onReanalyze={analyzeText}
+                  externalChanges={externalChanges}
+                  analysisState={analysisState}
                 />
               ) : (
                 <div className="flex-1 flex items-center justify-center bg-slate-50 p-3 sm:p-4">
