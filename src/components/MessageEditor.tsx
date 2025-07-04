@@ -22,20 +22,15 @@ interface MessageEditorProps {
   hasAcceptedSuggestion?: boolean;
   hasSignificantChange?: boolean;
   externalChanges?: boolean;
-  // 解析履歴
-  analysisHistory?: Array<{
-    timestamp: Date;
-    original: string;
-    suggestion: string;
-    settings: { hierarchy: string; socialDistance: string; };
-  }>;
-  onHistorySelect?: (index: number) => void;
-  // トグル機能用の新規追加
-  originalText?: string;
-  suggestionText?: string;
-  isShowingOriginal?: boolean;
-  onToggleOriginal?: () => void;
-  hasEditedOriginal?: boolean;
+  
+  // トグル機能用props
+  // ユーザーが「AIの提案」と「元の文章」を自由に切り替えて編集できる機能
+  // それぞれの編集内容は独立して保持され、いつでも切り替え可能
+  originalText?: string;          // 解析前の元の文章
+  suggestionText?: string;        // AIが提案した文章
+  isShowingOriginal?: boolean;    // 現在どちらを表示しているか
+  onToggleOriginal?: () => void;  // 表示を切り替える関数
+  hasEditedOriginal?: boolean;    // 元文章が編集されているか（UIヒント用）
 }
 
 export function MessageEditor({
@@ -57,8 +52,7 @@ export function MessageEditor({
   hasAcceptedSuggestion = false,
   hasSignificantChange = true,
   externalChanges = false,
-  analysisHistory = [],
-  onHistorySelect,
+  
   originalText,
   suggestionText,
   isShowingOriginal = false,
@@ -170,9 +164,9 @@ export function MessageEditor({
   };
 
 return (
-    <div className={`bg-white shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300 ${mode === 'suggestion' ? '' : 'rounded-xl overflow-hidden'}`}>
+    <div className={`bg-white ${mode === 'suggestion' ? 'overflow-hidden' : 'shadow-lg hover:shadow-xl border border-slate-200 rounded-xl overflow-hidden'} transition-shadow duration-300`}>
       {/* Header */}
-      <div className="px-4 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
+      <div className={`px-4 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 ${mode === 'suggestion' ? 'rounded-tl-xl rounded-tr-xl' : ''}`}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm sm:text-base font-semibold text-purple-800 tracking-wide">
             {title || (mode === 'input' ? labels.writeTitle : labels.suggestionTitle)}
@@ -186,38 +180,13 @@ return (
                 </span>
               </div>
             )}
-            {/* 解析履歴 */}
-            {analysisHistory.length > 0 && onHistorySelect && (
-              <div className="relative group">
-                <button className="text-xs text-purple-600 hover:text-purple-800">
-                  {isJapanese ? "履歴" : "History"} ({analysisHistory.length})
-                </button>
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
-                  <div className="p-2 max-h-48 overflow-y-auto">
-                    {analysisHistory.map((item, index) => (
-                      <button
-                        key={index}
-                        onClick={() => onHistorySelect(index)}
-                        className="block w-full text-left p-2 hover:bg-purple-50 rounded text-xs"
-                      >
-                        <div className="font-medium text-slate-700">
-                          {new Date(item.timestamp).toLocaleTimeString()}
-                        </div>
-                        <div className="text-slate-500 truncate">
-                          {item.original.substring(0, 30)}...
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
+            
           </div>
         </div>
       </div>
 
       {/* 関係性セレクター */}
-      <div className="bg-purple-50 px-4 py-2.5">
+      <div className={`bg-purple-50 px-4 py-2.5 ${mode === 'suggestion' ? '' : ''}`}>
         <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
           {/* 宛先セクション */}
           <div className="flex-1 flex flex-col sm:flex-col">
@@ -319,7 +288,7 @@ return (
                     onClick={onToggleOriginal}
                     className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
                   >
-                    ← {isJapanese ? "オリジナルに戻す" : "Show original"}
+                    ← {isJapanese ? "元文章に戻す" : "Show original"}
                   </button>
                 )}
                 {isShowingOriginal && (
@@ -328,7 +297,7 @@ return (
                     className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
                   >
                     {hasEditedOriginal 
-                      ? (isJapanese ? "← 編集中の文章に戻す" : "← Back to edited")
+                      ? (isJapanese ? "← 編集中の文章へ" : "← Back to edited")
                       : (isJapanese ? "提案を見る →" : "Show suggestion →")}
                   </button>
                 )}
@@ -338,8 +307,8 @@ return (
 
           {/* 右側：既存のボタン */}
           <div className="flex items-center gap-2">
-            {/* コピーボタン（suggestion modeの時は常に表示） */}
-            {mode === 'suggestion' && (
+            {/* コピーボタン（suggestion modeかつ解析完了時に表示） */}
+            {mode === 'suggestion' && analysisState === 'analyzed' && (
               <button
                 onClick={async () => {
                   if (text) {
@@ -394,7 +363,8 @@ return (
                   showCopyFeedback ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
                 }`}>
                   <span className="text-xs sm:text-sm">
-                    {isJapanese ? "クリップボードにコピー" : "Copy to clipboard"}
+                    <span className="sm:hidden">{isJapanese ? "コピー" : "Copy"}</span>
+                    <span className="hidden sm:inline">{isJapanese ? "クリップボードにコピー" : "Copy to clipboard"}</span>
                   </span>
                   <svg 
                     className="w-4 h-4"

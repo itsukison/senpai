@@ -40,28 +40,27 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [animationPhase, setAnimationPhase] = useState<'input' | 'transitioning' | 'suggestion'>('input'); // アニメーションフェーズ
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const animationTimersRef = useRef<NodeJS.Timeout[]>([]); // アニメーションタイマーの管理
   const [isFirstAnalysis, setIsFirstAnalysis] = useState(true); // 初回解析かどうか
   const [isReanalyzing, setIsReanalyzing] = useState(false); // 再解析中かどうか
   const [displayText, setDisplayText] = useState<string>(''); // 表示用テキスト（ランダムアニメーション用）
   const [isShowingRandomText, setIsShowingRandomText] = useState(false); // ランダムテキスト表示中
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false); // 詳細分析の表示状態
   const [showRandomTextFlag, setShowRandomTextFlag] = useState(false); // ランダムテキスト開始フラグ
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // エラーメッセージ
   const [isContextOpen, setIsContextOpen] = useState(false); // Context Inputの開閉状態（モバイル・タブレット用）
-  const [isShowingOriginal, setIsShowingOriginal] = useState(false); // オリジナル表示状態
-  const [editedOriginalText, setEditedOriginalText] = useState(""); // 編集されたオリジナルテキスト
+  
+  // ========== トグル機能の状態管理 ==========
+  // ユーザーストーリー：
+  // 1. AIの提案が良い場合 → そのまま提案を編集して完成
+  // 2. AIの提案がイマイチな場合 → 元文章に戻って、元文章を編集して完成
+  // どちらのパスでも、編集内容を保持しつつ、再解析も可能にする
+  const [isShowingOriginal, setIsShowingOriginal] = useState(false); // true: 元文章を表示中, false: AI提案を表示中
+  const [editedOriginalText, setEditedOriginalText] = useState(""); // 元文章に戻った時の編集内容を保持
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
   const [social_distance, setSocialDistance] = useState('neutral');
-
-  // 解析履歴の管理
-  const [analysisHistory, setAnalysisHistory] = useState<Array<{
-    timestamp: Date;
-    original: string;
-    suggestion: string;
-    settings: { hierarchy: string; socialDistance: string; };
-  }>>([]);
-
 
 // 合計文字数を取得
   const getTotalTextLength = () => {
@@ -132,29 +131,36 @@ const analyzeText = useCallback(
       // これらのタイミングがずれると、アニメーションが競合します。
       
       // アニメーション完了（1秒に修正）
-      setTimeout(() => {
+      const mainTimer = setTimeout(() => {
         setAnimationPhase('suggestion');
         setIsTransitioning(false);
         setIsFirstAnalysis(false);
         
         // レイアウト安定後、ランダムテキストの開始を制御
         // API応答が既にある場合はスキップ
-        setTimeout(() => {
+        const subTimer = setTimeout(() => {
           // この時点でまだAPI応答がない場合のみ、ランダムテキスト開始フラグを立てる
           if (!suggestion?.suggestion) {
             setShowRandomTextFlag(true);
           }
         }, 800); // 0.8秒の短い待機
+        animationTimersRef.current.push(subTimer);
       }, 1000); // CSS transitionと同期（1秒）
+      animationTimersRef.current.push(mainTimer);
     }
     // モバイルの場合、スクロール調整（初回のみ）
     if (!isReanalysis && window.innerWidth < 768) {
-      setTimeout(() => {
-        const suggestionElement = document.querySelector('.suggestion-container');
-        if (suggestionElement) {
-          suggestionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const scrollTimer = setTimeout(() => {
+        // 提案エリア全体を探す（統合コンテナ内の提案部分）
+        const suggestionHeader = document.querySelector('[class*="改善提案"], [class*="Improvement Suggestion"]')?.parentElement?.parentElement;
+        if (suggestionHeader) {
+          // ナビゲーションバーの高さを考慮して、少し余白を持たせる
+          const yOffset = -80; // ナビゲーションバー分のオフセット
+          const y = suggestionHeader.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
-      }, 600);
+      }, 1200); // アニメーション完了後にスクロール
+      animationTimersRef.current.push(scrollTimer);
     }
     
     // トグル状態のリセット
@@ -176,11 +182,17 @@ const analyzeText = useCallback(
     
     // ランダムテキストフラグをリセット
     setShowRandomTextFlag(false);
+    // エラーメッセージもリセット
+    setErrorMessage(null);
 
     // 既存の解析をキャンセル
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
+    
+    // 既存のタイマーをクリア
+    animationTimersRef.current.forEach(timer => clearTimeout(timer));
+    animationTimersRef.current = [];
 
     // 新しいAbortControllerを作成
     abortControllerRef.current = new AbortController();
@@ -226,6 +238,23 @@ const analyzeText = useCallback(
       if (!response.ok) {
         const errorText = await response.text();
         console.error("APIエラーレスポンス:", errorText);
+        
+        // ユーザー向けのエラーメッセージを設定
+        let userMessage = isJapanese 
+          ? "エラーが発生しました。もう一度お試しください。"
+          : "An error occurred. Please try again.";
+        
+        if (response.status === 401) {
+          userMessage = isJapanese
+            ? "認証エラーが発生しました。APIキーを確認してください。"
+            : "Authentication error. Please check the API key.";
+        } else if (response.status >= 500) {
+          userMessage = isJapanese
+            ? "サーバーエラーが発生しました。しばらく待ってからお試しください。"
+            : "Server error. Please try again later.";
+        }
+        
+        setErrorMessage(userMessage);
         throw new Error("Failed to analyze text");
       }
 
@@ -256,19 +285,6 @@ const analyzeText = useCallback(
         },
         processingTime: Date.now() - startTime,
       });
-
-      // 解析履歴に追加（成功時のみ、最大3件保持）
-      if (analysis.suggestion) {
-        setAnalysisHistory(prev => {
-          const newHistory = [{
-            timestamp: new Date(),
-            original: userDraft,
-            suggestion: analysis.suggestion!,
-            settings: { hierarchy, socialDistance: social_distance }
-          }, ...prev].slice(0, 3);
-          return newHistory;
-        });
-      }
 
       // Log analysis data to Supabase
       try {
@@ -309,19 +325,51 @@ const analyzeText = useCallback(
     } catch (error: any) {
       if (error.name === 'AbortError') {
         console.log('解析がキャンセルされました');
+        
+        // すべての解析関連の状態をリセット
+        setIsTransitioning(false);
+        setAnalysisState('ready');
+        setIsReanalyzing(false);
+        setShowRandomTextFlag(false);
+        setIsShowingRandomText(false);
+        
+        // 初回解析でキャンセルされた場合
+        if (isFirstAnalysis && showSuggestionArea) {
+          setAnimationPhase('input');
+          setShowSuggestionArea(false);
+          setSuggestion(null);
+          setIsFirstAnalysis(true); // 初回フラグも維持
+        } else {
+          // 再解析でキャンセルされた場合は提案エリアは維持
+          setAnimationPhase('suggestion');
+        }
+        
         return;
       }
       console.error("エラー詳細:", error);
       setSuggestion(null);
+      setAnalysisState('ready'); // エラー時もreadyに戻す
+      
+      // ネットワークエラーの場合
+      if (!error.name || error.name !== 'AbortError') {
+        const userMessage = isJapanese
+          ? "ネットワークエラーが発生しました。インターネット接続を確認してください。"
+          : "Network error. Please check your internet connection.";
+        setErrorMessage(userMessage);
+      }
     } finally {
-      setAnalysisState('analyzed');
-      console.log("=== 解析終了 ===");
+      // AbortErrorの場合はfinallyが実行されないようにする
+      if (!abortControllerRef.current?.signal.aborted) {
+        setAnalysisState('analyzed');
+        console.log("=== 解析終了 ===");
+      }
     }
   },
   [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze, showSuggestionArea, isShowingOriginal, editedOriginalText, suggestion]
 );
 
   // トグル機能の実装
+  // ユーザーが提案と元文章を自由に切り替えて、それぞれを独立して編集できるようにする
   const handleToggleOriginal = () => {
     setIsShowingOriginal(!isShowingOriginal);
   };
@@ -370,6 +418,8 @@ const analyzeText = useCallback(
   };
 
   // 編集時のテキスト処理を統一
+  // 重要：どちらのモードでも編集内容は独立して保存される
+  // これにより、ユーザーは提案と元文章を行き来しながら、それぞれのバージョンを編集できる
   const handleEditInSuggestionMode = (value: string) => {
     if (isShowingOriginal) {
       // オリジナル表示中はeditedOriginalTextを更新
@@ -760,10 +810,36 @@ const analyzeText = useCallback(
               }}
             >
               <div className="overflow-hidden">
-              {suggestion && (
-                <div className="p-5 space-y-4 border-b border-slate-200">
+              {(suggestion || errorMessage) && (
+                <div className="p-5 space-y-4 rounded-t-xl">
+                {/* エラーメッセージの表示 */}
+                {errorMessage && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start space-x-3">
+                      <svg className="w-5 h-5 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <div className="flex-1">
+                        <p className="text-sm text-red-800">{errorMessage}</p>
+                        <button
+                          onClick={() => {
+                            setErrorMessage(null);
+                            analyzeText();
+                          }}
+                          className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium"
+                        >
+                          {isJapanese ? "もう一度試す" : "Try again"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* 通常の提案内容（suggestionがある場合のみ） */}
+                {suggestion && !errorMessage && (
+                  <>
                 {/* ヘッダー with アイコン */}
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between rounded-t-xl">
                     <div className="flex items-center space-x-2">
                       <span className="text-2xl">
                         {suggestion.hasIssues ? '💡' : '❤️'}
@@ -798,13 +874,11 @@ const analyzeText = useCallback(
                   <div className="text-sm text-slate-700 leading-relaxed min-h-[40px]">
                     {(suggestion.ai_receipt || suggestion.reasoning) ? (
                       suggestion.ai_receipt || suggestion.reasoning
+
                     ) : (
-                      <div className="flex items-center justify-center h-10">
-                        <div className="flex space-x-2">
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                        </div>
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded animate-pulse w-3/5"></div>
                       </div>
                     )}
                   </div>
@@ -858,12 +932,10 @@ const analyzeText = useCallback(
                             )}
                           </>
                         ) : (
-                          <div className="flex items-center justify-center h-16">
-                            <div className="flex space-x-2">
-                              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                            </div>
+                          <div className="space-y-2">
+                            <div className="h-4 bg-yellow-200 rounded animate-pulse w-full"></div>
+                            <div className="h-4 bg-yellow-200 rounded animate-pulse w-4/5"></div>
+                            <div className="mt-3 h-3 bg-yellow-300 rounded animate-pulse w-24"></div>
                           </div>
                         )}
                       </div>
@@ -927,6 +999,8 @@ const analyzeText = useCallback(
                       </p>
                     </div>
                  )}
+                </>
+                )}
                 </div>
               )}
               </div>
@@ -974,16 +1048,13 @@ const analyzeText = useCallback(
                 isJapanese={isJapanese}
                 hasAcceptedSuggestion={hasAcceptedSuggestion}
                 hasSignificantChange={hasSignificantChange()}
-                analysisHistory={analysisHistory}
-                onHistorySelect={(index) => {
-                  const history = analysisHistory[index];
-                  setUserDraft(history.original);
-                  setHierarchy(history.settings.hierarchy);
-                  setSocialDistance(history.settings.socialDistance);
-                  setAnalysisState('ready');
-                }}
-                isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
-                isTransitioning={isTransitioning}
+                
+                // isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
+                // isTransitioning={isTransitioning}
+
+                isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
+                isTransitioning={false} // 一時的にfalseに固定してテスト
+
                 title={showSuggestionArea 
                   ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")
                   : undefined
