@@ -45,6 +45,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [displayText, setDisplayText] = useState<string>(''); // 表示用テキスト（ランダムアニメーション用）
   const [isShowingRandomText, setIsShowingRandomText] = useState(false); // ランダムテキスト表示中
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false); // 詳細分析の表示状態
+  const [showRandomTextFlag, setShowRandomTextFlag] = useState(false); // ランダムテキスト開始フラグ
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -119,14 +120,30 @@ const analyzeText = useCallback(
       // 即座に提案エリアを表示（移動開始）
       setShowSuggestionArea(true);
       
-      // アニメーション完了（1.2秒に延長）
+      // ⚠️ タイマー依存関係の重要な注意事項:
+      // このsetTimeoutは複数のアニメーションタイマーと連携しています。
+      // 変更する場合は以下も確認してください：
+      // 1. CSS transition duration（現在2000ms）
+      // 2. useEffect内のランダムテキスト待機時間
+      // 3. dismissSuggestion内のタイマー（1200ms）
+      // これらのタイミングがずれると、アニメーションが競合します。
+      
+      // アニメーション完了（2秒に統一）
       setTimeout(() => {
         setAnimationPhase('suggestion');
         setIsTransitioning(false);
         setIsFirstAnalysis(false);
-      }, 1200);
+        
+        // レイアウト安定後、ランダムテキストの開始を制御
+        // API応答が既にある場合はスキップ
+        setTimeout(() => {
+          // この時点でまだAPI応答がない場合のみ、ランダムテキスト開始フラグを立てる
+          if (!suggestion?.suggestion) {
+            setShowRandomTextFlag(true);
+          }
+        }, 800); // 0.8秒の短い待機
+      }, 2000); // CSS transitionと同期（2秒）
     }
-    
     // モバイルの場合、スクロール調整（初回のみ）
     if (!isReanalysis && window.innerWidth < 768) {
       setTimeout(() => {
@@ -149,6 +166,9 @@ const analyzeText = useCallback(
       issue_pattern: [],
       detected_mentions: []
     });
+    
+    // ランダムテキストフラグをリセット
+    setShowRandomTextFlag(false);
 
     // 既存の解析をキャンセル
     if (abortControllerRef.current) {
@@ -380,6 +400,7 @@ const analyzeText = useCallback(
       setIsTransitioning(false);
       setIsFirstAnalysis(true); // リセット
       setIsReanalyzing(false);
+      setShowRandomTextFlag(false); // フラグもリセット
     }, 1200);
   };
 
@@ -465,38 +486,36 @@ const analyzeText = useCallback(
       return;
     }
 
-    // 改善案がまだない場合、2秒後からランダムテキストアニメーション
-    if (!suggestion.suggestion && analysisState === 'analyzing') {
+    // 改善案がまだない場合、フラグに基づいてランダムテキストアニメーション
+    if (!suggestion.suggestion && analysisState === 'analyzing' && showRandomTextFlag) {
       setDisplayText(suggestion.originalText);
       
-      const startTimer = setTimeout(() => {
-        setIsShowingRandomText(true);
-        const animationStartTime = Date.now();
+      // フラグが立ったら即座に開始（待機はanalyzeText側で管理）
+      setIsShowingRandomText(true);
+      const animationStartTime = Date.now();
+      
+      let frameCount = 0;
+      const continuousAnimate = () => {
+        if (suggestion.suggestion) {
+          transitionToReal(suggestion.suggestion);
+          return;
+        }
         
-        let frameCount = 0;
-        const continuousAnimate = () => {
-          if (suggestion.suggestion) {
-            transitionToReal(suggestion.suggestion);
-            return;
-          }
+        frameCount++;
+        if (frameCount % 12 === 0) {
+          const elapsed = Date.now() - animationStartTime;
+          const progress = Math.min(1, elapsed / 3000);
           
-          frameCount++;
-          if (frameCount % 12 === 0) {
-            const elapsed = Date.now() - animationStartTime;
-            const progress = Math.min(1, elapsed / 2000);
-            
-            const partiallyRandomText = generatePartialRandomText(suggestion.originalText, progress);
-            setDisplayText(partiallyRandomText);
-          }
-          
-          animationFrame = requestAnimationFrame(continuousAnimate);
-        };
+          const partiallyRandomText = generatePartialRandomText(suggestion.originalText, progress);
+          setDisplayText(partiallyRandomText);
+        }
         
-        continuousAnimate();
-      }, 2000);
+        animationFrame = requestAnimationFrame(continuousAnimate);
+      };
+      
+      continuousAnimate();
       
       return () => {
-        clearTimeout(startTimer);
         if (animationFrame !== undefined) {
           cancelAnimationFrame(animationFrame);
         }
@@ -512,7 +531,7 @@ const analyzeText = useCallback(
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [suggestion, showSuggestionArea, analysisState, isJapanese]);
+  }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag]);
 
   // 言語切り替えを検知
   useEffect(() => {
@@ -616,19 +635,23 @@ const analyzeText = useCallback(
 
         {/* Right Side Container - Message Input and Suggestions */}
         <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4">
-          {/* 統合コンテナ - 常に表示、拡張アニメーション */}
-          <div className={`bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-all duration-1000 ${
-            showSuggestionArea ? '' : ''
-          }`}>
-            {/* 解析後の追加要素（上部） */}
-            {showSuggestionArea && suggestion && (
-              <div className={`transition-all duration-500 overflow-hidden ${
-                animationPhase === 'suggestion' 
-                  ? 'max-h-[2000px] opacity-100' 
-                  : 'max-h-0 opacity-0'
-              }`}>
-                <div className="p-5 space-y-4">
-                  {/* ヘッダー with アイコン */}
+          {/* 統合コンテナ - 常に存在 */}
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl overflow-hidden">
+            {/* 解析結果部分 - 常にDOMに存在、高さで制御 */}
+            {/* grid-rowsトリック: 0frから1frへの変化で自然な高さアニメーション */}
+            <div 
+              className={`grid transition-[grid-template-rows,opacity,transform] duration-[2500ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
+                showSuggestionArea ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+              }`}
+              style={{
+                opacity: showSuggestionArea ? 1 : 0,
+                transform: showSuggestionArea ? 'translateY(0)' : 'translateY(-10px)'
+              }}
+            >
+              <div className="overflow-hidden">
+              {suggestion && (
+                <div className="p-5 space-y-4 border-b border-slate-200">
+                {/* ヘッダー with アイコン */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-2xl">
@@ -792,22 +815,14 @@ const analyzeText = useCallback(
                         {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
                       </p>
                     </div>
-                  )}
+                 )}
                 </div>
-                
-                {/* スペースを追加 */}
-                <div className="mb-6"></div>
+              )}
               </div>
-            )}
-
-            {/* MessageEditor - 常に表示、位置が変化 */}
-            <div className={`transition-all ease-out ${
-              showSuggestionArea && animationPhase === 'transitioning' && !isReanalyzing
-                ? 'transform translate-y-4 opacity-90 duration-1000' 
-                : 'transform translate-y-0 opacity-100 duration-300'
-            }`}>
-
-              <MessageEditor
+            </div>
+            
+            {/* MessageEditor - 同じコンテナ内に常に存在 */}
+            <MessageEditor
                 mode={showSuggestionArea ? "suggestion" : "input"}
                 text={showSuggestionArea 
                   ? (isShowingRandomText || !suggestion?.suggestion ? displayText : suggestion.suggestion)
@@ -857,26 +872,12 @@ const analyzeText = useCallback(
                 isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
                 isTransitioning={isTransitioning}
                 title={showSuggestionArea 
-                  ? (isJapanese ? "投稿予定のメッセージ（編集可能）" : "Message to send (editable)")
+                  ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")
                   : undefined
                 }
                 externalChanges={externalChanges}
               />
-            </div>
           </div>
-
-          {/* プレースホルダー（解析前のみ） */}
-          {!showSuggestionArea && (
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex-1 min-h-[300px]">
-              <div className="flex-1 flex items-center justify-center bg-slate-50 p-3 sm:p-4 h-full">
-                <p className="text-slate-500 text-sm sm:text-base font-medium text-center max-w-sm whitespace-pre-line">
-                  {isJapanese
-                    ? "メッセージを入力するとSenpAI Senseiによる\nメッセージの改善案がここに表示されます"
-                    : "Tone suggestions will appear here as you type your message"}
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

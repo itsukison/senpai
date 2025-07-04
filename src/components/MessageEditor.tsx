@@ -158,7 +158,7 @@ export function MessageEditor({
   };
 
 return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300 overflow-hidden">
       {/* Header */}
       <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50">
         <div className="flex items-center justify-between">
@@ -166,12 +166,6 @@ return (
             {title || (mode === 'input' ? labels.writeTitle : labels.suggestionTitle)}
           </h3>
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* 編集中インジケーター */}
-            {mode === 'suggestion' && hasTextChanged && (
-              <span className="text-xs text-amber-600 font-medium">
-                {isJapanese ? "編集済み" : "Edited"}
-              </span>
-            )}
             {analysisState === 'analyzing' && (
               <div className="flex items-center space-x-1 sm:space-x-2">
                 <div className="w-3 h-3 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
