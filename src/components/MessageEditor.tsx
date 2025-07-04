@@ -106,7 +106,7 @@ export function MessageEditor({
 
   const labels = {
     writeTitle: isJapanese ? "投稿予定のメッセージを書く" : "Write your message",
-    suggestionTitle: isJapanese ? "投稿予定のメッセージ（編集可能）" : "Message to send (editable)",
+    suggestionTitle: isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)",
     writePlaceholder: isJapanese
       ? "ここに、これから相手に送ろうとしているメッセージを入力してください。　入力後、右下の送信/解析ボタンをクリックしてください。"
       : "Start typing your message here... Click the analyze button when ready.",

@@ -6,6 +6,7 @@ import { MessageEditor } from "./MessageEditor";
 import { Textarea } from "@/components/ui/textarea";
 import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
 import { createConvo } from "@/lib/actions";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 // 変更後
 interface ToneAnalysis {
@@ -43,6 +44,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [isReanalyzing, setIsReanalyzing] = useState(false); // 再解析中かどうか
   const [displayText, setDisplayText] = useState<string>(''); // 表示用テキスト（ランダムアニメーション用）
   const [isShowingRandomText, setIsShowingRandomText] = useState(false); // ランダムテキスト表示中
+  const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false); // 詳細分析の表示状態
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -681,9 +683,46 @@ const analyzeText = useCallback(
                       </h4>
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-h-[80px]">
                         {suggestion.improvement_points ? (
-                          <p className="text-sm text-slate-700 leading-relaxed">
-                            {suggestion.improvement_points}
-                          </p>
+                          <>
+                            <p className="text-sm text-slate-700 leading-relaxed">
+                              {suggestion.improvement_points}
+                            </p>
+                            
+                            {/* 詳細分析のアコーディオン */}
+                            {suggestion.detailed_analysis && (
+                              <div className="mt-3">
+                                <button
+                                  onClick={async () => {
+                                    const newState = !showDetailedAnalysis;
+                                    setShowDetailedAnalysis(newState);
+                                    
+                                    // ログ記録
+                                    await log("detailed_analysis_toggled", {
+                                      action: newState ? "expand" : "collapse",
+                                      previousText: suggestion.originalText,
+                                      newText: suggestion.suggestion || undefined
+                                    });
+                                  }}
+                                  className="flex items-center gap-1 text-xs font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
+                                >
+                                  <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
+                                  {showDetailedAnalysis ? (
+                                    <ChevronUp className="w-3 h-3" />
+                                  ) : (
+                                    <ChevronDown className="w-3 h-3" />
+                                  )}
+                                </button>
+                                
+                                {showDetailedAnalysis && (
+                                  <div className="mt-2 pt-2 border-t border-yellow-300">
+                                    <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                      {suggestion.detailed_analysis}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </>
                         ) : (
                           <div className="flex items-center justify-center h-16">
                             <div className="flex space-x-2">
@@ -704,30 +743,60 @@ const analyzeText = useCallback(
                         <p className="text-sm text-slate-700 leading-relaxed">
                           {suggestion.improvement_points}
                         </p>
+                        
+                        {/* 詳細分析のアコーディオン（hasIssues: falseの場合） */}
+                        {suggestion.detailed_analysis && (
+                          <div className="mt-3">
+                            <button
+                              onClick={async () => {
+                                const newState = !showDetailedAnalysis;
+                                setShowDetailedAnalysis(newState);
+                                
+                                // ログ記録
+                                await log("detailed_analysis_toggled", {
+                                  action: newState ? "expand" : "collapse",
+                                  previousText: suggestion.originalText,
+                                  newText: suggestion.suggestion || undefined
+                                });
+                              }}
+                              className="flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-800 transition-colors"
+                            >
+                              <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
+                              {showDetailedAnalysis ? (
+                                <ChevronUp className="w-3 h-3" />
+                              ) : (
+                                <ChevronDown className="w-3 h-3" />
+                              )}
+                            </button>
+                            
+                            {showDetailedAnalysis && (
+                              <div className="mt-2 pt-2 border-t border-green-300">
+                                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                                  {suggestion.detailed_analysis}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
 
-                  {/* セクションタイトル */}
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold text-slate-700">
-                      {suggestion.hasIssues 
-                        ? (isJapanese ? "改善案" : "Suggestion")
-                        : (isJapanese ? "あなたのメッセージ" : "Your message")}
-                    </h4>
-                    
-                    {!suggestion.hasIssues && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p className="text-sm text-blue-800 font-medium flex items-center gap-2">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+                  {/* hasIssues: falseの場合のみ青いバッジを表示 */}
+                  {!suggestion.hasIssues && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm text-blue-800 font-medium flex items-center gap-2">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {isJapanese ? "このまま送信OKです！" : "Ready to send!"}
+                      </p>
+                    </div>
+                  )}
                 </div>
+                
+                {/* スペースを追加 */}
+                <div className="mb-6"></div>
               </div>
             )}
 
@@ -737,9 +806,13 @@ const analyzeText = useCallback(
                 ? 'transform translate-y-4 opacity-90 duration-1000' 
                 : 'transform translate-y-0 opacity-100 duration-300'
             }`}>
+
               <MessageEditor
                 mode={showSuggestionArea ? "suggestion" : "input"}
-                text={showSuggestionArea && (isShowingRandomText || !suggestion?.suggestion) ? displayText : userDraft}
+                text={showSuggestionArea 
+                  ? (isShowingRandomText || !suggestion?.suggestion ? displayText : suggestion.suggestion)
+                  : userDraft
+                }
                 onTextChange={handleTextChange}
                 hierarchy={hierarchy}
                 socialDistance={social_distance}
