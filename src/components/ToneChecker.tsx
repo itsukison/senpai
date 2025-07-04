@@ -465,7 +465,7 @@ const analyzeText = useCallback(
     const generatePartialRandomText = (baseText: string, progress: number): string => {
       const lines = baseText.split('\n');
       const randomChars = isJapanese 
-        ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんアイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン会議資料確認共有関係者様連絡報告検討案件対応業務作業完了予定本日明日今週来週以降担当部署課長部長様方皆様御中ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        ? '石井遼介イシイリョウスケｲｼｲﾘｮｳｽｹ月奈なづきツキナナヅキﾂｷﾅﾅﾂﾞｷ孫逸歓ソンイツキｿﾝｲﾂｷ心理的安全性顧客志向両利きの経営エンゲージメントウェルビーイングSDGsPsychologicalSafetySonItsukiRyosukeIshiiTsukinaNazuki^&*()_+-=[]{}|;:,.<>?αβγδεζηθικλμνξοπρστυφχψω'
         : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?αβγδεζηθικλμνξοπρστυφχψω';
       
       return lines.map((line, lineIndex) => {
