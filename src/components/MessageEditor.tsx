@@ -68,11 +68,18 @@ export function MessageEditor({
 
   // テキストエリアの初期高さ設定と変更時の自動調整
   useEffect(() => {
-    if (textareaRef.current) {
-      // 初期高さを設定
-      textareaRef.current.style.height = 'auto';
-      const newHeight = Math.min(textareaRef.current.scrollHeight, 400);
-      textareaRef.current.style.height = `${newHeight}px`;
+    if (textareaRef.current && typeof window !== 'undefined') {
+      // モバイルデバイスでは固定高さを維持
+      const isMobile = window.innerWidth < 640;
+      if (isMobile) {
+        textareaRef.current.style.height = '150px';
+        textareaRef.current.style.minHeight = '150px';
+      } else {
+        // デスクトップでは自動調整
+        textareaRef.current.style.height = 'auto';
+        const newHeight = Math.min(textareaRef.current.scrollHeight, 400);
+        textareaRef.current.style.height = `${newHeight}px`;
+      }
     }
   }, [text, mode]); // textまたはmodeが変更されたら再計算
 
@@ -151,7 +158,7 @@ export function MessageEditor({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
+    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col" style={{ minHeight: '320px' }}>
       {/* Header */}
       <div className="px-4 sm:px-5 py-2 sm:py-3 border-b border-purple-200 bg-purple-50 flex-shrink-0">
         <div className="flex items-center justify-between">
@@ -204,7 +211,7 @@ export function MessageEditor({
       </div>
 
       {/* 関係性セレクター */}
-      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5 mb-4">
+      <div className="bg-purple-50 rounded-t-none rounded-b-lg px-4 py-2.5">
         <div className="flex flex-col sm:flex-row sm:items-stretch gap-2.5 sm:gap-6">
           {/* 宛先セクション */}
           <div className="flex-1 flex flex-col sm:flex-col">
@@ -272,7 +279,7 @@ export function MessageEditor({
       </div>
 
       {/* Text Area */}
-      <div className="relative flex flex-col flex-1 min-h-[150px]">
+      <div className="relative flex-1 flex flex-col p-4 pt-2" style={{ minHeight: '200px' }}>
         <textarea
           ref={textareaRef}
           value={text}
@@ -283,26 +290,29 @@ export function MessageEditor({
             }
           }}
           onInput={(e) => {
-            // 自動高さ調整
-            const target = e.target as HTMLTextAreaElement;
-            target.style.height = 'auto';
-            const newHeight = Math.min(target.scrollHeight, 400); // 最大高さ400px
-            target.style.height = `${newHeight}px`;
+            // 自動高さ調整（デスクトップのみ）
+            if (typeof window !== 'undefined' && window.innerWidth >= 640) {
+              const target = e.target as HTMLTextAreaElement;
+              target.style.height = 'auto';
+              const newHeight = Math.min(target.scrollHeight, 400);
+              target.style.height = `${newHeight}px`;
+            }
           }}
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
-          className={`flex-1 resize-none border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pb-12 pt-3 transition-all duration-300 overflow-y-auto ${
+          className={`w-full resize-none border-0 rounded-md focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-3 py-2 transition-all duration-300 overflow-y-auto ${
             isTransitioning ? 'opacity-80' : ''
           } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
           style={{ 
             fontFamily: "Inter, sans-serif",
             minHeight: '120px', // 5行相当の最小高さ
-            maxHeight: '400px'  // 最大高さ制限
+            maxHeight: '400px',  // 最大高さ制限
+            height: '120px' // 初期高さを明示的に設定
           }}
         />
 
         {/* 送信ボタン */}
-        <div className="absolute bottom-2 right-2 sm:right-4 z-10">
+        <div className="absolute bottom-4 right-4 z-10">
           <button
             onClick={onAnalyze}
             disabled={!shouldEnableAnalyze()}
