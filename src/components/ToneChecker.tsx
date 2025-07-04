@@ -613,7 +613,6 @@ const analyzeText = useCallback(
         </div>
 
         {/* Right Side Container - Message Input and Suggestions */}
-{/* Right Side Container - Message Input and Suggestions */}
         <div className="lg:col-span-2 flex flex-col gap-3 sm:gap-4 min-h-0 h-full">
           {/* 統合コンテナ - 常に表示、拡張アニメーション */}
           <div className={`bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-1000 flex flex-col ${
