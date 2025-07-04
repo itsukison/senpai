@@ -138,7 +138,7 @@ export function MessageEditor({
 
   const distanceOptions = isJapanese
     ? [
-        { value: 'very_close', label: '親密' },
+        { value: 'very_close', label: '親密 !' },
         { value: 'close', label: '仲間感' },
         { value: 'neutral', label: '職場標準' },
         { value: 'distant', label: '距離あり' },
@@ -246,9 +246,7 @@ return (
                         socialDistance === option.value
                           ? 'text-white'
                           : 'text-purple-700 hover:bg-purple-50'
-                      } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''} ${
-                        index !== distanceOptions.length - 1 ? 'border-r border-purple-200' : ''
-                      }`}
+                      } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
                       <span className="relative block sm:font-semibold">{option.label}</span>
                       {socialDistance === option.value && (
