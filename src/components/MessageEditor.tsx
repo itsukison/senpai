@@ -68,6 +68,7 @@ export function MessageEditor({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [hasTextChanged, setHasTextChanged] = useState(false);
   const [initialText, setInitialText] = useState(text);
+  const [showCopyFeedback, setShowCopyFeedback] = useState(false);
 
 // テキスト変更の検知
   useEffect(() => {
@@ -224,7 +225,7 @@ return (
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 min-w-[32px]">
                 {labels.to}
               </p>
-              <div className="flex space-x-1.5 flex-1 w-full">
+              <div className="flex space-x-1 flex-1 w-full">
                 {hierarchyOptions.map((option) => (
                   <button
                     key={option.value}
@@ -238,7 +239,7 @@ return (
                   >
                     {/* ホバー時の背景アニメーション */}
                     <div className="absolute inset-0 bg-purple-100 rounded-lg opacity-0 group-hover:opacity-50 transition-opacity duration-200" />
-                    <p className="relative text-[10px] sm:text-xs font-semibold">
+                    <p className="relative text-[11px] sm:text-xs font-semibold">
                       {option.label}
                     </p>
                   </button>
@@ -255,13 +256,13 @@ return (
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 min-w-[32px]">
                 {labels.distance}
               </p>
-              <div className="flex space-x-1.5 flex-1 w-full">
+              <div className="flex space-x-1 flex-1 w-full">
                 {distanceOptions.map((option) => (
                   <button
                     key={option.value}
                     onClick={() => onSocialDistanceChange(option.value)}
                     disabled={isTransitioning}
-                    className={`group relative flex-1 py-1 px-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
+                    className={`group relative flex-1 py-1 px-2 rounded-lg text-[11px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
                       socialDistance === option.value
                         ? 'bg-purple-600 text-white shadow-sm'
                         : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
@@ -342,28 +343,73 @@ return (
               <button
                 onClick={async () => {
                   if (text) {
-                    await navigator.clipboard.writeText(text);
-                    // TODO: コピー完了のフィードバック
+                    try {
+                      await navigator.clipboard.writeText(text);
+                      setShowCopyFeedback(true);
+                      
+                      // 2秒後にフィードバックを隠す
+                      setTimeout(() => {
+                        setShowCopyFeedback(false);
+                      }, 2000);
+                      
+                      // 振動フィードバック（モバイルデバイス用）
+                      if ('vibrate' in navigator) {
+                        navigator.vibrate(50);
+                      }
+                    } catch (err) {
+                      console.error('Failed to copy text:', err);
+                    }
                   }
                 }}
-                className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white text-sm shadow-sm hover:shadow-md transition-all duration-200"
+                className={`relative flex items-center gap-2 px-3 py-2 rounded-md text-white text-sm shadow-sm hover:shadow-md transition-all duration-200 ${
+                  showCopyFeedback 
+                    ? 'bg-green-500 hover:bg-green-600' 
+                    : 'bg-gray-500 hover:bg-gray-600'
+                }`}
               >
-                <span className="text-xs sm:text-sm">
-                  {isJapanese ? "クリップボードにコピー" : "Copy to clipboard"}
+                {/* チェックマークアニメーション */}
+                <span className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                  showCopyFeedback ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
+                }`}>
+                  <span className="text-xs sm:text-sm font-medium">
+                    {isJapanese ? "コピーしました！" : "Copied!"}
+                  </span>
+                  <svg 
+                    className="w-5 h-5 ml-1"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={3} 
+                      d="M5 13l4 4L19 7" 
+                    />
+                  </svg>
                 </span>
-                <svg 
-                  className="w-4 h-4"
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
-                  />
-                </svg>
+                
+                {/* 通常のコピーアイコンとテキスト */}
+                <span className={`flex items-center gap-2 transition-all duration-300 ${
+                  showCopyFeedback ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
+                }`}>
+                  <span className="text-xs sm:text-sm">
+                    {isJapanese ? "クリップボードにコピー" : "Copy to clipboard"}
+                  </span>
+                  <svg 
+                    className="w-4 h-4"
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" 
+                    />
+                  </svg>
+                </span>
               </button>
             )}
 

@@ -644,7 +644,7 @@ const analyzeText = useCallback(
 
     <div className="flex-1 flex flex-col overflow-visible p-2">
       {/* Responsive Grid Container */}
-      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 lg:min-h-0 max-h-[calc(100vh-140px)]">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-6 lg:min-h-0 max-h-[calc(100vh-140px)]">
 
         {/* Context Input - Accordion on mobile/tablet, normal on desktop */}
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 lg:flex lg:flex-col lg:col-span-1 lg:h-full">

@@ -61,7 +61,7 @@ export default function Home() {
       </nav>
       {/* Title and Description セクションを完全に削除 */}
       {/* Main Content - Flex container that takes remaining space */}
-      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 bg-white mb-4 min-h-0 mt-4">
+      <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-3 sm:px-5 lg:px-8 py-4 sm:py-6 bg-white mb-4 min-h-0 mt-4">
         <ToneChecker isJapanese={isJapanese} />
       </div>
 
