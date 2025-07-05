@@ -242,7 +242,7 @@ return (
                       key={option.value}
                       onClick={() => onSocialDistanceChange(option.value)}
                       disabled={isTransitioning}
-                      className={`relative flex-1 py-1 px-0.5 sm:px-1.5 lg:px-2 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
+                      className={`relative flex-1 py-1 px-0.5 sm:px-0.5 lg:px-1 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
                         socialDistance === option.value
                           ? 'text-white'
                           : 'text-purple-700 hover:bg-purple-50'
@@ -287,36 +287,41 @@ return (
           }}
         />
 
-        {/* ボタンエリア */}
-        <div className="absolute bottom-2 left-4 right-4 z-10 flex items-center justify-between">
-          {/* 左側：トグルボタン */}
-          <div>
-            {mode === 'suggestion' && onToggleOriginal && (
-              <>
-                {!isShowingOriginal && suggestionText && (
-                  <button
-                    onClick={onToggleOriginal}
-                    className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
-                  >
-                    ← {isJapanese ? "元文章に戻す" : "Show original"}
-                  </button>
-                )}
-                {isShowingOriginal && (
-                  <button
-                    onClick={onToggleOriginal}
-                    className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
-                  >
-                    {hasEditedOriginal 
-                      ? (isJapanese ? "← 編集中の文章へ" : "← Back to edited")
-                      : (isJapanese ? "提案を見る →" : "Show suggestion →")}
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+        {/* ボタンエリア - グラデーション背景付き */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          {/* グラデーション背景 */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none h-20" />
+          
+          {/* ボタンコンテンツ */}
+          <div className="relative flex items-center justify-between px-4 pb-2 pt-8">
+            {/* 左側：トグルボタン */}
+            <div>
+              {mode === 'suggestion' && onToggleOriginal && (
+                <>
+                  {!isShowingOriginal && suggestionText && (
+                    <button
+                      onClick={onToggleOriginal}
+                      className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
+                    >
+                      ← {isJapanese ? "元文章に戻す" : "Show original"}
+                    </button>
+                  )}
+                  {isShowingOriginal && (
+                    <button
+                      onClick={onToggleOriginal}
+                      className="text-sm text-purple-600 hover:text-purple-800 transition-colors"
+                    >
+                      {hasEditedOriginal 
+                        ? (isJapanese ? "← 編集中の文章へ" : "← Back to edited")
+                        : (isJapanese ? "提案を見る →" : "Show suggestion →")}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
 
-          {/* 右側：既存のボタン */}
-          <div className="flex items-center gap-2">
+            {/* 右側：既存のボタン */}
+            <div className="flex items-center gap-2">
             {/* コピーボタン（suggestion modeかつ解析完了時に表示） */}
             {mode === 'suggestion' && analysisState === 'analyzed' && (
               <button
@@ -454,5 +459,6 @@ return (
         </div>
       </div>
     </div>
+  </div>
   );
 }

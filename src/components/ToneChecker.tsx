@@ -318,9 +318,15 @@ const analyzeText = useCallback(
       console.log("suggestion:", analysis.suggestion);
 
       // hasIssuesがfalseでもanalyisを設定する
+// hasIssuesがfalseでもanalyisを設定する
       setSuggestion(analysis);
+      // ランダムテキストを確実に終了
+      if (analysis.suggestion) {
+        setIsShowingRandomText(false);
+        setShowRandomTextFlag(false);
+        setDisplayText(analysis.suggestion);
+      }
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
-
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -349,6 +355,8 @@ const analyzeText = useCallback(
       console.error("エラー詳細:", error);
       setSuggestion(null);
       setAnalysisState('ready'); // エラー時もreadyに戻す
+      setIsShowingRandomText(false); // エラー時もリセット
+      setShowRandomTextFlag(false);
       
       // ネットワークエラーの場合
       if (!error.name || error.name !== 'AbortError') {
@@ -361,6 +369,7 @@ const analyzeText = useCallback(
       // AbortErrorの場合はfinallyが実行されないようにする
       if (!abortControllerRef.current?.signal.aborted) {
         setAnalysisState('analyzed');
+        setIsShowingRandomText(false); // 解析終了時に必ずリセット
         console.log("=== 解析終了 ===");
       }
     }
@@ -495,6 +504,7 @@ const analyzeText = useCallback(
       setIsFirstAnalysis(true); // リセット
       setIsReanalyzing(false);
       setShowRandomTextFlag(false); // フラグもリセット
+      setIsShowingRandomText(false); // ランダムテキスト表示もリセット
       // トグル関連の状態もリセット
       setIsShowingOriginal(false);
       setEditedOriginalText("");
@@ -578,8 +588,13 @@ const analyzeText = useCallback(
     };
 
     // AIの実際の改善案が来たら、遷移アニメーションを開始
-    if (suggestion.suggestion && !isTransitioningToReal && isShowingRandomText) {
-      transitionToReal(suggestion.suggestion);
+    if (suggestion.suggestion) {
+      if (isShowingRandomText && !isTransitioningToReal) {
+        transitionToReal(suggestion.suggestion);
+      } else if (!isShowingRandomText) {
+        // 既にランダムテキストが終了している場合は即座に表示
+        setDisplayText(suggestion.suggestion);
+      }
       return;
     }
 
@@ -619,6 +634,7 @@ const analyzeText = useCallback(
       };
     } else if (suggestion.suggestion) {
       // 既に改善案がある場合は即座に表示
+      console.log("=== 即座に表示 - suggestion:", suggestion.suggestion);
       setDisplayText(suggestion.suggestion);
       setIsShowingRandomText(false);
     }
@@ -629,6 +645,25 @@ const analyzeText = useCallback(
       }
     };
   }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag]);
+
+  // ========== ここに新規追加 ==========
+  // ランダムテキスト状態の安全装置
+  useEffect(() => {
+    // 解析が完了したらランダムテキストを必ず終了
+    if (analysisState === 'analyzed' && isShowingRandomText) {
+      setIsShowingRandomText(false);
+      setShowRandomTextFlag(false);
+    }
+  }, [analysisState]);
+  // ========== 新規追加ここまで ==========
+
+  // 言語切り替えを検知
+  useEffect(() => {
+    setAnalysisState('ready');
+    if (showSuggestionArea) {
+      setExternalChanges(true);
+    }
+  }, [isJapanese]);
 
   // 言語切り替えを検知
   useEffect(() => {
@@ -1049,11 +1084,11 @@ const analyzeText = useCallback(
                 hasAcceptedSuggestion={hasAcceptedSuggestion}
                 hasSignificantChange={hasSignificantChange()}
                 
-                isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
-                isTransitioning={isTransitioning}
+                // isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
+                // isTransitioning={isTransitioning}
 
-                // isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
-                // isTransitioning={false} // 一時的にfalseに固定してテスト
+                isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
+                isTransitioning={false} // 一時的にfalseに固定してテスト
 
                 title={showSuggestionArea 
                   ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")
