@@ -1049,11 +1049,11 @@ const analyzeText = useCallback(
                 hasAcceptedSuggestion={hasAcceptedSuggestion}
                 hasSignificantChange={hasSignificantChange()}
                 
-                // isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
-                // isTransitioning={isTransitioning}
+                isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
+                isTransitioning={isTransitioning}
 
-                isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
-                isTransitioning={false} // 一時的にfalseに固定してテスト
+                // isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
+                // isTransitioning={false} // 一時的にfalseに固定してテスト
 
                 title={showSuggestionArea 
                   ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")

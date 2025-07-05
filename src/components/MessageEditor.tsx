@@ -248,9 +248,9 @@ return (
                           : 'text-purple-700 hover:bg-purple-50'
                       } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
-                      <span className="relative block sm:font-semibold">{option.label}</span>
+                      <span className="relative block sm:font-semibold text-center">{option.label}</span>
                       {socialDistance === option.value && (
-                        <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap">
+                        <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap text-center">
                           {getDistanceSubtext()}
                         </span>
                       )}
