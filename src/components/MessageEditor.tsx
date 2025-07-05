@@ -242,7 +242,7 @@ return (
                       key={option.value}
                       onClick={() => onSocialDistanceChange(option.value)}
                       disabled={isTransitioning}
-                      className={`relative flex-1 py-1 px-2 text-[11px] sm:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
+                      className={`relative flex-1 py-1 px-0.5 sm:px-1.5 lg:px-2 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
                         socialDistance === option.value
                           ? 'text-white'
                           : 'text-purple-700 hover:bg-purple-50'
