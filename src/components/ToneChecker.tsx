@@ -122,16 +122,34 @@ const analyzeText = useCallback(
     const isReanalysis = showSuggestionArea && suggestion !== null;
     setIsReanalyzing(isReanalysis);
     
+    // 現在表示されているテキストを取得
+    // Phase 3 修正: 編集された内容を正しく取得
+    const currentText = isReanalysis
+      ? (isShowingOriginal 
+        ? editedOriginalText  // 編集されたオリジナルテキスト
+        : (suggestion?.suggestion || userDraft))  // 編集された提案テキスト
+      : userDraft;  // 初回解析時は常にuserDraft
+    
     console.log("=== 解析タイプ判定 ===");
     console.log("isFirstAnalysis:", isFirstAnalysis);
     console.log("showSuggestionArea:", showSuggestionArea);
     console.log("suggestion:", suggestion);
     console.log("isReanalysis:", isReanalysis);
+    console.log("currentText:", currentText);  // デバッグ用
 
     if (isReanalysis) {
       // 再解析時：移動アニメーションなし、内容のフェードのみ
       setIsTransitioning(true);
       setExternalChanges(false);
+      
+      // Phase 3 追加: 編集状態を保持（再解析時のみ）
+      if (!isShowingOriginal && suggestion?.suggestion) {
+        // 提案が編集されている場合、その内容を新しいオリジナルとして扱う
+        setOriginalText(suggestion.suggestion);
+      } else if (isShowingOriginal && editedOriginalText) {
+        // オリジナルが編集されている場合、その内容を新しいオリジナルとして扱う
+        setOriginalText(editedOriginalText);
+      }
     } else {
       // 初回解析時：フルアニメーション
       setAnimationPhase('transitioning');
@@ -186,20 +204,23 @@ const analyzeText = useCallback(
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
     // ただし、suggestionフィールドはnullのままにして、ランダムテキストの判定に影響しないようにする
-    setSuggestion({
-      hasIssues: true,  // デフォルトでtrueと仮定
-      originalText: userDraft,
-      suggestion: null,  // 重要: nullのままにする
-      reasoning: '',
-      ai_receipt: '',
-      improvement_points: '',
-      detailed_analysis: '',
-      issue_pattern: [],
-      detected_mentions: []
-    });
+    // Phase 3 修正: 再解析時は現在のテキストを保持
+    if (!isReanalysis) {
+      setSuggestion({
+        hasIssues: true,  // デフォルトでtrueと仮定
+        originalText: userDraft,
+        suggestion: null,  // 重要: nullのままにする
+        reasoning: '',
+        ai_receipt: '',
+        improvement_points: '',
+        detailed_analysis: '',
+        issue_pattern: [],
+        detected_mentions: []
+      });
+    }
     
     // displayTextも初期化
-    setDisplayText(userDraft);
+    setDisplayText(isReanalysis ? currentText : userDraft);
     
     // ランダムテキストフラグをリセット
     setShowRandomTextFlag(false);
@@ -225,13 +246,6 @@ const analyzeText = useCallback(
     const startTime = Date.now();
 
     try {
-      // 現在表示されているテキストを取得
-      const currentText = isReanalysis
-        ? (isShowingOriginal 
-          ? (editedOriginalText || suggestion?.originalText || userDraft)
-          : (suggestion?.suggestion || userDraft))
-        : userDraft;  // 初回解析時は常にuserDraft
-
       const requestBody = {
         user_draft: currentText,  // 現在表示されているテキストを送信
         thread_context: threadContext,
@@ -432,6 +446,14 @@ const analyzeText = useCallback(
   // ユーザーが提案と元文章を自由に切り替えて、それぞれを独立して編集できるようにする
   const handleToggleOriginal = () => {
     setIsShowingOriginal(!isShowingOriginal);
+    // トグル時に表示テキストを更新
+    if (!isShowingOriginal) {
+      // オリジナルに切り替え
+      setDisplayText(editedOriginalText || suggestion?.originalText || "");
+    } else {
+      // 提案に切り替え
+      setDisplayText(suggestion?.suggestion || "");
+    }
   };
 
   // Handle text change with debouncing
@@ -466,10 +488,12 @@ const analyzeText = useCallback(
         ...suggestion,
         suggestion: newText
       });
-      // 再解析可能にする
-      if (analysisState === 'analyzed') {
-        setAnalysisState('ready');
-      }
+      // Phase 3: 表示テキストも更新
+      setDisplayText(newText);
+    }
+    // 再解析可能にする
+    if (analysisState === 'analyzed') {
+      setAnalysisState('ready');
     }
   };
 
@@ -477,12 +501,22 @@ const analyzeText = useCallback(
   // 重要：どちらのモードでも編集内容は独立して保存される
   // これにより、ユーザーは提案と元文章を行き来しながら、それぞれのバージョンを編集できる
   const handleEditInSuggestionMode = (value: string) => {
+    // Phase 3 修正: 空文字列も正しく処理
     if (isShowingOriginal) {
       // オリジナル表示中はeditedOriginalTextを更新
       setEditedOriginalText(value);
+      // 表示テキストも更新
+      setDisplayText(value);
     } else {
       // 提案表示中はsuggestionを更新
-      handleSuggestionEdit(value);
+      if (suggestion) {
+        setSuggestion({
+          ...suggestion,
+          suggestion: value
+        });
+        // 表示テキストも更新
+        setDisplayText(value);
+      }
     }
     
     // 再解析可能にする
@@ -1174,7 +1208,7 @@ const analyzeText = useCallback(
                 text={showSuggestionArea 
                   ? (isShowingOriginal 
                     ? (editedOriginalText || suggestion?.originalText || "") 
-                    : (isShowingRandomText ? displayText : (suggestion?.suggestion || displayText || "")))
+                    : (isAnalysisComplete && suggestion?.suggestion ? suggestion.suggestion : displayText))
                   : userDraft
                 }
                 onTextChange={showSuggestionArea ? handleEditInSuggestionMode : handleTextChange}
