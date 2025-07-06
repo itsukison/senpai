@@ -25,6 +25,7 @@ body {
 body {
   color: #1d1c1d;
   background: #ffffff;
+  transition: padding-bottom 0.3s ease;
 }
 
 a {
@@ -294,6 +295,21 @@ textarea::-webkit-scrollbar-thumb:hover {
   transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
+/* 提案エリアのアニメーション専用クラス */
+.suggestion-area-transition {
+  transition-property: grid-template-rows, opacity, transform;
+  transition-duration: 1000ms;
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* アニメーションパフォーマンスの最適化 */
+.animate-slide-out,
+.animate-slide-in,
+.animate-gentle-slide,
+.modal-appear {
+  will-change: transform, opacity;
+}
+
 /* リサイズハンドルのカスタマイズ */
 .resize-handle-large::-webkit-resizer {
   background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23999" d="M10 12l-2-2h4l-2 2zm0-5l-2-2h4l-2 2z"/></svg>');
@@ -303,7 +319,7 @@ textarea::-webkit-scrollbar-thumb:hover {
   height: 20px;
 }
 
-/* Phase 3: スマホの自動ズーム防止 */
+/* Phase 3: スマホの自動ズーム防止（完全版） */
 @media (max-width: 640px) {
   textarea,
   input[type="text"],
@@ -311,14 +327,44 @@ textarea::-webkit-scrollbar-thumb:hover {
   input[type="password"],
   input[type="tel"],
   input[type="number"] {
-    font-size: 16px !important; /* iOS自動ズーム防止 */
-    zoom: 0.75; /* 見た目を12pxサイズに維持 */
-    -webkit-text-size-adjust: 100%; /* テキストサイズ調整を防止 */
+    font-size: 16px !important;
+    -webkit-text-size-adjust: 100%;
+    -webkit-appearance: none;
+    border-radius: 0;
   }
   
-  /* テキストエリアのフォーカス時のズーム防止 */
+  /* Tailwindのtext-xsを上書き */
+  .text-xs {
+    font-size: 16px !important;
+  }
+  
+  /* 見た目を小さく保つ */
+  textarea {
+    transform: scale(0.85);
+    transform-origin: left top;
+    width: 117.65%;
+    height: auto !important;
+  }
+  
+  /* テキストエリアのフォーカス時 */
   textarea:focus,
   input:focus {
     font-size: 16px !important;
+  }
+}
+
+/* Context textareaの高さ調整 */
+@media (max-width: 1024px) {
+  textarea[placeholder*="SlackやTeams"],
+  textarea[placeholder*="conversation history"] {
+    min-height: 150px !important;
+    height: 150px !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  div:has(> textarea[placeholder*="SlackやTeams"]),
+  div:has(> textarea[placeholder*="conversation history"]) {
+    min-height: 150px;
   }
 }
