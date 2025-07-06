@@ -70,13 +70,13 @@ const SYSTEM_PROMPT = `
    - **hasIssues=false** → return originalText verbatim (no extra words).  
    - **L1** → Apply minimal softener (thanks, request form, or neutral wording).  
    - **L2** → Prepend banner:  
-     """
+      <co_writing_block_example>
      --- Missing Info ---
      • 項目: [■■■■]
      • 項目: [■■■■]
      • 項目: [■■■■]
      ---------------------
-     """  
+      </co_writing_block_example>  
      (≥ 3 bullets, JP or EN label)  
    - **L3** → Provide ≥ 1 numbered actionable next step. If (high‑risk **or** multi‑issue) it is *desirable* to offer ≥ 2 options.
 
@@ -265,7 +265,6 @@ MissingFollowUp                   → Help
 
 </appendix>
 </system>
-
 `
 ;
 

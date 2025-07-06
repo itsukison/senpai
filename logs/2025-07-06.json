@@ -123,5 +123,32 @@
       "processingTime": 6301
     },
     "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T01:50:09.084Z",
+    "sessionId": "session_1751766592738_2frc3tzcv",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "--- Missing Info ---\n• テストの目的: [■■■■ ここにテストの目的を補足してください ■■■■]\n• テスト対象や内容: [■■■■ ここにテスト内容を補足してください ■■■■]\n• 期限や希望する結果: [■■■■ ここに期限や期待する結果を補足してください ■■■■]\n---------------------",
+      "issue_pattern": [
+        "MissingContext",
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テスト依頼に必要な情報が不足しており、相手が対応しづらい状態です。",
+        "improvement_points": "必要な情報を具体的に補足することで、相手の理解が深まり迅速な対応が期待できます。",
+        "suggestion": "--- Missing Info ---\n• テストの目的: [■■■■ ここにテストの目的を補足してください ■■■■]\n• テスト対象や内容: [■■■■ ここにテスト内容を補足してください ■■■■]\n• 期限や希望する結果: [■■■■ ここに期限や期待する結果を補足してください ■■■■]\n---------------------",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "MissingContext",
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 14053
+    },
+    "ipAddress": "::1"
   }
 ]
