@@ -116,14 +116,17 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
       return userDraft;
     }
     
-    // 提案モード（提案エリアが表示中）
+    // 解析中はdisplayTextを信頼（ランダムアニメーション対応）
+    if (analysisState === 'analyzing') {
+      return displayText;
+    }
+    
+    // 解析完了後の通常処理
     if (isShowingOriginal) {
       // 「←元文章に戻す」を押した状態
-      // 編集されたことがある場合は編集内容を優先（空文字列も含む）
       return hasEditedOriginal ? editedOriginalText : (suggestion?.originalText || "");
     } else {
       // AI提案を表示中
-      // 編集されたことがある場合は編集内容を優先（空文字列も含む）
       return hasEditedSuggestion ? editedSuggestionText : (suggestion?.suggestion || "");
     }
   };
@@ -236,8 +239,6 @@ const analyzeText = useCallback(
     // トグル状態のリセット
     setIsShowingOriginal(false);
     setEditedOriginalText("");
-    setHasEditedOriginal(false);
-    setHasEditedSuggestion(false);
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
     // ただし、suggestionフィールドはnullのままにして、ランダムテキストの判定に影響しないようにする
@@ -260,8 +261,10 @@ const analyzeText = useCallback(
     // 画面には編集中のテキストを表示し続ける（ユーザーの編集内容が消えない）
     setDisplayText(isReanalysis ? currentText : userDraft);
     
-    // ランダムテキストフラグをリセット
-    setShowRandomTextFlag(false);
+    // ランダムテキストフラグをリセット（初回解析時のみ）
+    if (!isReanalysis) {
+      setShowRandomTextFlag(false);
+    }
     setHasReceivedResponse(false);  // API応答フラグをリセット
     // エラーメッセージもリセット
     setErrorMessage(null);
@@ -423,6 +426,8 @@ const analyzeText = useCallback(
         // Phase 3: 新しい提案が来たら編集状態をリセット
         setEditedSuggestionText("");  // 次回の編集に備えてクリア
         setHasEditedSuggestion(false); // 編集フラグもリセット
+        setEditedOriginalText("");     // 元文章の編集もクリア
+        setHasEditedOriginal(false);   // 元文章の編集フラグもリセット
         // トグル状態を提案表示に戻す
         setIsShowingOriginal(false);
       }
@@ -731,11 +736,11 @@ const analyzeText = useCallback(
     if (hasReceivedResponse && suggestion.suggestion) {
       if (isShowingRandomText && !isTransitioningToReal) {
         transitionToReal(suggestion.suggestion);
-      } else if (!isShowingRandomText) {
-        // 既にランダムテキストが終了している場合は即座に表示
+      } else if (!isShowingRandomText && !showRandomTextFlag) {
+        // ランダムテキストが開始予定でない場合のみ即座に表示
         setDisplayText(suggestion.suggestion);
       }
-      return;
+      // returnを削除：ランダムアニメーションのチェックを続行
     }
 
     // 改善案がまだない場合、フラグに基づいてランダムテキストアニメーション
@@ -1244,12 +1249,7 @@ const analyzeText = useCallback(
             {/* MessageEditor - 同じコンテナ内に常に存在 */}
             <MessageEditor
                 mode={showSuggestionArea ? "suggestion" : "input"}
-                text={showSuggestionArea 
-                  ? (analysisState === 'analyzing' && !isReanalyzing && !suggestion?.suggestion
-                    ? displayText  // 初回解析中はdisplayTextを使用
-                    : getDisplayTextForEditor())  // それ以外は通常通り
-                  : userDraft
-                }
+                text={showSuggestionArea ? getDisplayTextForEditor() : userDraft}
                 onTextChange={showSuggestionArea ? handleEditInSuggestionMode : handleTextChange}
                 hierarchy={hierarchy}
                 socialDistance={social_distance}

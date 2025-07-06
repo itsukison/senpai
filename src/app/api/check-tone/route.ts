@@ -125,7 +125,8 @@ Actional → Challenge/SpeakUp
 <!-- ===== FEW‑SHOT EXAMPLES (12件) ===== -->
 <!-- …（例 1 〜 12 は前レスの内容をそのまま収録） … -->
 
-<format>{
+<format>
+{
  "originalText": "",
  "hasIssues": false,
  "issue_pattern": [],
@@ -135,7 +136,8 @@ Actional → Challenge/SpeakUp
  "improvement_points": "",
  "suggestion": "",
  "reasoning": ""
-}</format>
+}
+</format>
 
 </appendix>
 </system>
