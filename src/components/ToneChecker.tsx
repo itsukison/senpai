@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { ToneSuggestion } from "./ToneSuggestion";
+// import { ToneSuggestion } from "./ToneSuggestion";
 import { MessageEditor } from "./MessageEditor";
 import { Textarea } from "@/components/ui/textarea";
 import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
@@ -11,7 +11,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 // 変更後
 interface ToneAnalysis {
   hasIssues: boolean;
-  originalText: string;
+  // originalText: string; // APIから削除
   suggestion: string | null;
   reasoning: string;
   ai_receipt?: string;
@@ -78,6 +78,9 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
   const [social_distance, setSocialDistance] = useState('neutral');
+  
+  // 解析時の元文章を保持（originalText削除に伴う対応）
+  const [analyzedOriginalText, setAnalyzedOriginalText] = useState<string>("");
 
 // 合計文字数を取得
   const getTotalTextLength = () => {
@@ -124,7 +127,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     // 解析完了後の通常処理
     if (isShowingOriginal) {
       // 「←元文章に戻す」を押した状態
-      return hasEditedOriginal ? editedOriginalText : (suggestion?.originalText || "");
+      return hasEditedOriginal ? editedOriginalText : analyzedOriginalText;
     } else {
       // AI提案を表示中
       return hasEditedSuggestion ? editedSuggestionText : (suggestion?.suggestion || "");
@@ -170,6 +173,9 @@ const analyzeText = useCallback(
       // 再解析時：移動アニメーションなし、内容のフェードのみ
       setIsTransitioning(true);
       setExternalChanges(false);
+      
+      // 再解析時の元文章を更新
+      setAnalyzedOriginalText(currentText);
       
       // 再解析時は即座にランダムテキストを開始
       setShowRandomTextFlag(true);
@@ -245,9 +251,12 @@ const analyzeText = useCallback(
     // ただし、suggestionフィールドはnullのままにして、ランダムテキストの判定に影響しないようにする
     // Phase 3 修正: 再解析時は現在のテキストを保持
     if (!isReanalysis) {
+      // 初回解析時の元文章を保存
+      setAnalyzedOriginalText(userDraft);
+      
       setSuggestion({
         hasIssues: true,  // デフォルトでtrueと仮定
-        originalText: userDraft,
+        // originalText: userDraft, // 削除
         suggestion: null,  // 重要: nullのままにする
         reasoning: '',
         ai_receipt: '',
@@ -498,7 +507,7 @@ const analyzeText = useCallback(
     if (!isShowingOriginal) {
       // オリジナルに切り替え
       // 編集済みの元文章 or 最初の元文章を表示
-      setDisplayText(editedOriginalText || suggestion?.originalText || "");
+      setDisplayText(editedOriginalText || analyzedOriginalText);
     } else {
       // 提案に切り替え
       // 編集済みの提案 or AIの提案を表示
@@ -641,6 +650,10 @@ const analyzeText = useCallback(
       setHasEditedSuggestion(false);
       // Phase 3: 最大高さもリセット
       setMaxTextAreaHeight(null);
+      // 元文章もリセット
+      setAnalyzedOriginalText("");
+      // ユーザーの入力もクリア
+      setUserDraft("");
     }, 1200);
   };
 
@@ -746,23 +759,23 @@ const analyzeText = useCallback(
     console.log("=== ランダムテキスト条件チェック ===");
     console.log("showRandomTextFlag:", showRandomTextFlag);
     console.log("hasReceivedResponse:", hasReceivedResponse);
-    console.log("suggestion?.originalText:", suggestion?.originalText);
+    console.log("analyzedOriginalText:", analyzedOriginalText);
     console.log("条件1 (showRandomTextFlag):", showRandomTextFlag);
     console.log("条件2 (!hasReceivedResponse):", !hasReceivedResponse);
-    console.log("条件3 (suggestion?.originalText):", !!suggestion?.originalText);
-    console.log("全条件:", showRandomTextFlag && !hasReceivedResponse && suggestion?.originalText);
+    console.log("条件3 (analyzedOriginalText):", !!analyzedOriginalText);
+    console.log("全条件:", showRandomTextFlag && !hasReceivedResponse && analyzedOriginalText);
     
-    if (showRandomTextFlag && !hasReceivedResponse && suggestion?.originalText) {
+    if (showRandomTextFlag && !hasReceivedResponse && analyzedOriginalText) {
       console.log("=== ランダムテキストアニメーション条件成立 ===");
       console.log("showRandomTextFlag:", showRandomTextFlag);
       console.log("hasReceivedResponse:", hasReceivedResponse);
-      console.log("originalText:", suggestion.originalText);
+      console.log("analyzedOriginalText:", analyzedOriginalText);
       
       // Phase 3: 再解析時は編集されたテキストをベースにアニメーション
       // これにより、ユーザーが編集した内容がランダムに変化する様子が見える
       const baseTextForAnimation = isReanalyzing 
         ? getDisplayTextForEditor()  // 現在表示中のテキストを正確に取得
-        : suggestion.originalText;
+        : analyzedOriginalText;
       
       if (!isShowingRandomText) {
         console.log("=== ランダムテキストアニメーション開始 ===");
@@ -1148,7 +1161,7 @@ const analyzeText = useCallback(
                                     // ログ記録
                                     await log("detailed_analysis_toggled", {
                                       action: newState ? "expand" : "collapse",
-                                      previousText: suggestion.originalText,
+                                      previousText: analyzedOriginalText,
                                       newText: suggestion.suggestion || undefined
                                     });
                                   }}
@@ -1202,7 +1215,7 @@ const analyzeText = useCallback(
                                 // ログ記録
                                 await log("detailed_analysis_toggled", {
                                   action: newState ? "expand" : "collapse",
-                                  previousText: suggestion.originalText,
+                                  previousText: analyzedOriginalText,
                                   newText: suggestion.suggestion || undefined
                                 });
                               }}
@@ -1299,7 +1312,7 @@ const analyzeText = useCallback(
                 }
                 externalChanges={externalChanges}
                 // トグル機能用の新規props
-                originalText={suggestion?.originalText}
+                originalText={analyzedOriginalText}
                 suggestionText={suggestion?.suggestion || undefined}
                 isShowingOriginal={isShowingOriginal}
                 onToggleOriginal={handleToggleOriginal}
