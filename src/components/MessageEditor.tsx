@@ -31,6 +31,12 @@ interface MessageEditorProps {
   isShowingOriginal?: boolean;    // 現在どちらを表示しているか
   onToggleOriginal?: () => void;  // 表示を切り替える関数
   hasEditedOriginal?: boolean;    // 元文章が編集されているか（UIヒント用）
+  
+  // Phase 3 追加props
+  isAnalysisComplete?: boolean;   // 解析が完了しているか
+  maxHeight?: number | null;      // テキストエリアの最大高さ
+  onMaxHeightChange?: (height: number) => void;  // 最大高さ更新
+  onFocusChange?: (focused: boolean) => void;    // フォーカス状態の通知
 }
 
 export function MessageEditor({
@@ -58,11 +64,18 @@ export function MessageEditor({
   isShowingOriginal = false,
   onToggleOriginal,
   hasEditedOriginal = false,
+  
+  // Phase 3 追加
+  isAnalysisComplete = false,
+  maxHeight = null,
+  onMaxHeightChange,
+  onFocusChange,
 }: MessageEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [hasTextChanged, setHasTextChanged] = useState(false);
   const [initialText, setInitialText] = useState(text);
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
+  const [currentHeight, setCurrentHeight] = useState<number>(120);  // Phase 3: 現在の高さ
 
 // テキスト変更の検知
   useEffect(() => {
@@ -72,23 +85,52 @@ export function MessageEditor({
     }
   }, [mode, analysisState, text]);
 
-  // テキストエリアの初期高さ設定と変更時の自動調整
+  // Phase 3: テキストエリアの高さ管理（改善版）
   useEffect(() => {
     if (textareaRef.current && typeof window !== 'undefined') {
-      // モバイルデバイスでは固定高さを維持
       const isMobile = window.innerWidth < 640;
+      
       if (isMobile) {
+        // モバイルでは固定高さ
         textareaRef.current.style.height = '150px';
         textareaRef.current.style.minHeight = '150px';
       } else {
         // デスクトップでは自動調整
         textareaRef.current.style.height = 'auto';
-        const newHeight = Math.min(textareaRef.current.scrollHeight, 400);
-        textareaRef.current.style.height = `${newHeight}px`;
+        const scrollHeight = textareaRef.current.scrollHeight;
+        const newHeight = Math.min(scrollHeight, 400);
+        
+        // Phase 3: 最大高さの管理
+        if (maxHeight !== null) {
+          // 一度記録された最大高さより小さくならない
+          const finalHeight = Math.max(newHeight, maxHeight);
+          textareaRef.current.style.height = `${finalHeight}px`;
+          setCurrentHeight(finalHeight);
+        } else {
+          textareaRef.current.style.height = `${newHeight}px`;
+          setCurrentHeight(newHeight);
+          
+          // 最大高さを更新
+          if (onMaxHeightChange && newHeight > (maxHeight || 0)) {
+            onMaxHeightChange(newHeight);
+          }
+        }
       }
     }
-  }, [text, mode]); // textまたはmodeが変更されたら再計算
+  }, [text, mode, maxHeight, onMaxHeightChange]);
 
+  // Phase 3: フォーカスイベントの処理
+  const handleFocus = () => {
+    if (onFocusChange) {
+      onFocusChange(true);
+    }
+  };
+  
+  const handleBlur = () => {
+    if (onFocusChange) {
+      onFocusChange(false);
+    }
+  };
 
   // 距離のサブテキスト
   const getDistanceSubtext = () => {
@@ -286,6 +328,8 @@ return (
               setHasTextChanged(true);
             }
           }}
+          onFocus={handleFocus}  // Phase 3: フォーカスイベント
+          onBlur={handleBlur}    // Phase 3: ブラーイベント
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
           className={`w-full resize-y border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-12 transition-all duration-300 ${
@@ -334,8 +378,8 @@ return (
 
             {/* 右側：既存のボタン */}
             <div className="flex items-center gap-2">
-            {/* Phase 1 修正: コピーボタンの表示条件を改善 */}
-            {mode === 'suggestion' && text && (
+            {/* Phase 3 修正: 解析完了後のみコピーボタンを表示 */}
+            {mode === 'suggestion' && text && isAnalysisComplete && (
               <button
                 onClick={async () => {
                   if (text) {

@@ -323,3 +323,22 @@ textarea::-webkit-scrollbar-thumb:hover {
   height: 20px;
 }
 
+/* Phase 3: スマホの自動ズーム防止 */
+@media (max-width: 640px) {
+  textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="tel"],
+  input[type="number"] {
+    font-size: 16px !important; /* iOS自動ズーム防止 */
+    zoom: 0.75; /* 見た目を12pxサイズに維持 */
+    -webkit-text-size-adjust: 100%; /* テキストサイズ調整を防止 */
+  }
+  
+  /* テキストエリアのフォーカス時のズーム防止 */
+  textarea:focus,
+  input:focus {
+    font-size: 16px !important;
+  }
+}

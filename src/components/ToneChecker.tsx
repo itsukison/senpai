@@ -51,6 +51,15 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [hasReceivedResponse, setHasReceivedResponse] = useState(false); // API応答受信フラグ
   const [isContextOpen, setIsContextOpen] = useState(false); // Context Inputの開閉状態（モバイル・タブレット用）
   
+  // Phase 3 追加: 解析完了フラグ
+  const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
+  
+  // Phase 3 追加: テキストエリアの最大高さ管理
+  const [maxTextAreaHeight, setMaxTextAreaHeight] = useState<number | null>(null);
+  
+  // Phase 3 追加: 編集モード管理（PC版の位置調整用）
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  
   // ========== トグル機能の状態管理 ==========
   // ユーザーストーリー：
   // 1. AIの提案が良い場合 → そのまま提案を編集して完成
@@ -105,6 +114,9 @@ const analyzeText = useCallback(
     if (!canAnalyze) {
       return;
     }
+
+    // Phase 3: 解析完了フラグをリセット
+    setIsAnalysisComplete(false);
 
     // 再解析かどうかを判定
     const isReanalysis = showSuggestionArea && suggestion !== null;
@@ -358,6 +370,9 @@ const analyzeText = useCallback(
         setDisplayText(analysis.suggestion);
       }
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
+      
+      // Phase 3: 解析完了フラグを設定
+      setIsAnalysisComplete(true);
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -370,6 +385,7 @@ const analyzeText = useCallback(
         setShowRandomTextFlag(false);
         setIsShowingRandomText(false);  // 確実にリセット
         setHasReceivedResponse(false);  // API応答フラグもリセット
+        setIsAnalysisComplete(false);   // Phase 3: 解析完了フラグもリセット
         
         // 初回解析でキャンセルされた場合
         if (isFirstAnalysis && showSuggestionArea) {
@@ -390,6 +406,7 @@ const analyzeText = useCallback(
       setIsShowingRandomText(false); // Phase 1 修正: エラー時も確実にリセット
       setShowRandomTextFlag(false);
       setHasReceivedResponse(false); // API応答フラグもリセット
+      setIsAnalysisComplete(false);  // Phase 3: 解析完了フラグもリセット
       
       // ネットワークエラーの場合
       if (!error.name || error.name !== 'AbortError') {
@@ -536,9 +553,12 @@ const analyzeText = useCallback(
       setShowRandomTextFlag(false); // フラグもリセット
       setIsShowingRandomText(false); // ランダムテキスト表示もリセット
       setHasReceivedResponse(false); // API応答フラグもリセット
+      setIsAnalysisComplete(false);  // Phase 3: 解析完了フラグもリセット
       // トグル関連の状態もリセット
       setIsShowingOriginal(false);
       setEditedOriginalText("");
+      // Phase 3: 最大高さもリセット
+      setMaxTextAreaHeight(null);
     }, 1200);
   };
 
@@ -549,6 +569,13 @@ const analyzeText = useCallback(
     console.log("showSuggestionArea:", showSuggestionArea);
     console.log("showRandomTextFlag:", showRandomTextFlag);
     console.log("hasReceivedResponse:", hasReceivedResponse);
+    console.log("isReanalyzing:", isReanalyzing);  // Phase 3: 再解析チェック追加
+    
+    // Phase 3: 再解析時はランダムテキストを表示しない
+    if (isReanalyzing) {
+      console.log("=== 再解析中のためランダムテキストをスキップ ===");
+      return;
+    }
     
     if (!suggestion || !showSuggestionArea) {
       setDisplayText(userDraft);
@@ -698,7 +725,7 @@ const analyzeText = useCallback(
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag, hasReceivedResponse]);
+  }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag, hasReceivedResponse, isReanalyzing]);
 
   // Phase 1 修正: ランダムテキスト状態の安全装置を強化
   useEffect(() => {
@@ -758,6 +785,24 @@ const analyzeText = useCallback(
     }
   }, [animationPhase, isReanalyzing, analysisState, hasReceivedResponse, isFirstAnalysis]);
 
+  // Phase 3: PC版の編集モード管理
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    
+    if (!isMobile && isEditingMode) {
+      // PC版のみ: 編集時に画面下部に余白を追加
+      document.body.style.paddingBottom = '60vh';
+      document.body.style.transition = 'padding-bottom 0.3s ease';
+    } else {
+      // 編集終了時または、モバイルでは余白を削除
+      document.body.style.paddingBottom = '0';
+    }
+    
+    return () => {
+      document.body.style.paddingBottom = '0';
+    };
+  }, [isEditingMode]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -767,6 +812,8 @@ const analyzeText = useCallback(
       }
       // タイマーのクリーンアップ
       animationTimersRef.current.forEach(timer => clearTimeout(timer));
+      // Phase 3: body要素のスタイルもリセット
+      document.body.style.paddingBottom = '0';
     };
   }, []);
 
@@ -1138,8 +1185,10 @@ const analyzeText = useCallback(
                   if (analysisState === 'analyzing' && abortControllerRef.current) {
                     abortControllerRef.current.abort();
                   }
-                  if (analysisState === 'analyzed' && !showSuggestionArea) {
+                  // Phase 3: セレクタ変更時に再解析可能に
+                  if (analysisState === 'analyzed' || showSuggestionArea) {
                     setAnalysisState('ready');
+                    setExternalChanges(true);
                   }
                 }}
                 onSocialDistanceChange={(value) => {
@@ -1147,8 +1196,10 @@ const analyzeText = useCallback(
                   if (analysisState === 'analyzing' && abortControllerRef.current) {
                     abortControllerRef.current.abort();
                   }
-                  if (analysisState === 'analyzed' && !showSuggestionArea) {
+                  // Phase 3: セレクタ変更時に再解析可能に
+                  if (analysisState === 'analyzed' || showSuggestionArea) {
                     setAnalysisState('ready');
+                    setExternalChanges(true);
                   }
                 }}
                 onAnalyze={() => {
@@ -1168,7 +1219,7 @@ const analyzeText = useCallback(
                 isEditable={analysisState !== 'analyzing'}
                 isTransitioning={false}
 
-                title={showSuggestionArea 
+                title={showSuggestionArea && isAnalysisComplete  // Phase 3: 解析完了後のみタイトル変更
                   ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")
                   : undefined
                 }
@@ -1179,6 +1230,12 @@ const analyzeText = useCallback(
                 isShowingOriginal={isShowingOriginal}
                 onToggleOriginal={handleToggleOriginal}
                 hasEditedOriginal={!!editedOriginalText}
+                
+                // Phase 3: 追加props
+                isAnalysisComplete={isAnalysisComplete}
+                maxHeight={maxTextAreaHeight}
+                onMaxHeightChange={setMaxTextAreaHeight}
+                onFocusChange={setIsEditingMode}
               />
           </div>
         </div>
