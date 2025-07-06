@@ -66,10 +66,14 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   // 2. AIの提案がイマイチな場合 → 元文章に戻って、元文章を編集して完成
   // どちらのパスでも、編集内容を保持しつつ、再解析も可能にする
   const [isShowingOriginal, setIsShowingOriginal] = useState(false); // true: 元文章を表示中, false: AI提案を表示中
-  const [editedOriginalText, setEditedOriginalText] = useState(""); // 元文章に戻った時の編集内容を保持
+  const [editedOriginalText, setEditedOriginalText] = useState<string>(""); // 元文章に戻った時の編集内容を保持
   
   // Phase 3 ハイブリッドアプローチ: 提案の編集を明示的に管理
-  const [editedSuggestionText, setEditedSuggestionText] = useState(""); // AI提案を編集した内容を保持
+  const [editedSuggestionText, setEditedSuggestionText] = useState<string>(""); // AI提案を編集した内容を保持
+  
+  // 編集済みフラグ
+  const [hasEditedOriginal, setHasEditedOriginal] = useState(false);
+  const [hasEditedSuggestion, setHasEditedSuggestion] = useState(false);
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -115,13 +119,12 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     // 提案モード（提案エリアが表示中）
     if (isShowingOriginal) {
       // 「←元文章に戻す」を押した状態
-      // 編集された元文章 > オリジナルの元文章 > 空文字 の優先順位
-      return editedOriginalText || suggestion?.originalText || "";
+      // 編集されたことがある場合は編集内容を優先（空文字列も含む）
+      return hasEditedOriginal ? editedOriginalText : (suggestion?.originalText || "");
     } else {
       // AI提案を表示中
-      // 解析中でも編集内容を維持するため、isAnalysisCompleteに依存しない
-      // 編集された提案 > AIの提案 > 空文字 の優先順位
-      return editedSuggestionText || suggestion?.suggestion || "";
+      // 編集されたことがある場合は編集内容を優先（空文字列も含む）
+      return hasEditedSuggestion ? editedSuggestionText : (suggestion?.suggestion || "");
     }
   };
 
@@ -150,9 +153,7 @@ const analyzeText = useCallback(
     // Phase 3 修正: 編集された内容を正しく取得
     // ユーザーが編集した内容（元文章の編集 or 提案の編集）をAPIに送信
     const currentText = isReanalysis
-      ? (isShowingOriginal 
-        ? editedOriginalText  // 「←元文章に戻す」で編集した内容
-        : (editedSuggestionText || suggestion?.suggestion || userDraft))  // 提案を編集した内容
+      ? getDisplayTextForEditor()  // 既存の関数を活用して正確に取得
       : userDraft;  // 初回解析時は常にuserDraft
     
     console.log("=== 解析タイプ判定 ===");
@@ -167,13 +168,17 @@ const analyzeText = useCallback(
       setIsTransitioning(true);
       setExternalChanges(false);
       
+      // 再解析時は即座にランダムテキストを開始
+      setShowRandomTextFlag(true);
+      console.log("=== 再解析: showRandomTextFlag を true に設定 ===");
+      
       // Phase 3 追加: 編集状態を保持（再解析時のみ）
       // 再解析時は現在の編集内容を新しいオリジナルとして扱う
       // これにより、編集→再解析→編集のサイクルが可能になる
-      if (!isShowingOriginal && (editedSuggestionText || suggestion?.suggestion)) {
+      if (!isShowingOriginal && hasEditedSuggestion) {
         // 提案を編集していた場合、その内容を新しいオリジナルとする
-        setOriginalText(editedSuggestionText || suggestion?.suggestion || "");
-      } else if (isShowingOriginal && editedOriginalText) {
+        setOriginalText(editedSuggestionText);
+      } else if (isShowingOriginal && hasEditedOriginal) {
         // 元文章を編集していた場合、その内容を新しいオリジナルとする
         setOriginalText(editedOriginalText);
       }
@@ -197,13 +202,16 @@ const analyzeText = useCallback(
         setAnimationPhase('suggestion');
         setIsTransitioning(false);
         setIsFirstAnalysis(false);
-        
-        // 初回解析時は1秒後にランダムテキストフラグを設定
-        if (!isReanalysis) {
-          setShowRandomTextFlag(true);
-          console.log("=== showRandomTextFlag を true に設定（メインタイマー内） ===");
-        }
-      }, 1800); // CSS transitionと同期（1秒）
+      }, 1000); // CSS transitionと同期（1秒）
+      
+      // ランダムテキストの開始タイミング
+      const randomTextTimer = setTimeout(() => {
+        setShowRandomTextFlag(true);
+        console.log("=== showRandomTextFlag を true に設定 ===");
+      }, 1800); // 初回は1.8秒後
+      
+      animationTimersRef.current.push(mainTimer);
+      animationTimersRef.current.push(randomTextTimer);
       
       console.log("=== タイマーID:", mainTimer);
       animationTimersRef.current.push(mainTimer);
@@ -228,6 +236,8 @@ const analyzeText = useCallback(
     // トグル状態のリセット
     setIsShowingOriginal(false);
     setEditedOriginalText("");
+    setHasEditedOriginal(false);
+    setHasEditedSuggestion(false);
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
     // ただし、suggestionフィールドはnullのままにして、ランダムテキストの判定に影響しないようにする
@@ -412,6 +422,9 @@ const analyzeText = useCallback(
         setDisplayText(analysis.suggestion);
         // Phase 3: 新しい提案が来たら編集状態をリセット
         setEditedSuggestionText("");  // 次回の編集に備えてクリア
+        setHasEditedSuggestion(false); // 編集フラグもリセット
+        // トグル状態を提案表示に戻す
+        setIsShowingOriginal(false);
       }
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
       
@@ -535,12 +548,14 @@ const analyzeText = useCallback(
     if (isShowingOriginal) {
       // 「←元文章に戻す」を押している状態での編集
       setEditedOriginalText(value);
+      setHasEditedOriginal(true);
       // 画面の表示も即座に更新
       setDisplayText(value);
     } else {
       // AI提案を表示中の編集
       // 専用の状態（editedSuggestionText）に保存
       setEditedSuggestionText(value);
+      setHasEditedSuggestion(true);
       // 画面の表示も即座に更新
       setDisplayText(value);
     }
@@ -617,6 +632,9 @@ const analyzeText = useCallback(
       // トグル関連の状態もリセット
       setIsShowingOriginal(false);
       setEditedOriginalText("");
+      setEditedSuggestionText("");
+      setHasEditedOriginal(false);
+      setHasEditedSuggestion(false);
       // Phase 3: 最大高さもリセット
       setMaxTextAreaHeight(null);
     }, 1200);
@@ -739,7 +757,7 @@ const analyzeText = useCallback(
       // Phase 3: 再解析時は編集されたテキストをベースにアニメーション
       // これにより、ユーザーが編集した内容がランダムに変化する様子が見える
       const baseTextForAnimation = isReanalyzing 
-        ? (isShowingOriginal ? editedOriginalText : (editedSuggestionText || suggestion?.suggestion || suggestion.originalText))
+        ? getDisplayTextForEditor()  // 現在表示中のテキストを正確に取得
         : suggestion.originalText;
       
       if (!isShowingRandomText) {
@@ -816,30 +834,6 @@ const analyzeText = useCallback(
   }, [threadContext, hierarchy, social_distance]);
   // ========== 言語切り替えの検知ここまで ==========
 
-  // Phase 1 追加: 初回解析時のタイマー管理
-  useEffect(() => {
-    console.log("=== タイマー管理useEffect ===");
-    console.log("animationPhase:", animationPhase);
-    console.log("isReanalyzing:", isReanalyzing);
-    console.log("analysisState:", analysisState);
-    console.log("isFirstAnalysis:", isFirstAnalysis);
-    
-    if (animationPhase === 'transitioning' && !isReanalyzing && analysisState === 'analyzing' && isFirstAnalysis) {
-      console.log("=== useEffectでタイマー設定（条件成立） ===");
-      const timer = setTimeout(() => {
-        console.log("=== useEffectタイマー実行（1秒後） ===");
-        console.log("現在のhasReceivedResponse:", hasReceivedResponse);
-        setShowRandomTextFlag(true);
-        console.log("=== showRandomTextFlag を true に設定完了 ===");
-      }, 1000);
-      
-      return () => {
-        console.log("=== useEffectタイマークリア:", timer);
-        clearTimeout(timer);
-      };
-    }
-  }, [animationPhase, isReanalyzing, analysisState, hasReceivedResponse, isFirstAnalysis]);
-
   // Phase 3: PC版の編集モード管理
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
@@ -857,6 +851,13 @@ const analyzeText = useCallback(
       document.body.style.paddingBottom = '0';
     };
   }, [isEditingMode]);
+
+  // AI提案の初期編集テキスト設定
+  useEffect(() => {
+    if (suggestion?.suggestion && isAnalysisComplete && !isShowingOriginal && !editedSuggestionText) {
+      setEditedSuggestionText(suggestion.suggestion);
+    }
+  }, [suggestion?.suggestion, isAnalysisComplete, isShowingOriginal]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -931,12 +932,12 @@ const analyzeText = useCallback(
       <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-2.5 sm:gap-4 lg:gap-6 lg:min-h-0 max-h-[calc(100vh-140px)]">
 
         {/* Context Input - Accordion on mobile/tablet, normal on desktop */}
-        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 lg:flex lg:flex-col lg:col-span-1 lg:h-full">
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 lg:flex lg:flex-col lg:col-span-1 lg:h-full flex-shrink-0">
           {/* モバイル・タブレット用アコーディオン */}
           <div className="lg:hidden">
             <button
               onClick={() => setIsContextOpen(!isContextOpen)}
-              className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-purple-50 hover:bg-purple-100 transition-colors flex items-center justify-between"
+              className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-purple-50 hover:bg-purple-100 transition-colors flex items-center justify-between min-h-[44px]"
             >
               <div className="flex items-center gap-2">
                 <svg
@@ -1244,9 +1245,9 @@ const analyzeText = useCallback(
             <MessageEditor
                 mode={showSuggestionArea ? "suggestion" : "input"}
                 text={showSuggestionArea 
-                  ? (isShowingOriginal 
-                    ? (editedOriginalText || suggestion?.originalText || "") 
-                    : (isAnalysisComplete && suggestion?.suggestion ? suggestion.suggestion : displayText))
+                  ? (analysisState === 'analyzing' && !isReanalyzing && !suggestion?.suggestion
+                    ? displayText  // 初回解析中はdisplayTextを使用
+                    : getDisplayTextForEditor())  // それ以外は通常通り
                   : userDraft
                 }
                 onTextChange={showSuggestionArea ? handleEditInSuggestionMode : handleTextChange}

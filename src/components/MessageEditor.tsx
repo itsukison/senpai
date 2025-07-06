@@ -296,15 +296,15 @@ return (
                         }
                       }}
                       disabled={isTransitioning}
-                      className={`relative flex-1 py-1 px-0.5 sm:px-0.5 lg:px-1 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
+                      className={`relative flex-1 py-1 px-0.5 sm:px-0.5 lg:px-1 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col items-center justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
                         socialDistance === option.value
                           ? 'text-white'
                           : 'text-purple-700 hover:bg-purple-50'
                       } ${isTransitioning ? 'opacity-60 cursor-not-allowed' : ''}`}
                     >
-                      <span className="relative block sm:font-semibold text-center">{option.label}</span>
+                      <span className="relative block sm:font-semibold">{option.label}</span>
                       {socialDistance === option.value && (
-                        <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap text-center">
+                        <span className="relative hidden sm:block text-[8px] opacity-80 -mt-0.5 whitespace-nowrap">
                           {getDistanceSubtext()}
                         </span>
                       )}
