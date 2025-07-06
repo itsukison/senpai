@@ -174,7 +174,15 @@ const analyzeText = useCallback(
       // 再解析時は即座にランダムテキストを開始
       setShowRandomTextFlag(true);
       console.log("=== 再解析: showRandomTextFlag を true に設定 ===");
-      
+    } else {
+      // 初回解析時も即座にランダムテキストを開始
+      setTimeout(() => {
+        setShowRandomTextFlag(true);
+        console.log("=== 初回解析: showRandomTextFlag を true に設定（遅延実行） ===");
+      }, 1800);
+    }
+    
+    if (isReanalysis) {
       // Phase 3 追加: 編集状態を保持（再解析時のみ）
       // 再解析時は現在の編集内容を新しいオリジナルとして扱う
       // これにより、編集→再解析→編集のサイクルが可能になる
@@ -207,17 +215,10 @@ const analyzeText = useCallback(
         setIsFirstAnalysis(false);
       }, 1000); // CSS transitionと同期（1秒）
       
-      // ランダムテキストの開始タイミング
-      const randomTextTimer = setTimeout(() => {
-        setShowRandomTextFlag(true);
-        console.log("=== showRandomTextFlag を true に設定 ===");
-      }, 1800); // 初回は1.8秒後
-      
       animationTimersRef.current.push(mainTimer);
-      animationTimersRef.current.push(randomTextTimer);
+      // randomTextTimerは削除（useEffectで管理）
       
-      console.log("=== タイマーID:", mainTimer);
-      animationTimersRef.current.push(mainTimer);
+      console.log("=== タイマーID: mainTimer=", mainTimer);
       console.log("=== 保存されたタイマー数:", animationTimersRef.current.length);
       console.log("=== 保存されたタイマー配列:", animationTimersRef.current);
     }
@@ -274,11 +275,9 @@ const analyzeText = useCallback(
       abortControllerRef.current.abort();
     }
     
-    // 既存のタイマーをクリア（再解析時のみ）
-    if (isReanalysis) {
-      animationTimersRef.current.forEach(timer => clearTimeout(timer));
-      animationTimersRef.current = [];
-    }
+    // 既存のタイマーをクリア（初回・再解析どちらも）
+    animationTimersRef.current.forEach(timer => clearTimeout(timer));
+    animationTimersRef.current = [];
 
     // 新しいAbortControllerを作成
     abortControllerRef.current = new AbortController();
@@ -813,6 +812,7 @@ const analyzeText = useCallback(
     };
   }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag, hasReceivedResponse, isReanalyzing]);
 
+
   // Phase 1 修正: ランダムテキスト状態の安全装置を強化
   useEffect(() => {
     // 解析が完了したらランダムテキストを必ず終了
@@ -873,6 +873,7 @@ const analyzeText = useCallback(
       }
       // タイマーのクリーンアップ
       animationTimersRef.current.forEach(timer => clearTimeout(timer));
+      animationTimersRef.current = [];  // 配列もリセット
       // Phase 3: body要素のスタイルもリセット
       document.body.style.paddingBottom = '0';
     };
