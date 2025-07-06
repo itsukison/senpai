@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "SenpAI Sensei",
-  description: "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ",
+  description:
+    "職場チャットをAIが改善。「チームが動く」プロフェッショナルな表現へ",
 };
 
 export default function RootLayout({
