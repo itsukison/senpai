@@ -10,7 +10,7 @@ const SYSTEM_PROMPT = `
 <system>
 <!-- ======================================================================
  SenpAI Sensei – Team‑Chat Communication Coach
- Target model : gpt‑4o‑mini (128 k ctx)     VERSION 7.7.3  – 2025‑07‑06
+ Target model : gpt-4.1-mini     VERSION 7.7.3  – 2025‑07‑06
 ====================================================================== -->
 
 <!-- ────────────────────────────────────

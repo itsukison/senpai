@@ -67,6 +67,9 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   // どちらのパスでも、編集内容を保持しつつ、再解析も可能にする
   const [isShowingOriginal, setIsShowingOriginal] = useState(false); // true: 元文章を表示中, false: AI提案を表示中
   const [editedOriginalText, setEditedOriginalText] = useState(""); // 元文章に戻った時の編集内容を保持
+  
+  // Phase 3 ハイブリッドアプローチ: 提案の編集を明示的に管理
+  const [editedSuggestionText, setEditedSuggestionText] = useState(""); // AI提案を編集した内容を保持
 
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
@@ -101,6 +104,27 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
     return editDistance > 5;
   };
 
+  // Phase 3 ハイブリッドアプローチ: 表示するテキストを決定する関数
+  // 画面に表示すべきテキストを一元的に管理し、複雑な条件分岐を整理
+  const getDisplayTextForEditor = () => {
+    // 入力モード（提案エリアが表示されていない）
+    if (!showSuggestionArea) {
+      return userDraft;
+    }
+    
+    // 提案モード（提案エリアが表示中）
+    if (isShowingOriginal) {
+      // 「←元文章に戻す」を押した状態
+      // 編集された元文章 > オリジナルの元文章 > 空文字 の優先順位
+      return editedOriginalText || suggestion?.originalText || "";
+    } else {
+      // AI提案を表示中
+      // 解析中でも編集内容を維持するため、isAnalysisCompleteに依存しない
+      // 編集された提案 > AIの提案 > 空文字 の優先順位
+      return editedSuggestionText || suggestion?.suggestion || "";
+    }
+  };
+
 // Debounced analysis function - analyze full text
 const analyzeText = useCallback(
   async () => {
@@ -124,10 +148,11 @@ const analyzeText = useCallback(
     
     // 現在表示されているテキストを取得
     // Phase 3 修正: 編集された内容を正しく取得
+    // ユーザーが編集した内容（元文章の編集 or 提案の編集）をAPIに送信
     const currentText = isReanalysis
       ? (isShowingOriginal 
-        ? editedOriginalText  // 編集されたオリジナルテキスト
-        : (suggestion?.suggestion || userDraft))  // 編集された提案テキスト
+        ? editedOriginalText  // 「←元文章に戻す」で編集した内容
+        : (editedSuggestionText || suggestion?.suggestion || userDraft))  // 提案を編集した内容
       : userDraft;  // 初回解析時は常にuserDraft
     
     console.log("=== 解析タイプ判定 ===");
@@ -143,11 +168,13 @@ const analyzeText = useCallback(
       setExternalChanges(false);
       
       // Phase 3 追加: 編集状態を保持（再解析時のみ）
-      if (!isShowingOriginal && suggestion?.suggestion) {
-        // 提案が編集されている場合、その内容を新しいオリジナルとして扱う
-        setOriginalText(suggestion.suggestion);
+      // 再解析時は現在の編集内容を新しいオリジナルとして扱う
+      // これにより、編集→再解析→編集のサイクルが可能になる
+      if (!isShowingOriginal && (editedSuggestionText || suggestion?.suggestion)) {
+        // 提案を編集していた場合、その内容を新しいオリジナルとする
+        setOriginalText(editedSuggestionText || suggestion?.suggestion || "");
       } else if (isShowingOriginal && editedOriginalText) {
-        // オリジナルが編集されている場合、その内容を新しいオリジナルとして扱う
+        // 元文章を編集していた場合、その内容を新しいオリジナルとする
         setOriginalText(editedOriginalText);
       }
     } else {
@@ -220,6 +247,7 @@ const analyzeText = useCallback(
     }
     
     // displayTextも初期化
+    // 画面には編集中のテキストを表示し続ける（ユーザーの編集内容が消えない）
     setDisplayText(isReanalysis ? currentText : userDraft);
     
     // ランダムテキストフラグをリセット
@@ -382,6 +410,8 @@ const analyzeText = useCallback(
       setShowRandomTextFlag(false);    // フラグもリセット
       if (analysis.suggestion) {
         setDisplayText(analysis.suggestion);
+        // Phase 3: 新しい提案が来たら編集状態をリセット
+        setEditedSuggestionText("");  // 次回の編集に備えてクリア
       }
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
       
@@ -447,12 +477,15 @@ const analyzeText = useCallback(
   const handleToggleOriginal = () => {
     setIsShowingOriginal(!isShowingOriginal);
     // トグル時に表示テキストを更新
+    // 画面の表示が即座に切り替わる
     if (!isShowingOriginal) {
       // オリジナルに切り替え
+      // 編集済みの元文章 or 最初の元文章を表示
       setDisplayText(editedOriginalText || suggestion?.originalText || "");
     } else {
       // 提案に切り替え
-      setDisplayText(suggestion?.suggestion || "");
+      // 編集済みの提案 or AIの提案を表示
+      setDisplayText(editedSuggestionText || suggestion?.suggestion || "");
     }
   };
 
@@ -483,14 +516,11 @@ const analyzeText = useCallback(
 
   // 提案の編集を処理
   const handleSuggestionEdit = (newText: string) => {
-    if (suggestion) {
-      setSuggestion({
-        ...suggestion,
-        suggestion: newText
-      });
-      // Phase 3: 表示テキストも更新
-      setDisplayText(newText);
-    }
+    // Phase 3: editedSuggestionTextに保存して、提案の編集を明示的に管理
+    setEditedSuggestionText(newText);
+    // 画面の表示も更新（リアルタイムで編集内容を反映）
+    setDisplayText(newText);
+    
     // 再解析可能にする
     if (analysisState === 'analyzed') {
       setAnalysisState('ready');
@@ -501,25 +531,21 @@ const analyzeText = useCallback(
   // 重要：どちらのモードでも編集内容は独立して保存される
   // これにより、ユーザーは提案と元文章を行き来しながら、それぞれのバージョンを編集できる
   const handleEditInSuggestionMode = (value: string) => {
-    // Phase 3 修正: 空文字列も正しく処理
+    // Phase 3 修正: 空文字列も正しく処理し、適切な状態に保存
     if (isShowingOriginal) {
-      // オリジナル表示中はeditedOriginalTextを更新
+      // 「←元文章に戻す」を押している状態での編集
       setEditedOriginalText(value);
-      // 表示テキストも更新
+      // 画面の表示も即座に更新
       setDisplayText(value);
     } else {
-      // 提案表示中はsuggestionを更新
-      if (suggestion) {
-        setSuggestion({
-          ...suggestion,
-          suggestion: value
-        });
-        // 表示テキストも更新
-        setDisplayText(value);
-      }
+      // AI提案を表示中の編集
+      // 専用の状態（editedSuggestionText）に保存
+      setEditedSuggestionText(value);
+      // 画面の表示も即座に更新
+      setDisplayText(value);
     }
     
-    // 再解析可能にする
+    // 再解析可能にする（編集したら再解析ボタンを有効化）
     if (analysisState === 'analyzed') {
       setAnalysisState('ready');
     }
@@ -605,11 +631,8 @@ const analyzeText = useCallback(
     console.log("hasReceivedResponse:", hasReceivedResponse);
     console.log("isReanalyzing:", isReanalyzing);  // Phase 3: 再解析チェック追加
     
-    // Phase 3: 再解析時はランダムテキストを表示しない
-    if (isReanalyzing) {
-      console.log("=== 再解析中のためランダムテキストをスキップ ===");
-      return;
-    }
+    // Phase 3: 再解析時もランダムテキストを表示する（スキップを削除）
+    // 初回も再解析も同じユーザー体験を提供
     
     if (!suggestion || !showSuggestionArea) {
       setDisplayText(userDraft);
@@ -713,9 +736,15 @@ const analyzeText = useCallback(
       console.log("hasReceivedResponse:", hasReceivedResponse);
       console.log("originalText:", suggestion.originalText);
       
+      // Phase 3: 再解析時は編集されたテキストをベースにアニメーション
+      // これにより、ユーザーが編集した内容がランダムに変化する様子が見える
+      const baseTextForAnimation = isReanalyzing 
+        ? (isShowingOriginal ? editedOriginalText : (editedSuggestionText || suggestion?.suggestion || suggestion.originalText))
+        : suggestion.originalText;
+      
       if (!isShowingRandomText) {
         console.log("=== ランダムテキストアニメーション開始 ===");
-        setDisplayText(suggestion.originalText);
+        setDisplayText(baseTextForAnimation);
         setIsShowingRandomText(true);
       }
       
@@ -733,7 +762,7 @@ const analyzeText = useCallback(
           const elapsed = Date.now() - animationStartTime;
           const progress = Math.min(1, elapsed / 3000);
           
-          const partiallyRandomText = generatePartialRandomText(suggestion.originalText, progress);
+          const partiallyRandomText = generatePartialRandomText(baseTextForAnimation, progress);
           setDisplayText(partiallyRandomText);
         }
         
