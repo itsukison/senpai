@@ -157,7 +157,7 @@ export function MessageEditor({
     if (mode === 'input') {
       return canAnalyze && (!hasAcceptedSuggestion || hasSignificantChange);
     } else {
-      // suggestion mode
+      // Phase 1 修正: セレクタ変更時も再解析可能に
       const textChanged = text !== initialText && Math.abs(text.length - initialText.length) > 5;
       return canAnalyze && (textChanged || externalChanges);
     }
@@ -198,7 +198,13 @@ return (
                 {hierarchyOptions.map((option) => (
                   <button
                     key={option.value}
-                    onClick={() => onHierarchyChange(option.value)}
+                    onClick={() => {
+                      onHierarchyChange(option.value);
+                      // Phase 1 修正: 関係性変更時に再解析可能にする
+                      if (mode === 'suggestion') {
+                        setHasTextChanged(true);
+                      }
+                    }}
                     disabled={isTransitioning}
                     className={`group relative flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:min-h-[36px] sm:h-[36px] ${
                       hierarchy === option.value
@@ -240,7 +246,13 @@ return (
                   {distanceOptions.map((option, index) => (
                     <button
                       key={option.value}
-                      onClick={() => onSocialDistanceChange(option.value)}
+                      onClick={() => {
+                        onSocialDistanceChange(option.value);
+                        // Phase 1 修正: 距離変更時も再解析可能にする
+                        if (mode === 'suggestion') {
+                          setHasTextChanged(true);
+                        }
+                      }}
                       disabled={isTransitioning}
                       className={`relative flex-1 py-1 px-0.5 sm:px-0.5 lg:px-1 text-[10px] sm:text-[11px] lg:text-xs font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:min-h-[36px] sm:h-[36px] z-20 ${
                         socialDistance === option.value
@@ -322,8 +334,8 @@ return (
 
             {/* 右側：既存のボタン */}
             <div className="flex items-center gap-2">
-            {/* コピーボタン（suggestion modeかつ解析完了時に表示） */}
-            {mode === 'suggestion' && analysisState === 'analyzed' && (
+            {/* Phase 1 修正: コピーボタンの表示条件を改善 */}
+            {mode === 'suggestion' && text && (
               <button
                 onClick={async () => {
                   if (text) {

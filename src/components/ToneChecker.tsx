@@ -48,6 +48,7 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false); // 詳細分析の表示状態
   const [showRandomTextFlag, setShowRandomTextFlag] = useState(false); // ランダムテキスト開始フラグ
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // エラーメッセージ
+  const [hasReceivedResponse, setHasReceivedResponse] = useState(false); // API応答受信フラグ
   const [isContextOpen, setIsContextOpen] = useState(false); // Context Inputの開閉状態（モバイル・タブレット用）
   
   // ========== トグル機能の状態管理 ==========
@@ -106,8 +107,14 @@ const analyzeText = useCallback(
     }
 
     // 再解析かどうかを判定
-    const isReanalysis = showSuggestionArea && !isFirstAnalysis;
+    const isReanalysis = showSuggestionArea && suggestion !== null;
     setIsReanalyzing(isReanalysis);
+    
+    console.log("=== 解析タイプ判定 ===");
+    console.log("isFirstAnalysis:", isFirstAnalysis);
+    console.log("showSuggestionArea:", showSuggestionArea);
+    console.log("suggestion:", suggestion);
+    console.log("isReanalysis:", isReanalysis);
 
     if (isReanalysis) {
       // 再解析時：移動アニメーションなし、内容のフェードのみ
@@ -122,31 +129,29 @@ const analyzeText = useCallback(
       // 即座に提案エリアを表示（移動開始）
       setShowSuggestionArea(true);
       
-      // ⚠️ タイマー依存関係の重要な注意事項:
-      // このsetTimeoutは複数のアニメーションタイマーと連携しています。
-      // 変更する場合は以下も確認してください：
-      // 1. CSS transition duration（現在2000ms）
-      // 2. useEffect内のランダムテキスト待機時間
-      // 3. dismissSuggestion内のタイマー（1200ms）
-      // これらのタイミングがずれると、アニメーションが競合します。
+      console.log("=== タイマー設定開始 ===");
+      console.log("現在のタイマー配列:", animationTimersRef.current);
       
       // アニメーション完了（1秒に修正）
       const mainTimer = setTimeout(() => {
+        console.log("=== メインタイマー実行（1秒後） ===");
+        console.log("タイマー内 - animationTimersRef.current:", animationTimersRef.current);
+        
         setAnimationPhase('suggestion');
         setIsTransitioning(false);
         setIsFirstAnalysis(false);
         
-        // レイアウト安定後、ランダムテキストの開始を制御
-        // API応答が既にある場合はスキップ
-        const subTimer = setTimeout(() => {
-          // この時点でまだAPI応答がない場合のみ、ランダムテキスト開始フラグを立てる
-          if (!suggestion?.suggestion) {
-            setShowRandomTextFlag(true);
-          }
-        }, 800); // 0.8秒の短い待機
-        animationTimersRef.current.push(subTimer);
+        // 初回解析時は1秒後にランダムテキストフラグを設定
+        if (!isReanalysis) {
+          setShowRandomTextFlag(true);
+          console.log("=== showRandomTextFlag を true に設定（メインタイマー内） ===");
+        }
       }, 1000); // CSS transitionと同期（1秒）
+      
+      console.log("=== タイマーID:", mainTimer);
       animationTimersRef.current.push(mainTimer);
+      console.log("=== 保存されたタイマー数:", animationTimersRef.current.length);
+      console.log("=== 保存されたタイマー配列:", animationTimersRef.current);
     }
     // モバイルの場合、スクロール調整（初回のみ）
     if (!isReanalysis && window.innerWidth < 768) {
@@ -168,10 +173,11 @@ const analyzeText = useCallback(
     setEditedOriginalText("");
     
     // 解析開始時に空のsuggestionをセット（スケルトンUI表示用）
+    // ただし、suggestionフィールドはnullのままにして、ランダムテキストの判定に影響しないようにする
     setSuggestion({
       hasIssues: true,  // デフォルトでtrueと仮定
       originalText: userDraft,
-      suggestion: null,
+      suggestion: null,  // 重要: nullのままにする
       reasoning: '',
       ai_receipt: '',
       improvement_points: '',
@@ -180,8 +186,12 @@ const analyzeText = useCallback(
       detected_mentions: []
     });
     
+    // displayTextも初期化
+    setDisplayText(userDraft);
+    
     // ランダムテキストフラグをリセット
     setShowRandomTextFlag(false);
+    setHasReceivedResponse(false);  // API応答フラグをリセット
     // エラーメッセージもリセット
     setErrorMessage(null);
 
@@ -190,9 +200,11 @@ const analyzeText = useCallback(
       abortControllerRef.current.abort();
     }
     
-    // 既存のタイマーをクリア
-    animationTimersRef.current.forEach(timer => clearTimeout(timer));
-    animationTimersRef.current = [];
+    // 既存のタイマーをクリア（再解析時のみ）
+    if (isReanalysis) {
+      animationTimersRef.current.forEach(timer => clearTimeout(timer));
+      animationTimersRef.current = [];
+    }
 
     // 新しいAbortControllerを作成
     abortControllerRef.current = new AbortController();
@@ -202,11 +214,11 @@ const analyzeText = useCallback(
 
     try {
       // 現在表示されているテキストを取得
-      const currentText = showSuggestionArea 
+      const currentText = isReanalysis
         ? (isShowingOriginal 
           ? (editedOriginalText || suggestion?.originalText || userDraft)
           : (suggestion?.suggestion || userDraft))
-        : userDraft;
+        : userDraft;  // 初回解析時は常にuserDraft
 
       const requestBody = {
         user_draft: currentText,  // 現在表示されているテキストを送信
@@ -317,13 +329,32 @@ const analyzeText = useCallback(
       console.log("hasIssues:", analysis.hasIssues);
       console.log("suggestion:", analysis.suggestion);
 
-      // hasIssuesがfalseでもanalyisを設定する
-// hasIssuesがfalseでもanalyisを設定する
+      // API応答を受信したことを記録
+      setHasReceivedResponse(true);
+      
+      // Phase 1 修正: 最小待機時間の確保
+      const elapsedTime = Date.now() - startTime;
+      const minimumWaitTime = isFirstAnalysis && !isReanalysis ? 1200 : 0; // 初回は1.2秒、再解析は即座
+      const remainingWaitTime = Math.max(0, minimumWaitTime - elapsedTime);
+      
+      console.log("=== 待機時間計算 ===");
+      console.log("経過時間:", elapsedTime, "ms");
+      console.log("最小待機時間:", minimumWaitTime, "ms");
+      console.log("残り待機時間:", remainingWaitTime, "ms");
+      
+      if (remainingWaitTime > 0) {
+        // 最小待機時間まで待つ
+        await new Promise(resolve => setTimeout(resolve, remainingWaitTime));
+      }
+
+      // API応答を受信したことを記録
+      setHasReceivedResponse(true);
+      
+      // API応答時に確実にランダムテキストを終了
       setSuggestion(analysis);
-      // ランダムテキストを確実に終了
+      setIsShowingRandomText(false);  // 必ずfalseに設定
+      setShowRandomTextFlag(false);    // フラグもリセット
       if (analysis.suggestion) {
-        setIsShowingRandomText(false);
-        setShowRandomTextFlag(false);
         setDisplayText(analysis.suggestion);
       }
       console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
@@ -332,12 +363,13 @@ const analyzeText = useCallback(
       if (error.name === 'AbortError') {
         console.log('解析がキャンセルされました');
         
-        // すべての解析関連の状態をリセット
+        // Phase 1 修正: キャンセル時の完全なリセット
         setIsTransitioning(false);
         setAnalysisState('ready');
         setIsReanalyzing(false);
         setShowRandomTextFlag(false);
-        setIsShowingRandomText(false);
+        setIsShowingRandomText(false);  // 確実にリセット
+        setHasReceivedResponse(false);  // API応答フラグもリセット
         
         // 初回解析でキャンセルされた場合
         if (isFirstAnalysis && showSuggestionArea) {
@@ -355,8 +387,9 @@ const analyzeText = useCallback(
       console.error("エラー詳細:", error);
       setSuggestion(null);
       setAnalysisState('ready'); // エラー時もreadyに戻す
-      setIsShowingRandomText(false); // エラー時もリセット
+      setIsShowingRandomText(false); // Phase 1 修正: エラー時も確実にリセット
       setShowRandomTextFlag(false);
+      setHasReceivedResponse(false); // API応答フラグもリセット
       
       // ネットワークエラーの場合
       if (!error.name || error.name !== 'AbortError') {
@@ -366,15 +399,16 @@ const analyzeText = useCallback(
         setErrorMessage(userMessage);
       }
     } finally {
-      // AbortErrorの場合はfinallyが実行されないようにする
+      // Phase 1 修正: finallyでも確実にリセット
       if (!abortControllerRef.current?.signal.aborted) {
         setAnalysisState('analyzed');
         setIsShowingRandomText(false); // 解析終了時に必ずリセット
-        console.log("=== 解析終了 ===");
+        setShowRandomTextFlag(false);  // フラグもリセット
+        console.log("=== 解析終了 - isShowingRandomText を false に設定 ===");
       }
     }
   },
-  [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze, showSuggestionArea, isShowingOriginal, editedOriginalText, suggestion]
+  [threadContext, userDraft, isJapanese, log, hierarchy, social_distance, canAnalyze, showSuggestionArea, isShowingOriginal, editedOriginalText, suggestion, isFirstAnalysis]
 );
 
   // トグル機能の実装
@@ -385,11 +419,7 @@ const analyzeText = useCallback(
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
-    // ランダムテキスト表示中は編集を無視
-    if (isShowingRandomText) {
-      return;
-    }
-    
+    // Phase 1 修正: ランダムテキスト表示中でも編集を受け付ける
     setUserDraft(value);
     setDisplayText(value);
     
@@ -505,6 +535,7 @@ const analyzeText = useCallback(
       setIsReanalyzing(false);
       setShowRandomTextFlag(false); // フラグもリセット
       setIsShowingRandomText(false); // ランダムテキスト表示もリセット
+      setHasReceivedResponse(false); // API応答フラグもリセット
       // トグル関連の状態もリセット
       setIsShowingOriginal(false);
       setEditedOriginalText("");
@@ -513,6 +544,12 @@ const analyzeText = useCallback(
 
 // ランダムテキストアニメーション
   useEffect(() => {
+    console.log("=== ランダムテキストuseEffect実行 ===");
+    console.log("suggestion:", suggestion);
+    console.log("showSuggestionArea:", showSuggestionArea);
+    console.log("showRandomTextFlag:", showRandomTextFlag);
+    console.log("hasReceivedResponse:", hasReceivedResponse);
+    
     if (!suggestion || !showSuggestionArea) {
       setDisplayText(userDraft);
       return;
@@ -559,6 +596,7 @@ const analyzeText = useCallback(
         if (progress >= 1) {
           setDisplayText(targetText);
           setIsShowingRandomText(false);
+          console.log("=== transitionToReal完了 - isShowingRandomText を false に設定 ===");
           return;
         }
         
@@ -588,7 +626,7 @@ const analyzeText = useCallback(
     };
 
     // AIの実際の改善案が来たら、遷移アニメーションを開始
-    if (suggestion.suggestion) {
+    if (hasReceivedResponse && suggestion.suggestion) {
       if (isShowingRandomText && !isTransitioningToReal) {
         transitionToReal(suggestion.suggestion);
       } else if (!isShowingRandomText) {
@@ -599,16 +637,32 @@ const analyzeText = useCallback(
     }
 
     // 改善案がまだない場合、フラグに基づいてランダムテキストアニメーション
-    if (!suggestion.suggestion && analysisState === 'analyzing' && showRandomTextFlag) {
-      setDisplayText(suggestion.originalText);
+    console.log("=== ランダムテキスト条件チェック ===");
+    console.log("showRandomTextFlag:", showRandomTextFlag);
+    console.log("hasReceivedResponse:", hasReceivedResponse);
+    console.log("suggestion?.originalText:", suggestion?.originalText);
+    console.log("条件1 (showRandomTextFlag):", showRandomTextFlag);
+    console.log("条件2 (!hasReceivedResponse):", !hasReceivedResponse);
+    console.log("条件3 (suggestion?.originalText):", !!suggestion?.originalText);
+    console.log("全条件:", showRandomTextFlag && !hasReceivedResponse && suggestion?.originalText);
+    
+    if (showRandomTextFlag && !hasReceivedResponse && suggestion?.originalText) {
+      console.log("=== ランダムテキストアニメーション条件成立 ===");
+      console.log("showRandomTextFlag:", showRandomTextFlag);
+      console.log("hasReceivedResponse:", hasReceivedResponse);
+      console.log("originalText:", suggestion.originalText);
       
-      // フラグが立ったら即座に開始（待機はanalyzeText側で管理）
-      setIsShowingRandomText(true);
+      if (!isShowingRandomText) {
+        console.log("=== ランダムテキストアニメーション開始 ===");
+        setDisplayText(suggestion.originalText);
+        setIsShowingRandomText(true);
+      }
+      
       const animationStartTime = Date.now();
       
       let frameCount = 0;
       const continuousAnimate = () => {
-        if (suggestion.suggestion) {
+        if (hasReceivedResponse && suggestion.suggestion) {
           transitionToReal(suggestion.suggestion);
           return;
         }
@@ -632,7 +686,7 @@ const analyzeText = useCallback(
           cancelAnimationFrame(animationFrame);
         }
       };
-    } else if (suggestion.suggestion) {
+    } else if (hasReceivedResponse && suggestion?.suggestion) {
       // 既に改善案がある場合は即座に表示
       console.log("=== 即座に表示 - suggestion:", suggestion.suggestion);
       setDisplayText(suggestion.suggestion);
@@ -644,18 +698,17 @@ const analyzeText = useCallback(
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag]);
+  }, [suggestion, showSuggestionArea, analysisState, isJapanese, showRandomTextFlag, hasReceivedResponse]);
 
-  // ========== ここに新規追加 ==========
-  // ランダムテキスト状態の安全装置
+  // Phase 1 修正: ランダムテキスト状態の安全装置を強化
   useEffect(() => {
     // 解析が完了したらランダムテキストを必ず終了
-    if (analysisState === 'analyzed' && isShowingRandomText) {
+    if (analysisState === 'analyzed') {
       setIsShowingRandomText(false);
       setShowRandomTextFlag(false);
+      console.log("=== 安全装置: analyzed状態でisShowingRandomTextをfalseに ===");
     }
   }, [analysisState]);
-  // ========== 新規追加ここまで ==========
 
   // 言語切り替えを検知
   useEffect(() => {
@@ -681,12 +734,39 @@ const analyzeText = useCallback(
   }, [threadContext, hierarchy, social_distance]);
   // ========== 言語切り替えの検知ここまで ==========
 
-  // Cleanup abort controller on unmount
+  // Phase 1 追加: 初回解析時のタイマー管理
+  useEffect(() => {
+    console.log("=== タイマー管理useEffect ===");
+    console.log("animationPhase:", animationPhase);
+    console.log("isReanalyzing:", isReanalyzing);
+    console.log("analysisState:", analysisState);
+    console.log("isFirstAnalysis:", isFirstAnalysis);
+    
+    if (animationPhase === 'transitioning' && !isReanalyzing && analysisState === 'analyzing' && isFirstAnalysis) {
+      console.log("=== useEffectでタイマー設定（条件成立） ===");
+      const timer = setTimeout(() => {
+        console.log("=== useEffectタイマー実行（1秒後） ===");
+        console.log("現在のhasReceivedResponse:", hasReceivedResponse);
+        setShowRandomTextFlag(true);
+        console.log("=== showRandomTextFlag を true に設定完了 ===");
+      }, 1000);
+      
+      return () => {
+        console.log("=== useEffectタイマークリア:", timer);
+        clearTimeout(timer);
+      };
+    }
+  }, [animationPhase, isReanalyzing, analysisState, hasReceivedResponse, isFirstAnalysis]);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
+      console.log("=== コンポーネントアンマウント - クリーンアップ実行 ===");
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      // タイマーのクリーンアップ
+      animationTimersRef.current.forEach(timer => clearTimeout(timer));
     };
   }, []);
 
@@ -1047,7 +1127,7 @@ const analyzeText = useCallback(
                 text={showSuggestionArea 
                   ? (isShowingOriginal 
                     ? (editedOriginalText || suggestion?.originalText || "") 
-                    : (isShowingRandomText || !suggestion?.suggestion ? displayText : suggestion.suggestion))
+                    : (isShowingRandomText ? displayText : (suggestion?.suggestion || displayText || "")))
                   : userDraft
                 }
                 onTextChange={showSuggestionArea ? handleEditInSuggestionMode : handleTextChange}
@@ -1084,11 +1164,9 @@ const analyzeText = useCallback(
                 hasAcceptedSuggestion={hasAcceptedSuggestion}
                 hasSignificantChange={hasSignificantChange()}
                 
-                // isEditable={!isShowingRandomText} // ランダムテキスト表示中は編集不可
-                // isTransitioning={isTransitioning}
-
-                isEditable={true} // 常に編集可能にする（ランダムテキスト表示中の制御は別の方法で）
-                isTransitioning={false} // 一時的にfalseに固定してテスト
+                // Phase 1 修正: 解析中以外は常に編集可能
+                isEditable={analysisState !== 'analyzing'}
+                isTransitioning={false}
 
                 title={showSuggestionArea 
                   ? (isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)")

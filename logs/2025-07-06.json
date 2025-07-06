@@ -1,0 +1,127 @@
+[
+  {
+    "timestamp": "2025-07-06T01:19:54.775Z",
+    "sessionId": "session_1751735428046_2uhcvdt1m",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "はちもじでテスト",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テストの目的や詳細がもう少しわかると助かります。",
+        "improvement_points": "テストの目的や詳細を明確に伝えることで、誤解や手戻りを減らせます。",
+        "suggestion": "--- Missing Info ---\n• テストの目的: [■■■■ ここに目的を補足してください ■■■■]\n• テスト対象: [■■■■ ここに対象を補足してください ■■■■]\n• 期待する結果: [■■■■ ここに期待結果を補足してください ■■■■]\n---------------------",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 5496
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T01:21:25.803Z",
+    "sessionId": "session_1751764848726_0reygw0g0",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "はちもじでテスト",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テスト内容や目的がわからず、対応が難しい状況です。",
+        "improvement_points": "テストの目的や内容を具体的に示すことで、誤解や対応遅れを防げます。",
+        "suggestion": "--- Missing Info ---\n• テスト内容: [■■■■ ここにテストの詳細を補足してください ■■■■]\n• 目的・期待結果: [■■■■ ここに目的や期待する結果を補足してください ■■■■]\n• 実施日時や期限: [■■■■ ここに日時や期限を補足してください ■■■■]\n---------------------",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 6306
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T01:21:51.005Z",
+    "sessionId": "session_1751764889660_ta2siccmp",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "はちもじでテスト",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テストの目的や詳細が不明ですので、もう少し教えてください。",
+        "improvement_points": "テストの目的や内容を具体的に伝えることで、誤解なく迅速な対応が期待できます。",
+        "suggestion": "--- Missing Info ---\n• テストの目的: [■■■■]\n• テスト対象や内容: [■■■■]\n• 期待する結果や期限: [■■■■]\n---------------------",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 4348
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T01:25:14.256Z",
+    "sessionId": "session_1751765099393_zahz0m05o",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "はちもじでテスト",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テストの具体的な内容や目的が不明です。",
+        "improvement_points": "テスト内容を具体的に伝えることで、迅速かつ正確な対応が可能になります。",
+        "suggestion": "--- Missing Info ---\n• テスト対象: [■■■■]\n• テスト目的: [■■■■]\n• 期待する結果: [■■■■]\n---------------------\nお手数ですが、詳細を教えていただけますか？",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 5851
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T01:26:08.213Z",
+    "sessionId": "session_1751765158006_mjz71uge9",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "はちもじでテスト",
+      "issue_pattern": [
+        "VagueIntent"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "テストの目的や詳細がわからず、対応が難しい状況です。",
+        "improvement_points": "テストの目的や詳細を明確に伝えることで、誤解なく迅速な対応が可能になります。",
+        "suggestion": "--- Missing Info ---\n• テストの目的: [■■■■ ここにテストの目的を補足してください ■■■■]\n• テスト対象や内容: [■■■■ ここにテスト内容を補足してください ■■■■]\n• 期限や希望する結果: [■■■■ ここに期限や期待する結果を補足してください ■■■■]\n---------------------",
+        "reasoning": "SpeakUp ToneBand:Acceptable",
+        "issue_pattern": [
+          "VagueIntent"
+        ]
+      },
+      "processingTime": 6301
+    },
+    "ipAddress": "::1"
+  }
+]
