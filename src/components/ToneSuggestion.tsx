@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useLogging } from "@/hooks/useLogging";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { MessageEditor } from "./MessageEditor";
 
 interface ToneAnalysis {
   hasIssues: boolean;
@@ -12,7 +11,7 @@ interface ToneAnalysis {
   reasoning: string;
   ai_receipt?: string;
   improvement_points?: string;
-  detailed_analysis?: string;  // 新規追加
+  detailed_analysis?: string;
   issue_pattern?: string[];
   detected_mentions?: string[];
 }
@@ -32,9 +31,9 @@ interface ToneSuggestionProps {
   onHierarchyChange?: (value: string) => void;
   onSocialDistanceChange?: (value: string) => void;
   onReanalyze?: () => void;
-  externalChanges?: boolean;  // thread_contextや言語の変更フラグ
+  externalChanges?: boolean;
   analysisState?: 'ready' | 'analyzing' | 'analyzed';
-  animationPhase?: 'input' | 'transitioning' | 'suggestion';  // 追加
+  animationPhase?: 'input' | 'transitioning' | 'suggestion';
 }
 
 export function ToneSuggestion({
@@ -54,25 +53,22 @@ export function ToneSuggestion({
   onReanalyze,
   externalChanges = false,
   analysisState = 'ready',
-  animationPhase = 'suggestion',  // 追加
+  animationPhase = 'suggestion',
 }: ToneSuggestionProps) {
-  // showCopyFeedback state をコンポーネントのトップレベルで定義
   const [showCopyFeedback, setShowCopyFeedback] = useState(false);
   const [showDetailedAnalysis, setShowDetailedAnalysis] = useState(false);
-  const [isShowingOriginal, setIsShowingOriginal] = useState(false); // 追加：オリジナルを表示中かどうか
-  const [displayText, setDisplayText] = useState<string>(''); // 表示用テキスト
-  const [isTransitioning, setIsTransitioning] = useState(false); // テキスト変化中かどうか
-  const [isAnalyzed, setIsAnalyzed] = useState(false); // 解析済みかどうか
+  const [isShowingOriginal, setIsShowingOriginal] = useState(false);
+  const [displayText, setDisplayText] = useState<string>('');
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isAnalyzed, setIsAnalyzed] = useState(false);
   
-  // 編集検知用のstate
   const [currentText, setCurrentText] = useState<string>('');
   const [hasTextChanged, setHasTextChanged] = useState(false);
   const [initialHierarchy, setInitialHierarchy] = useState(hierarchy);
   const [initialSocialDistance, setInitialSocialDistance] = useState(socialDistance);
   
-  const { log } = useLogging(isJapanese ? "ja" : "en"); // log取得用
+  const { log } = useLogging(isJapanese ? "ja" : "en");
 
-  // suggestionが更新されたら解析済み状態を更新
   useEffect(() => {
     if (suggestion.suggestion) {
       setIsAnalyzed(true);
@@ -83,7 +79,6 @@ export function ToneSuggestion({
     }
   }, [suggestion.suggestion, hierarchy, socialDistance]);
 
-  // 文字列の編集距離を簡易的に計算
   const getEditDistance = (str1: string, str2: string): number => {
     const lengthDiff = Math.abs(str1.length - str2.length);
     const commonLength = Math.min(str1.length, str2.length);
@@ -96,26 +91,22 @@ export function ToneSuggestion({
     return lengthDiff + differences;
   };
 
-  // 有意な変更があるかどうか
   const hasSignificantChange = () => {
     if (!currentText || !suggestion.suggestion) return false;
     const editDistance = getEditDistance(currentText, suggestion.suggestion);
     return editDistance > 5;
   };
 
-  // 関係性が変更されたかどうか
   const hasRelationshipChanged = () => {
     return hierarchy !== initialHierarchy || socialDistance !== initialSocialDistance;
   };
 
-  // 再解析が可能かどうか
   const canReanalyze = () => {
     if (!suggestion.suggestion || isTransitioning) return false;
-    if (isShowingOriginal) return true; // オリジナル表示時は常に有効
+    if (isShowingOriginal) return true;
     return hasTextChanged || hasRelationshipChanged() || externalChanges;
   };
 
-  // テキスト編集時の処理
   const handleTextEdit = (newText: string) => {
     setCurrentText(newText);
     setHasTextChanged(hasSignificantChange());
@@ -124,7 +115,6 @@ export function ToneSuggestion({
     }
   };
 
-  // 再解析時の処理
   const handleReanalyze = () => {
     if (onReanalyze && canReanalyze()) {
       setIsAnalyzed(false);
@@ -132,7 +122,6 @@ export function ToneSuggestion({
     }
   };
 
-// テキストの段階的変化を実装
   useEffect(() => {
     if (!suggestion.originalText) {
       setDisplayText('');
@@ -143,7 +132,6 @@ export function ToneSuggestion({
     let transitionTimer: NodeJS.Timeout | undefined;
     let isTransitioningToReal = false;
 
-    // ランダムな文字を生成する関数
     const generateRandomText = (baseText: string): string => {
       const lines = baseText.split('\n');
       const randomChars = isJapanese 
@@ -154,16 +142,12 @@ export function ToneSuggestion({
         if (!line) return line;
         
         return line.split('').map(char => {
-          // スペースと改行は維持
           if (char === ' ' || char === '\n') return char;
-          
-          // ランダムな文字に置き換え
           return randomChars[Math.floor(Math.random() * randomChars.length)];
         }).join('');
       }).join('\n');
     };
 
-    // 部分的にランダムな文字を生成する関数
     const generatePartialRandomText = (baseText: string, progress: number): string => {
       const lines = baseText.split('\n');
       const randomChars = isJapanese 
@@ -174,30 +158,24 @@ export function ToneSuggestion({
         if (!line) return line;
         
         return line.split('').map((char, charIndex) => {
-          // スペースと改行は維持
           if (char === ' ' || char === '\n') return char;
           
-          // 文字ごとに異なる確率でランダム化
-          // 波のような効果を作る
           const waveOffset = Math.sin((lineIndex * 3 + charIndex * 0.5 + Date.now() * 0.001)) * 0.5 + 0.5;
           const randomThreshold = progress * (0.7 + waveOffset * 0.3);
           
           if (Math.random() < randomThreshold) {
-            // ランダムな文字に置き換え
             return randomChars[Math.floor(Math.random() * randomChars.length)];
           } else {
-            // オリジナルの文字を維持
             return char;
           }
         }).join('');
       }).join('\n');
     };
 
-    // 実際の結果への遷移アニメーション
     const transitionToReal = (targetText: string) => {
       isTransitioningToReal = true;
       const startTime = Date.now();
-      const duration = 200; // 0.2秒
+      const duration = 200;
       
       const animate = () => {
         const elapsed = Date.now() - startTime;
@@ -209,18 +187,16 @@ export function ToneSuggestion({
           return;
         }
         
-        // プログレスに応じて、ランダムな文字から実際の文字へ変化
         const lines = targetText.split('\n');
         const result = lines.map(line => {
           if (!line) return line;
           
           return line.split('').map((char, index) => {
-            const charProgress = progress + (Math.random() * 0.2 - 0.1); // ランダム性を追加
+            const charProgress = progress + (Math.random() * 0.2 - 0.1);
             
             if (charProgress > Math.random()) {
-              return char; // 実際の文字
+              return char;
             } else {
-              // まだランダムな文字
               const randomChars = isJapanese 
                 ? 'あいうえおかきくけこさしすせそたちつてとなにぬねのアイウエオカキクケコ会議資料確認共有連絡報告'
                 : 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -236,20 +212,16 @@ export function ToneSuggestion({
       animate();
     };
 
-    // AIの実際の改善案が来たら、遷移アニメーションを開始
     if (suggestion.suggestion && !isTransitioningToReal) {
       if (isTransitioning) {
-        // ランダムテキストアニメーション中なら遷移開始
         transitionToReal(suggestion.suggestion);
       } else {
-        // まだアニメーションが始まっていない場合は即座に表示
         setDisplayText(suggestion.suggestion);
         setIsTransitioning(false);
       }
       return;
     }
 
-    // 改善案がまだない場合、2秒後からランダムテキストアニメーション
     if (!suggestion.suggestion) {
       setDisplayText(suggestion.originalText);
       
@@ -257,22 +229,18 @@ export function ToneSuggestion({
         setIsTransitioning(true);
         const animationStartTime = Date.now();
         
-        // 徐々に変化していくアニメーション
         let frameCount = 0;
         const continuousAnimate = () => {
           if (suggestion.suggestion) {
-            // AIの結果が来たら遷移開始
             transitionToReal(suggestion.suggestion);
             return;
           }
           
           frameCount++;
-          // 12フレームに1回だけ更新（約60fps → 約5fps）
           if (frameCount % 12 === 0) {
             const elapsed = Date.now() - animationStartTime;
-            const progress = Math.min(1, elapsed / 2000); // 2秒かけて完全にランダムに
+            const progress = Math.min(1, elapsed / 2000);
             
-            // プログレスに応じて部分的にランダム化
             const partiallyRandomText = generatePartialRandomText(suggestion.originalText, progress);
             setDisplayText(partiallyRandomText);
           }
@@ -304,48 +272,7 @@ export function ToneSuggestion({
     };
   }, [suggestion.suggestion, suggestion.originalText, isJapanese]);
 
-  // Handle escape key to close popup
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onDismiss();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
-  }, [onDismiss]);
-
-  // Update the position of the popup based on the selection or caret position
-  const updatePosition = () => {
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      // Set the position based on the caret's bounding rectangle
-      position = {
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
-      };
-    }
-  };
-
-  // Handle input events to update the position dynamically
-  useEffect(() => {
-    const handleInput = () => {
-      updatePosition();
-    };
-
-    document.addEventListener("input", handleInput);
-    document.addEventListener("selectionchange", updatePosition);
-    return () => {
-      document.removeEventListener("input", handleInput);
-      document.removeEventListener("selectionchange", updatePosition);
-    };
-  }, []);
-
   const labels = {
-    // title: isJapanese ? "トーンチェック" : "Tone Check",
     title: isJapanese ? "改善提案" : "Improvement Suggestion",
     issues: isJapanese ? "問題点:" : "Issues:",
     suggestion: isJapanese ? "提案:" : "Suggestion:",
@@ -363,7 +290,6 @@ export function ToneSuggestion({
     return (
       <div className="h-full overflow-auto bg-white rounded-lg">
         <div className="p-5 space-y-4">
-          {/* ヘッダー with 💡 アイコン */}
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-2xl">
@@ -395,7 +321,6 @@ export function ToneSuggestion({
             </button>
           </div>
 
-          {/* AI Receipt - 共感的な受け止め（背景色なし） */}
           <div className={`text-sm text-slate-700 leading-relaxed min-h-[40px] transition-all duration-500 ${
             animationPhase === 'suggestion' ? 'opacity-100' : 'opacity-0'
           }`} style={{ transitionDelay: animationPhase === 'suggestion' ? '200ms' : '0ms' }}>
@@ -409,7 +334,6 @@ export function ToneSuggestion({
             )}
           </div>
 
-          {/* 改善ポイント - 黄色背景 */}
           {suggestion.hasIssues ? (
             <div className="space-y-2">
               <h4 className="text-sm font-semibold text-slate-700">
@@ -430,7 +354,6 @@ export function ToneSuggestion({
                   </div>
                 )}
                 
-                {/* 詳細分析のアコーディオン */}
                 {suggestion.detailed_analysis && (
                   <div className="mt-3">
                     <button
@@ -438,7 +361,6 @@ export function ToneSuggestion({
                         const newState = !showDetailedAnalysis;
                         setShowDetailedAnalysis(newState);
                         
-                        // ログ記録
                         await log("detailed_analysis_toggled", {
                           action: newState ? "expand" : "collapse",
                           previousText: suggestion.originalText,
@@ -479,13 +401,11 @@ export function ToneSuggestion({
             </div>
           )}
 
-          {/* 改善案またはメッセージ表示（共通UI） */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-slate-700">
               {suggestion.hasIssues ? labels.suggestionTitle : (isJapanese ? "あなたのメッセージ" : "Your message")}
             </h4>
             
-            {/* このまま送信OKバッジ（hasIssues:falseの場合のみ） */}
             {!suggestion.hasIssues && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
                 <p className="text-sm text-blue-800 font-medium flex items-center gap-2">
@@ -496,13 +416,9 @@ export function ToneSuggestion({
                 </p>
               </div>
             )}
-            
-            {/* MessageEditorは親コンポーネントで管理するため削除 */}
           </div>
 
-          {/* アクションボタン */}
           <div className="flex items-center justify-between pt-3">
-            {/* 左側：トグルボタン */}
             <div>
               {suggestion.hasIssues && suggestion.suggestion && (
                 <button
@@ -522,8 +438,8 @@ export function ToneSuggestion({
                       strokeLinejoin="round"
                       strokeWidth={2}
                       d={isShowingOriginal 
-                        ? "M9 5l7 7-7 7" // 右向き矢印（改善案へ）
-                        : "M11 17l-5-5m0 0l5-5m-5 5h12" // 左向き矢印（オリジナルへ）
+                        ? "M9 5l7 7-7 7"
+                        : "M11 17l-5-5m0 0l5-5m-5 5h12"
                       }
                     />
                   </svg>
@@ -535,9 +451,7 @@ export function ToneSuggestion({
               )}
             </div>
 
-            {/* 右側：コピーボタン */}
             <div className="flex items-center gap-3">
-              {/* コピーボタン */}
               <button
                 onClick={async () => {
                   const textToCopy = isShowingOriginal 
@@ -584,6 +498,5 @@ export function ToneSuggestion({
     );
   }
 
-  // ポップアップ版は使用しない
   return null;
 }

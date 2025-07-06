@@ -76,20 +76,6 @@ a {
   background: #616061;
 }
 
-/* Dark theme scrollbar (for potential theme switching) */
-.dark-theme ::-webkit-scrollbar-track {
-  background: #191414;
-}
-
-.dark-theme ::-webkit-scrollbar-thumb {
-  background: #1a1a1a;
-  border-radius: 6px;
-}
-
-.dark-theme ::-webkit-scrollbar-thumb:hover {
-  background: #333;
-}
-
 /* Modal animations */
 @keyframes modal-appear {
   from {
@@ -286,13 +272,6 @@ textarea::-webkit-scrollbar-thumb:hover {
 
 .animate-gentle-slide {
   animation: gentle-slide-down 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-/* 提案エリアのアニメーション専用クラス */
-.suggestion-area-transition {
-  transition-property: grid-template-rows, opacity, transform;
-  transition-duration: 1000ms;
-  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* 提案エリアのアニメーション専用クラス */

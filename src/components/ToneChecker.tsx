@@ -203,7 +203,7 @@ const analyzeText = useCallback(
           setShowRandomTextFlag(true);
           console.log("=== showRandomTextFlag を true に設定（メインタイマー内） ===");
         }
-      }, 1000); // CSS transitionと同期（1秒）
+      }, 1800); // CSS transitionと同期（1秒）
       
       console.log("=== タイマーID:", mainTimer);
       animationTimersRef.current.push(mainTimer);
@@ -808,14 +808,6 @@ const analyzeText = useCallback(
     }
   }, [isJapanese]);
 
-  // 言語切り替えを検知
-  useEffect(() => {
-    setAnalysisState('ready');
-    if (showSuggestionArea) {
-      setExternalChanges(true);
-    }
-  }, [isJapanese]);
-
   // 各種設定変更を検知
   useEffect(() => {
     if (analysisState === 'analyzed') {
@@ -880,6 +872,23 @@ const analyzeText = useCallback(
     };
   }, []);
 
+// 解析状態に応じたクリーンアップの強化
+  useEffect(() => {
+    return () => {
+      // 解析中にコンポーネントがアンマウントされる場合の対策
+      if (analysisState === 'analyzing' && abortControllerRef.current) {
+        console.log("=== 解析中のアンマウント検出 - 解析をキャンセル ===");
+        abortControllerRef.current.abort();
+      }
+      
+      // すべてのタイマーを確実にクリア
+      if (animationTimersRef.current.length > 0) {
+        console.log("=== 残存タイマーのクリア:", animationTimersRef.current.length, "個 ===");
+        animationTimersRef.current.forEach(timer => clearTimeout(timer));
+        animationTimersRef.current = [];
+      }
+    };
+  }, [analysisState]);
 
   // ========== ここにショートカットキーの実装を追加 ==========
   // ショートカットキーの実装
