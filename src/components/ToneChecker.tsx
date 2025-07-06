@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { ToneSuggestion } from "./ToneSuggestion";
 import { Textarea } from "@/components/ui/textarea";
 import { useLogging } from "@/hooks/useLogging"; //ログ保存機能
-import { createConvo } from "@/lib/actions";
+import { createConvo, testSupabaseConnection } from "@/lib/actions";
 
 // 変更後
 interface ToneAnalysis {
@@ -14,7 +14,7 @@ interface ToneAnalysis {
   reasoning: string;
   ai_receipt?: string;
   improvement_points?: string;
-  detailed_analysis?: string;    // 新規追加
+  detailed_analysis?: string; // 新規追加
   issue_pattern?: string[];
   detected_mentions?: string[];
 }
@@ -33,166 +33,193 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   const [originalText, setOriginalText] = useState(""); // 元のテキストを保存
   const [hasAcceptedSuggestion, setHasAcceptedSuggestion] = useState(false); // 提案を受け入れたかどうか
   const [currentAnalyzingText, setCurrentAnalyzingText] = useState<string>("");
-  const [isUserInitiatedAnalysis, setIsUserInitiatedAnalysis] = useState(false); // ユーザーがボタンを押したか  
+  const [isUserInitiatedAnalysis, setIsUserInitiatedAnalysis] = useState(false); // ユーザーがボタンを押したか
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>();
 
   // 関係性セレクター用のstate
-  const [hierarchy, setHierarchy] = useState('peer');
-  const [social_distance, setSocialDistance] = useState('neutral');
+  const [hierarchy, setHierarchy] = useState("peer");
+  const [social_distance, setSocialDistance] = useState("neutral");
 
   // 距離のサブテキスト
   const getDistanceSubtext = () => {
     const subtextMap: { [key: string]: string } = isJapanese
       ? {
-          'close': '日常的に交流',
-          'somewhat_close': '定期的に交流',
-          'neutral': '業務上の関係',
-          'somewhat_distant': '限定的な接点',
-          'distant': '最小限の接点'
+          close: "日常的に交流",
+          somewhat_close: "定期的に交流",
+          neutral: "業務上の関係",
+          somewhat_distant: "限定的な接点",
+          distant: "最小限の接点",
         }
       : {
-          'close': 'Daily interaction',
-          'somewhat_close': 'Regular interaction',
-          'neutral': 'Professional relation',
-          'somewhat_distant': 'Limited contact',
-          'distant': 'Minimal contact'
+          close: "Daily interaction",
+          somewhat_close: "Regular interaction",
+          neutral: "Professional relation",
+          somewhat_distant: "Limited contact",
+          distant: "Minimal contact",
         };
-    return subtextMap[social_distance] || '';
+    return subtextMap[social_distance] || "";
   };
 
-// Debounced analysis function - analyze full text
-const analyzeText = useCallback(
-  async (textToAnalyze: string) => {
-    console.log("=== 解析開始 ===");
-    console.log("入力文字数:", textToAnalyze.length);
-    console.log("入力内容:", textToAnalyze);
-    
-    if (!textToAnalyze.trim() || textToAnalyze.length < 15) {
-      setSuggestion(null);
-      return;
-    }
+  // Debounced analysis function - analyze full text
+  const analyzeText = useCallback(
+    async (textToAnalyze: string) => {
+      console.log("=== 解析開始 ===");
+      console.log("入力文字数:", textToAnalyze.length);
+      console.log("入力内容:", textToAnalyze);
 
-    // 既に同じテキストを解析中の場合は何もしない
-    if (isAnalyzing && currentAnalyzingText === textToAnalyze) return;
-
-    setIsAnalyzing(true);
-    setCurrentAnalyzingText(textToAnalyze);
-    const startTime = Date.now();
-
-    try {
-      const requestBody = {
-        user_draft: textToAnalyze,
-        thread_context: threadContext,
-        language: isJapanese ? "japanese" : "english",
-        hierarchy: hierarchy,
-        social_distance: social_distance,
-      };
-      
-      // 送信データの詳細をログ出力
-      console.log("=== APIリクエスト詳細 ===");
-      console.log("language:", requestBody.language);
-      console.log("hierarchy:", requestBody.hierarchy);
-      console.log("social_distance:", requestBody.social_distance);
-      console.log("thread_context長さ:", requestBody.thread_context.length);
-      console.log("完全なリクエストボディ:", JSON.stringify(requestBody, null, 2));
-
-      const response = await fetch("/api/check-tone", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      console.log("APIレスポンスステータス:", response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("APIエラーレスポンス:", errorText);
-        throw new Error("Failed to analyze text");
+      if (!textToAnalyze.trim() || textToAnalyze.length < 15) {
+        setSuggestion(null);
+        return;
       }
 
-      const analysis: ToneAnalysis = await response.json();
-      
-      // レスポンスの詳細をログ出力
-      console.log("=== APIレスポンス詳細 ===");
-      console.log("hasIssues:", analysis.hasIssues);
-      console.log("issue_pattern:", analysis.issue_pattern);
-      console.log("ai_receipt:", analysis.ai_receipt);
-      console.log("improvement_points:", analysis.improvement_points);
-      console.log("detailed_analysis:", analysis.detailed_analysis);
-      console.log("suggestion長さ:", analysis.suggestion?.length || 0);
-      console.log("完全なレスポンス:", JSON.stringify(analysis, null, 2));
+      // 既に同じテキストを解析中の場合は何もしない
+      if (isAnalyzing && currentAnalyzingText === textToAnalyze) return;
 
-      // 変更後
-      await log("analysis_completed", {
-        context: threadContext,
-        originalMessage: textToAnalyze,
-        issue_pattern: analysis.issue_pattern || [],  // 追加
-        aiResponse: {
-          hasIssues: analysis.hasIssues,
-          ai_receipt: analysis.ai_receipt,
-          improvement_points: analysis.improvement_points,
-          suggestion: analysis.suggestion || undefined,
-          reasoning: analysis.reasoning,
-          issue_pattern: analysis.issue_pattern || [],  // 追加
-        },
-        processingTime: Date.now() - startTime,
-      });
+      setIsAnalyzing(true);
+      setCurrentAnalyzingText(textToAnalyze);
+      const startTime = Date.now();
 
-      // Log analysis data to Supabase
       try {
-        const result = await createConvo({
-          input: textToAnalyze,
-          feedback: analysis.suggestion || "",
+        const requestBody = {
+          user_draft: textToAnalyze,
+          thread_context: threadContext,
+          language: isJapanese ? "japanese" : "english",
           hierarchy: hierarchy,
           social_distance: social_distance,
-          language: isJapanese ? "japanese" : "english",
-          thread_context: threadContext,
-          issue_pattern: analysis.issue_pattern || [],
-          has_issues: analysis.hasIssues,
-          ai_receipt: analysis.ai_receipt || "",
-          improvement_points: analysis.improvement_points || "",
-          detailed_analysis: analysis.detailed_analysis || "",
-          reasoning: analysis.reasoning || "",
-          detected_mentions: analysis.detected_mentions || [],
-          timestamp: new Date().toISOString()
+        };
+
+        // 送信データの詳細をログ出力
+        console.log("=== APIリクエスト詳細 ===");
+        console.log("language:", requestBody.language);
+        console.log("hierarchy:", requestBody.hierarchy);
+        console.log("social_distance:", requestBody.social_distance);
+        console.log("thread_context長さ:", requestBody.thread_context.length);
+        console.log(
+          "完全なリクエストボディ:",
+          JSON.stringify(requestBody, null, 2)
+        );
+
+        const response = await fetch("/api/check-tone", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
         });
-        
-        if (result) {
-          console.log("Successfully logged to Supabase with full data");
-        } else {
-          console.warn("Failed to log to Supabase, but continuing with analysis");
+
+        console.log("APIレスポンスステータス:", response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("APIエラーレスポンス:", errorText);
+          throw new Error("Failed to analyze text");
         }
+
+        const analysis: ToneAnalysis = await response.json();
+
+        // レスポンスの詳細をログ出力
+        console.log("=== APIレスポンス詳細 ===");
+        console.log("hasIssues:", analysis.hasIssues);
+        console.log("issue_pattern:", analysis.issue_pattern);
+        console.log("ai_receipt:", analysis.ai_receipt);
+        console.log("improvement_points:", analysis.improvement_points);
+        console.log("detailed_analysis:", analysis.detailed_analysis);
+        console.log("suggestion長さ:", analysis.suggestion?.length || 0);
+        console.log("完全なレスポンス:", JSON.stringify(analysis, null, 2));
+
+        // 変更後
+        await log("analysis_completed", {
+          context: threadContext,
+          originalMessage: textToAnalyze,
+          issue_pattern: analysis.issue_pattern || [], // 追加
+          aiResponse: {
+            hasIssues: analysis.hasIssues,
+            ai_receipt: analysis.ai_receipt,
+            improvement_points: analysis.improvement_points,
+            suggestion: analysis.suggestion || undefined,
+            reasoning: analysis.reasoning,
+            issue_pattern: analysis.issue_pattern || [], // 追加
+          },
+          processingTime: Date.now() - startTime,
+        });
+
+        // Log analysis data to Supabase
+        try {
+          console.log("=== Attempting Supabase Insert ===");
+          console.log("Data to insert:", {
+            input: textToAnalyze,
+            feedback: analysis.suggestion || "",
+            hierarchy: hierarchy,
+            social_distance: social_distance,
+            language: isJapanese ? "japanese" : "english",
+            thread_context: threadContext,
+            issue_pattern: analysis.issue_pattern || [],
+            has_issue: analysis.hasIssues, // Changed from has_issues to has_issue
+            improvement_points: analysis.improvement_points || "",
+            detailed_analysis: analysis.detailed_analysis || "",
+            // Removed: ai_receipt, reasoning, detected_mentions, timestamp
+          });
+
+          const result = await createConvo({
+            input: textToAnalyze,
+            feedback: analysis.suggestion || "",
+            hierarchy: hierarchy,
+            social_distance: social_distance,
+            language: isJapanese ? "japanese" : "english",
+            thread_context: threadContext,
+            issue_pattern: analysis.issue_pattern || [],
+            has_issue: analysis.hasIssues, // Changed from has_issues to has_issue
+            improvement_points: analysis.improvement_points || "",
+            detailed_analysis: analysis.detailed_analysis || "",
+            // Removed: ai_receipt, reasoning, detected_mentions, timestamp
+          });
+
+          console.log("✅ Successfully logged to Supabase:", result);
+        } catch (error) {
+          console.error("❌ CRITICAL: Failed to log to Supabase:", error);
+          console.error("Error details:", error);
+          // Don't fail the analysis just because of database issues
+          // But log it prominently for debugging
+        }
+
+        console.log("hasIssues:", analysis.hasIssues);
+        console.log("suggestion:", analysis.suggestion);
+
+        // hasIssuesがfalseでもanalyisを設定する
+        setSuggestion(analysis);
+        console.log(
+          "分析結果を設定 - hasIssues:",
+          analysis.hasIssues,
+          "suggestion:",
+          analysis.suggestion
+        );
+
+        setLastAnalyzedText(textToAnalyze);
       } catch (error) {
-        console.error("Error logging to Supabase:", error);
+        console.error("エラー詳細:", error);
+        setSuggestion(null);
+      } finally {
+        setIsAnalyzing(false);
+        setIsUserInitiatedAnalysis(false); // 解析終了時にリセット
+        console.log("=== 解析終了 ===");
       }
-
-      console.log("hasIssues:", analysis.hasIssues);
-      console.log("suggestion:", analysis.suggestion);
-
-      // hasIssuesがfalseでもanalyisを設定する
-      setSuggestion(analysis);
-      console.log("分析結果を設定 - hasIssues:", analysis.hasIssues, "suggestion:", analysis.suggestion);
-
-      setLastAnalyzedText(textToAnalyze);
-    } catch (error) {
-      console.error("エラー詳細:", error);
-      setSuggestion(null);
-    } finally {
-      setIsAnalyzing(false);
-      setIsUserInitiatedAnalysis(false); // 解析終了時にリセット
-      console.log("=== 解析終了 ===");
-    }
-  },
-  [threadContext, isJapanese, log, isAnalyzing, currentAnalyzingText, hierarchy, social_distance]
-);
+    },
+    [
+      threadContext,
+      isJapanese,
+      log,
+      isAnalyzing,
+      currentAnalyzingText,
+      hierarchy,
+      social_distance,
+    ]
+  );
 
   // Handle text change with debouncing
   const handleTextChange = (value: string) => {
     setUserDraft(value);
-    
+
     // Clear existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -213,25 +240,25 @@ const analyzeText = useCallback(
     }, 3000); // 3 seconds delay
   };
 
-    // Accept suggestion
-    const acceptSuggestion = async () => {
-      if (suggestion?.suggestion) {
-        // 元のテキストを保存
-        setOriginalText(userDraft);
-        // 全文を置換
-        setUserDraft(suggestion.suggestion);
-        setLastAnalyzedText(suggestion.suggestion);
-        setHasAcceptedSuggestion(true);
-        textareaRef.current?.focus();
+  // Accept suggestion
+  const acceptSuggestion = async () => {
+    if (suggestion?.suggestion) {
+      // 元のテキストを保存
+      setOriginalText(userDraft);
+      // 全文を置換
+      setUserDraft(suggestion.suggestion);
+      setLastAnalyzedText(suggestion.suggestion);
+      setHasAcceptedSuggestion(true);
+      textareaRef.current?.focus();
 
-        // ログ記録
-        await log("suggestion_accepted", {
-          action: "accept",
-          previousText: userDraft,
-          newText: suggestion.suggestion,
-        });
-      }
-    };
+      // ログ記録
+      await log("suggestion_accepted", {
+        action: "accept",
+        previousText: userDraft,
+        newText: suggestion.suggestion,
+      });
+    }
+  };
 
   // Revert to original text
   const revertToOriginal = async () => {
@@ -257,6 +284,15 @@ const analyzeText = useCallback(
     // Mark current text as analyzed to avoid re-analyzing
     setLastAnalyzedText(userDraft);
   };
+
+  // Test Supabase connection on mount
+  useEffect(() => {
+    const testConnection = async () => {
+      console.log("🔄 Testing Supabase connection...");
+      await testSupabaseConnection();
+    };
+    testConnection();
+  }, []);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -287,30 +323,30 @@ const analyzeText = useCallback(
   const RelationshipSelector = () => {
     const hierarchyOptionsWithDetails = isJapanese
       ? [
-          { value: 'junior', label: '後輩・部下' },
-          { value: 'peer', label: '同僚・対等' },
-          { value: 'senior', label: '目上のかた' }
+          { value: "junior", label: "後輩・部下" },
+          { value: "peer", label: "同僚・対等" },
+          { value: "senior", label: "目上のかた" },
         ]
       : [
-          { value: 'junior', label: 'Junior' },
-          { value: 'peer', label: 'Peer' },
-          { value: 'senior', label: 'Senior' }
+          { value: "junior", label: "Junior" },
+          { value: "peer", label: "Peer" },
+          { value: "senior", label: "Senior" },
         ];
 
     const distanceOptionsArray = isJapanese
       ? [
-          { value: 'close', label: '近い' },
-          { value: 'somewhat_close', label: 'やや近' },
-          { value: 'neutral', label: '標準' },
-          { value: 'somewhat_distant', label: 'やや遠' },
-          { value: 'distant', label: '遠い' }
+          { value: "close", label: "近い" },
+          { value: "somewhat_close", label: "やや近" },
+          { value: "neutral", label: "標準" },
+          { value: "somewhat_distant", label: "やや遠" },
+          { value: "distant", label: "遠い" },
         ]
       : [
-          { value: 'close', label: 'Close' },
-          { value: 'somewhat_close', label: 'Rather Close' },
-          { value: 'neutral', label: 'Neutral' },
-          { value: 'somewhat_distant', label: 'Rather Distant' },
-          { value: 'distant', label: 'Distant' }
+          { value: "close", label: "Close" },
+          { value: "somewhat_close", label: "Rather Close" },
+          { value: "neutral", label: "Neutral" },
+          { value: "somewhat_distant", label: "Rather Distant" },
+          { value: "distant", label: "Distant" },
         ];
 
     return (
@@ -321,7 +357,7 @@ const analyzeText = useCallback(
             {/* PC版: ラベル上 / モバイル版: ラベル左 */}
             <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
-                {isJapanese ? '宛先' : 'To'}
+                {isJapanese ? "宛先" : "To"}
               </p>
               <div className="flex space-x-1.5 flex-1 w-full">
                 {hierarchyOptionsWithDetails.map((option) => (
@@ -330,13 +366,11 @@ const analyzeText = useCallback(
                     onClick={() => setHierarchy(option.value)}
                     className={`flex-1 py-1.5 px-2 rounded-lg transition-all duration-200 min-h-[32px] sm:h-auto ${
                       hierarchy === option.value
-                        ? 'bg-purple-600 text-white shadow-sm'
-                        : 'bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200'
+                        ? "bg-purple-600 text-white shadow-sm"
+                        : "bg-white text-purple-700 hover:bg-purple-100 shadow-sm border border-purple-200"
                     }`}
                   >
-                    <p className="text-[10px] font-semibold">
-                      {option.label}
-                    </p>
+                    <p className="text-[10px] font-semibold">{option.label}</p>
                   </button>
                 ))}
               </div>
@@ -350,7 +384,7 @@ const analyzeText = useCallback(
             {/* PC版: ラベル上 / モバイル版: ラベル左 */}
             <div className="flex flex-row sm:flex-col items-center sm:items-stretch gap-2 sm:gap-1">
               <p className="text-[11px] font-semibold text-purple-800 whitespace-nowrap sm:mb-0 px-1.5 sm:px-0">
-                {isJapanese ? '距離' : 'Distance'}
+                {isJapanese ? "距離" : "Distance"}
               </p>
               <div className="bg-white rounded-lg p-0.5 shadow-inner flex space-x-0.5 flex-1 w-full">
                 {distanceOptionsArray.map((option) => (
@@ -359,8 +393,8 @@ const analyzeText = useCallback(
                     onClick={() => setSocialDistance(option.value)}
                     className={`flex-1 py-1 px-1.5 rounded-md text-[10px] font-medium transition-all duration-200 flex flex-col justify-center min-h-[32px] sm:h-auto ${
                       social_distance === option.value
-                        ? 'bg-purple-600 text-white shadow-sm'
-                        : 'text-purple-700 hover:bg-purple-50'
+                        ? "bg-purple-600 text-white shadow-sm"
+                        : "text-purple-700 hover:bg-purple-50"
                     }`}
                   >
                     <span className="block">{option.label}</span>
@@ -383,7 +417,6 @@ const analyzeText = useCallback(
     <div className="flex-1 flex flex-col h-full overflow-visible p-2">
       {/* Responsive Grid Container */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 h-full min-h-0 max-h-[calc(100vh-140px)]">
-
         {/* Context Input - Full width on mobile, left 1/3 on laptop+ */}
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col lg:col-span-1 min-h-[200px] h-full">
           {/* Context Header */}
@@ -444,77 +477,95 @@ const analyzeText = useCallback(
 
               {/* Slack風送信ボタン */}
               <div className="absolute bottom-2 right-4">
-
                 <button
                   onClick={() => {
                     if (userDraft.trim().length < 15) return;
-                    
+
                     // 既に解析済みで同じテキストの場合
-                    if (!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft) {
+                    if (
+                      !isAnalyzing &&
+                      suggestion !== null &&
+                      lastAnalyzedText === userDraft
+                    ) {
                       return; // 何もしない
                     }
-                    
+
                     // ユーザーがボタンを押したことを記録
                     setIsUserInitiatedAnalysis(true);
-                    
+
                     // 既に解析中の場合は、フラグを立てるだけ
                     if (isAnalyzing && currentAnalyzingText === userDraft) {
                       return;
                     }
-                    
+
                     // 解析を実行
                     analyzeText(userDraft);
                   }}
-
                   disabled={userDraft.trim().length < 15}
                   className={`
                     p-2 rounded-md transition-all duration-200
-                    ${userDraft.trim().length >= 15
-                      ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
-                        ? 'bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm'  // 解析済み
-                        : 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md'  // 通常
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'  // 無効
+                    ${
+                      userDraft.trim().length >= 15
+                        ? !isAnalyzing &&
+                          suggestion !== null &&
+                          lastAnalyzedText === userDraft
+                          ? "bg-gray-300 hover:bg-gray-400 text-gray-600 shadow-sm" // 解析済み
+                          : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm hover:shadow-md" // 通常
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed" // 無効
                     }
                   `}
                   title={
                     userDraft.trim().length < 15
-                      ? isJapanese ? "15文字以上入力してください" : "Enter at least 15 characters"
-                      : !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
-                        ? isJapanese ? "解析済み" : "Already analyzed"
-                        : isJapanese ? "メッセージを解析" : "Analyze message"
+                      ? isJapanese
+                        ? "15文字以上入力してください"
+                        : "Enter at least 15 characters"
+                      : !isAnalyzing &&
+                        suggestion !== null &&
+                        lastAnalyzedText === userDraft
+                      ? isJapanese
+                        ? "解析済み"
+                        : "Already analyzed"
+                      : isJapanese
+                      ? "メッセージを解析"
+                      : "Analyze message"
                   }
                 >
                   {/* ユーザーがボタンを押した場合のみローディング表示 */}
                   {isAnalyzing && isUserInitiatedAnalysis ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
-                    <svg 
+                    <svg
                       className={`w-5 h-5 transform transition-transform duration-200 ${
-                        userDraft.trim().length >= 15 
-                          ? !isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft
-                            ? 'rotate-0'  // 解析済み
-                            : 'rotate-90'  // 解析可能
-                          : 'rotate-45'  // 無効
+                        userDraft.trim().length >= 15
+                          ? !isAnalyzing &&
+                            suggestion !== null &&
+                            lastAnalyzedText === userDraft
+                            ? "rotate-0" // 解析済み
+                            : "rotate-90" // 解析可能
+                          : "rotate-45" // 無効
                       }`}
-                      fill="none" 
-                      stroke="currentColor" 
+                      fill="none"
+                      stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      {!isAnalyzing && suggestion !== null && lastAnalyzedText === userDraft && userDraft.trim().length >= 15 ? (
+                      {!isAnalyzing &&
+                      suggestion !== null &&
+                      lastAnalyzedText === userDraft &&
+                      userDraft.trim().length >= 15 ? (
                         // チェックマークアイコン（解析済み）
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M5 13l4 4L19 7" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
                         />
                       ) : (
                         // 紙飛行機アイコン（通常）
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" 
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
                         />
                       )}
                     </svg>
