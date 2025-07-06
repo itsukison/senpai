@@ -36,10 +36,6 @@ export const createConvo = async(data: ConvoInput) => {
             ai_receipt: data.ai_receipt,
             improvement_points: data.improvement_points,
             detailed_analysis: data.detailed_analysis,
-            reasoning: data.reasoning,
-            detected_mentions: data.detected_mentions,
-            analyzed_at: data.timestamp,
-            created_at: new Date().toISOString()
         })
         .select()
 

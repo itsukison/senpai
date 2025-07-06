@@ -1,0 +1,39 @@
+[
+  {
+    "timestamp": "2025-06-26T07:36:03.217Z",
+    "sessionId": "session_1750923348160_tul3opcwk",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "What the fuck you dumbass",
+      "issue_pattern": [
+        "RudeFeedback"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "相手に対する感情的な表現が強いですね。もう少し建設的な言い方に変えると良いでしょう。",
+        "improvement_points": "感情的な表現を避け、具体的な指摘や質問にすることで、相手が受け入れやすくなります。また、相手に対する配慮を示すことで、より良いコミュニケーションが生まれるでしょう。",
+        "suggestion": "この件について、もう少し詳しく教えてもらえますか？何が問題だったのか、一緒に考えたいと思います。",
+        "reasoning": "感情的な表現を避けることで、相手が防御的にならず、建設的な対話が生まれる可能性が高まります。具体的な指摘や質問をすることで、相手が行動しやすくなり、問題解決に向けた協力を促します。",
+        "issue_pattern": [
+          "RudeFeedback"
+        ]
+      },
+      "processingTime": 6219
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-26T07:36:16.410Z",
+    "sessionId": "session_1750923348160_tul3opcwk",
+    "language": "ja",
+    "event": "suggestion_accepted",
+    "data": {
+      "action": "accept",
+      "previousText": "What the fuck you dumbass",
+      "newText": "この件について、もう少し詳しく教えてもらえますか？何が問題だったのか、一緒に考えたいと思います。"
+    },
+    "ipAddress": "::1"
+  }
+]

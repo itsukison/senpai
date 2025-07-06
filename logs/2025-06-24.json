@@ -1,0 +1,85 @@
+[
+  {
+    "timestamp": "2025-06-24T04:36:13.582Z",
+    "sessionId": "session_1750739764751_m6ai5qyor",
+    "language": "en",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "What the fuck",
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "I see you're feeling frustrated. Let's refine your message.",
+        "improvement_points": "The language is harsh and may escalate tensions. It's important to express frustration constructively.",
+        "suggestion": "I’m feeling quite frustrated with the current situation. Can we discuss what’s going wrong and how to address it?",
+        "reasoning": "The tone is aggressive and may not foster a supportive environment for resolution.",
+        "issues": [
+          "Use of profanity may escalate tensions",
+          "Lacks clarity on the issue at hand",
+          "Does not promote constructive dialogue"
+        ]
+      },
+      "processingTime": 2700
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-24T04:49:47.582Z",
+    "sessionId": "session_1750740508210_mkgwym10j",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "What the heck",
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "この表現は感情的な反応を示しており、相手に誤解を与える可能性があります。状況をより明確にするための具体的な表現が求められます。",
+        "improvement_points": "感情的な表現を避け、具体的な問題や疑問を提示することで、相手に理解しやすく、建設的なコミュニケーションを促すことが重要です。",
+        "suggestion": "今回の状況についてもう少し詳しく教えていただけますか？具体的な問題点や懸念事項を共有してもらえると、解決に向けて一緒に考えることができると思います。",
+        "reasoning": "感情的な表現を具体的な質問に置き換えることで、相手とのコミュニケーションを円滑にし、理解を深めることができます。",
+        "issues": [
+          "感情的な反応であり、具体的な問題を示していない",
+          "相手に対する攻撃的な印象を与える可能性がある"
+        ]
+      },
+      "processingTime": 7739
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-24T04:49:52.047Z",
+    "sessionId": "session_1750740508210_mkgwym10j",
+    "language": "ja",
+    "event": "suggestion_accepted",
+    "data": {
+      "action": "accept",
+      "previousText": "What the heck",
+      "newText": "今回の状況についてもう少し詳しく教えていただけますか？具体的な問題点や懸念事項を共有してもらえると、解決に向けて一緒に考えることができると思います。"
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-06-24T04:59:33.788Z",
+    "sessionId": "session_1750741165628_ut4qks64t",
+    "language": "en",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "What the fuck",
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "I see you're feeling frustrated. Let's rephrase this for clarity.",
+        "improvement_points": "The language used is inappropriate for a professional setting and may escalate tensions.",
+        "suggestion": "I’m feeling quite frustrated about the current situation. Can we discuss what’s going wrong and how we can resolve it together?",
+        "reasoning": "The draft is inappropriate for workplace communication and does not promote constructive discussion.",
+        "issues": [
+          "Use of profanity is unprofessional",
+          "Lacks clarity on the specific issue",
+          "Does not foster constructive dialogue"
+        ]
+      },
+      "processingTime": 2822
+    },
+    "ipAddress": "::1"
+  }
+]

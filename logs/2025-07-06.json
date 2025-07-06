@@ -150,5 +150,152 @@
       "processingTime": 14053
     },
     "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T02:23:39.055Z",
+    "sessionId": "session_1751768601040_qou3uue6n",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "何考えて仕事してんだよ",
+      "issue_pattern": [
+        "HarshTone",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "強い言い回しで相手の気持ちを傷つける恐れがあります。",
+        "improvement_points": "丁寧で具体的な指摘に変えると、相手の理解と協力が得やすくなります。",
+        "suggestion": "この部分の進め方について、もう少し詳しく教えてもらえますか？一緒に改善点を考えたいです。",
+        "reasoning": "Respect ToneBand:Harmful",
+        "issue_pattern": [
+          "HarshTone",
+          "Impolite"
+        ]
+      },
+      "processingTime": 5565
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T02:25:59.743Z",
+    "sessionId": "session_1751768752976_5gajvijlm",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "何考えて仕事してんだよ",
+      "issue_pattern": [
+        "HarshTone",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "強い口調で相手を責めてしまい、関係悪化の恐れがあります。",
+        "improvement_points": "丁寧で具体的な指摘に変えることで、相手の理解と協力を得やすくなります。",
+        "suggestion": "お疲れ様です。今回の仕事の進め方について、もう少し詳しく教えていただけますか？改善点を一緒に考えたいです。",
+        "reasoning": "Respect ToneBand:Harmful",
+        "issue_pattern": [
+          "HarshTone",
+          "Impolite"
+        ]
+      },
+      "processingTime": 3988
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T02:26:08.663Z",
+    "sessionId": "session_1751768752976_5gajvijlm",
+    "language": "ja",
+    "event": "detailed_analysis_toggled",
+    "data": {
+      "action": "expand",
+      "previousText": "何考えて仕事してんだよ",
+      "newText": "お疲れ様です。今回の仕事の進め方について、もう少し詳しく教えていただけますか？改善点を一緒に考えたいです。"
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T02:27:45.366Z",
+    "sessionId": "session_1751768857718_rfl56dukj",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "何考えて仕事してんだよ",
+      "issue_pattern": [
+        "HarshTone",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "強い言い方で相手が防御的になる恐れがあります。",
+        "improvement_points": "丁寧で具体的な表現に変えると、相手の理解と協力が得やすくなります。",
+        "suggestion": "〇〇さん、今回の作業について少し気になる点があるのですが、どのように進めているか教えてもらえますか？",
+        "reasoning": "Respect ToneBand:Harmful",
+        "issue_pattern": [
+          "HarshTone",
+          "Impolite"
+        ]
+      },
+      "processingTime": 5138
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T03:21:55.721Z",
+    "sessionId": "session_1751772099604_bs29gv5t0",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "本当にいつも何考えて仕事してんの\n",
+      "issue_pattern": [
+        "HarshTone",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "感情的な表現が強く、相手に不快感を与える可能性があります。",
+        "improvement_points": "丁寧で具体的な表現に変えることで、相手の理解と協力を得やすくなります。",
+        "suggestion": "お忙しいところ恐縮ですが、最近の業務についてもう少し詳しく教えていただけますか？",
+        "reasoning": "Respect ToneBand:Harmful",
+        "issue_pattern": [
+          "HarshTone",
+          "Impolite"
+        ]
+      },
+      "processingTime": 3719
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "timestamp": "2025-07-06T03:24:02.742Z",
+    "sessionId": "session_1751772226876_vfkrmanwb",
+    "language": "ja",
+    "event": "analysis_completed",
+    "data": {
+      "context": "",
+      "originalMessage": "本当にいつも何考えて仕事してんだよ",
+      "issue_pattern": [
+        "HarshTone",
+        "Impolite"
+      ],
+      "aiResponse": {
+        "hasIssues": true,
+        "ai_receipt": "感情的な表現で相手が防御的になる恐れがあります。",
+        "improvement_points": "丁寧で具体的な表現にすることで、相手の理解と協力を得やすくなります。",
+        "suggestion": "いつもお忙しい中ですが、今回の件についてもう少し詳しく教えていただけますか？",
+        "reasoning": "Respect ToneBand:Harmful",
+        "issue_pattern": [
+          "HarshTone",
+          "Impolite"
+        ]
+      },
+      "processingTime": 5101
+    },
+    "ipAddress": "::1"
   }
 ]
