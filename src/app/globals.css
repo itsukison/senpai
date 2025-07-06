@@ -263,27 +263,7 @@ textarea::-webkit-scrollbar-thumb {
 textarea::-webkit-scrollbar-thumb:hover {
   background: #d1d1d1;
 }
-/* カスタムアニメーション */
-@keyframes gentle-slide-down {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-  10% {
-    transform: translateY(2px) scale(0.995);
-  }
-  90% {
-    transform: translateY(14px) scale(0.99);
-  }
-  100% {
-    transform: translateY(16px) scale(0.99);
-    opacity: 0.95;
-  }
-}
 
-.animate-gentle-slide {
-  animation: gentle-slide-down 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
 
 /* カスタムアニメーション */
 @keyframes gentle-slide-down {
