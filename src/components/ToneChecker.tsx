@@ -23,9 +23,10 @@ interface ToneAnalysis {
 
 interface ToneCheckerProps {
   isJapanese: boolean;
+  promptVersion: 'v8.4' | 'v8.5' | 'β1.0';
 }
 
-export function ToneChecker({ isJapanese }: ToneCheckerProps) {
+export function ToneChecker({ isJapanese, promptVersion }: ToneCheckerProps) {
   const [userDraft, setUserDraft] = useState("");
   const { log } = useLogging(isJapanese ? "ja" : "en"); // log保存用
   const [threadContext, setThreadContext] = useState("");
@@ -82,8 +83,6 @@ export function ToneChecker({ isJapanese }: ToneCheckerProps) {
   // 解析時の元文章を保持（originalText削除に伴う対応）
   const [analyzedOriginalText, setAnalyzedOriginalText] = useState<string>("");
   
-  // 開発者用：プロンプトバージョン
-  const [promptVersion, setPromptVersion] = useState<'v4.8' | 'v4.9' | 'β1.0'>('v4.8');
 
 // 合計文字数を取得
   const getTotalTextLength = () => {
@@ -1048,32 +1047,6 @@ const analyzeText = useCallback(
                   minHeight: '120px'
                 }}
               />
-              
-              {/* 開発者用プロンプトバージョン切り替え */}
-              <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 p-2 bg-gradient-to-t from-white via-white/90 to-transparent">
-                <div className="flex items-center gap-1 bg-gray-100/50 rounded-full px-2 py-1">
-                  {(['v4.8', 'v4.9', 'β1.0'] as const).map(version => (
-                    <button
-                      key={version}
-                      onClick={() => {
-                        setPromptVersion(version);
-                        if (analysisState === 'analyzed') {
-                          setAnalysisState('ready');
-                          setExternalChanges(true);
-                        }
-                      }}
-                      className={`px-2 py-0.5 text-xs rounded-full transition-all ${
-                        promptVersion === version
-                          ? 'bg-purple-600 text-white'
-                          : 'text-gray-500 hover:text-gray-700'
-                      }`}
-                    >
-                      {version}
-                    </button>
-                  ))}
-                </div>
-                <span className="text-xs text-gray-400">prompt</span>
-              </div>
             </div>
           </div>
         </div>
