@@ -1431,7 +1431,7 @@ export async function POST(request: NextRequest) {
       language,
       hierarchy = 'peer',
       social_distance = 'neutral',
-      prompt_version = 'v4.8' // デフォルト β1.0
+      prompt_version = 'β1.0' // デフォルト v8.4, v8.5, β1.0
     } = requestBody
 
     // リクエストボディ全体をログ出力
