@@ -5,9 +5,14 @@ import { ToneChecker } from "@/components/ToneChecker";
 
 export default function Home() {
   const [isJapanese, setIsJapanese] = useState(true);
+  const [resetKey, setResetKey] = useState(0); // リセット用のキー
 
   const toggleLanguage = () => {
     setIsJapanese(!isJapanese);
+  };
+
+  const handleReset = () => {
+    setResetKey(prev => prev + 1); // キーを変更してコンポーネントを再マウント
   };
 
   return (
@@ -17,7 +22,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">
+              <div 
+                className="text-lg sm:text-xl font-bold text-slate-800 tracking-tight cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={handleReset}
+              >
                 SenpAI<span className="text-purple-800"> Sensei</span>
               </div>
               <div className="hidden sm:block text-xs sm:text-sm text-slate-600 font-medium">
@@ -62,7 +70,7 @@ export default function Home() {
       {/* Title and Description セクションを完全に削除 */}
       {/* Main Content - Flex container that takes remaining space */}
       <div className="flex-1 flex flex-col max-w-7xl mx-auto w-full px-3 sm:px-5 lg:px-8 py-4 sm:py-6 bg-white mb-4 min-h-0 mt-4">
-        <ToneChecker isJapanese={isJapanese} />
+        <ToneChecker key={resetKey} isJapanese={isJapanese} />
       </div>
 
       {/* Footer */}
