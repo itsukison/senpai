@@ -6,7 +6,29 @@ import { ToneChecker } from "@/components/ToneChecker";
 export default function Home() {
   const [isJapanese, setIsJapanese] = useState(true);
   const [resetKey, setResetKey] = useState(0); // リセット用のキー
-  const [promptVersion, setPromptVersion] = useState<'v8.4' | 'v8.5' | 'β1.0'>('v8.4');
+  const [promptVersion, setPromptVersion] = useState<string>('β1.0'); // デフォルトを仮設定
+  const [availableVersions, setAvailableVersions] = useState<string[]>(['v8.4', 'v8.5', 'β1.0']); // 仮のデフォルト
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  // APIから設定を取得
+  useEffect(() => {
+    fetch('/api/check-tone')
+      .then(res => res.json())
+      .then(data => {
+        if (data.defaultVersion) {
+          setPromptVersion(data.defaultVersion);
+        }
+        if (data.availableVersions && data.availableVersions.length > 0) {
+          setAvailableVersions(data.availableVersions);
+        }
+        setConfigLoaded(true);
+      })
+      .catch(err => {
+        console.error('Failed to load config:', err);
+        // エラー時はデフォルト値をそのまま使用
+        setConfigLoaded(true);
+      });
+  }, []);
 
   const toggleLanguage = () => {
     setIsJapanese(!isJapanese);
@@ -37,21 +59,23 @@ export default function Home() {
             </div>
 
             {/* Version Selector (開発者用) */}
-            <div className="flex items-center gap-1 mr-2 sm:mr-4">
-              {(['v8.4', 'v8.5', 'β1.0'] as const).map(version => (
-                <button
-                  key={version}
-                  onClick={() => setPromptVersion(version)}
-                  className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-full transition-all ${
-                    promptVersion === version
-                      ? 'bg-purple-100 text-purple-700'
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  {version}
-                </button>
-              ))}
-            </div>
+            {configLoaded && (
+              <div className="flex items-center gap-1 mr-2 sm:mr-4">
+                {availableVersions.map(version => (
+                  <button
+                    key={version}
+                    onClick={() => setPromptVersion(version)}
+                    className={`px-1.5 sm:px-2 py-0.5 text-xs rounded-full transition-all ${
+                      promptVersion === version
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    {version}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Language Toggle */}
             <div className="flex items-center space-x-2">

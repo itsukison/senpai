@@ -23,7 +23,7 @@ interface ToneAnalysis {
 
 interface ToneCheckerProps {
   isJapanese: boolean;
-  promptVersion: 'v8.4' | 'v8.5' | 'β1.0';
+  promptVersion: string;  // 文字列型に変更して柔軟性を持たせる
 }
 
 export function ToneChecker({ isJapanese, promptVersion }: ToneCheckerProps) {
