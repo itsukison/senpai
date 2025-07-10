@@ -55,16 +55,16 @@ function getAvailableVersions(): string[] {
       ...betaVersions.slice(0, 2)
     ]
     
-    return selectedVersions.length > 0 ? selectedVersions : ['v8.4', 'b1.0']
+    return selectedVersions.length > 0 ? selectedVersions : ['v8.4', 'b1.4']
   } catch (error) {
     console.error('Failed to get available versions:', error)
-    return ['v8.4', 'b1.0']
+    return ['v8.4', 'b1.4']
   }
 }
 
 // 設定を一元管理
 const CONFIG = {
-  DEFAULT_PROMPT_VERSION: 'b1.3',  // ハードコード指定
+  DEFAULT_PROMPT_VERSION: 'b1.4',  // ハードコード指定
   AVAILABLE_VERSIONS: getAvailableVersions()
 }
 

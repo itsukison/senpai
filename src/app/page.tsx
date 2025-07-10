@@ -6,8 +6,8 @@ import { ToneChecker } from "@/components/ToneChecker";
 export default function Home() {
   const [isJapanese, setIsJapanese] = useState(true);
   const [resetKey, setResetKey] = useState(0); // リセット用のキー
-  const [promptVersion, setPromptVersion] = useState<string>('β1.0'); // デフォルトを仮設定
-  const [availableVersions, setAvailableVersions] = useState<string[]>(['v8.4', 'v8.5', 'β1.0']); // 仮のデフォルト
+  const [promptVersion, setPromptVersion] = useState<string>('b1.4'); // デフォルトを仮設定
+  const [availableVersions, setAvailableVersions] = useState<string[]>(['v8.5', 'b1.4', 'b1.6']); // 仮のデフォルト
   const [configLoaded, setConfigLoaded] = useState(false);
 
   // APIから設定を取得
