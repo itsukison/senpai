@@ -337,9 +337,15 @@ return (
           } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
           rows={5}
           style={{ 
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
+            fontSize: "15px",
+            lineHeight: "1.5",
+            letterSpacing: "-0.003em",  // Slack/Claude風の絶妙な文字間隔
             minHeight: "120px",
-            maxHeight: "70vh"
+            maxHeight: "70vh",
+            // 美しいテキストレンダリング
+            WebkitFontSmoothing: "antialiased",
+            MozOsxFontSmoothing: "grayscale",
           }}
         />
 
