@@ -332,20 +332,14 @@ return (
           onBlur={handleBlur}    // Phase 3: ブラーイベント
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
-          className={`w-full resize-y border-0 rounded-none focus:outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-12 transition-all duration-300 ${
+          className={`w-full resize-y border-0 rounded-none !outline-none focus:!outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-20 transition-all duration-300 ${
             isTransitioning ? 'opacity-80' : ''
           } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
           rows={5}
           style={{ 
-            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif",
-            fontSize: "15px",
-            lineHeight: "1.5",
-            letterSpacing: "-0.003em",  // Slack/Claude風の絶妙な文字間隔
+            fontFamily: "Inter, sans-serif",
             minHeight: "120px",
-            maxHeight: "70vh",
-            // 美しいテキストレンダリング
-            WebkitFontSmoothing: "antialiased",
-            MozOsxFontSmoothing: "grayscale",
+            maxHeight: "70vh"
           }}
         />
 
