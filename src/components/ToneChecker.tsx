@@ -52,6 +52,13 @@ export function ToneChecker({ isJapanese, promptVersion }: ToneCheckerProps) {
   const [hasReceivedResponse, setHasReceivedResponse] = useState(false); // API応答受信フラグ
   const [isContextOpen, setIsContextOpen] = useState(false); // Context Inputの開閉状態（モバイル・タブレット用）
   
+  // Phase 4 追加: 解析中テキスト管理
+  const [analysisPhaseText, setAnalysisPhaseText] = useState({
+    ai_receipt: '',
+    improvement_points: ''
+  });
+  const [currentAnalysisPhase, setCurrentAnalysisPhase] = useState<'relationship' | 'analyzing' | 'finalizing' | null>(null);
+  
   // Phase 3 追加: 解析完了フラグ
   const [isAnalysisComplete, setIsAnalysisComplete] = useState(false);
   
@@ -79,6 +86,62 @@ export function ToneChecker({ isJapanese, promptVersion }: ToneCheckerProps) {
   // 関係性セレクター用のstate
   const [hierarchy, setHierarchy] = useState('peer');
   const [social_distance, setSocialDistance] = useState('neutral');
+  
+  // Phase 4 定数定義
+  const DISTANCE_ADJECTIVES: Record<string, string> = {
+    'very_close': 'かなり近しい',
+    'close': '仲間感のある',
+    'neutral': '一般的な職場の',
+    'distant': '少し距離感のある',
+    'very_distant': 'かなり遠いご関係の'
+  };
+
+  const HIERARCHY_NOUNS: Record<string, string> = {
+    'junior': '相手のかた',
+    'peer': 'かた', 
+    'senior': '目上のかた'
+  };
+
+  const ANALYSIS_MESSAGES = {
+    phase2: {
+      ai_receipt: [
+        "このメッセージで達成したい目的を分析しています",
+        "ビジネスゴールと人間関係の両立を検討しています"
+      ],
+      improvement_points: [
+        "改善ポイントを抽出しています",
+        "相手の視点から検証しています"
+      ]
+    },
+    phase3: {
+      ai_receipt: [
+        "あなたの状況を深く理解し、最適な表現を調整しています",
+        "相手の立場に立って、メッセージの受け取られ方を検証しています", 
+        "プロフェッショナルかつ温かみのある表現に仕上げています"
+      ],
+      improvement_points: [
+        "関係性を大切にしながら、目的を達成する方法を最終化しています",
+        "誤解なく、スムーズに伝わる表現に磨き上げています",
+        "このコミュニケーションが生み出す価値を最大化しています"
+      ]
+    }
+  };
+
+  // 文字数による調整
+  const LENGTH_BASED_MESSAGES = {
+    short: { // 30字以下
+      phase2: "簡潔なメッセージから意図を読み取っています",
+      phase3: "短い言葉に込められた想いを大切にしています"
+    },
+    medium: { // 30-200字
+      phase2: "メッセージの構造を整理しています",
+      phase3: "バランスの取れた表現に調整しています"
+    },
+    long: { // 200字以上
+      phase2: "詳細な内容から要点を抽出しています",
+      phase3: "情報を整理して伝わりやすくしています"
+    }
+  };
   
   // 解析時の元文章を保持（originalText削除に伴う対応）
   const [analyzedOriginalText, setAnalyzedOriginalText] = useState<string>("");
@@ -179,15 +242,16 @@ const analyzeText = useCallback(
       // 再解析時の元文章を更新
       setAnalyzedOriginalText(currentText);
       
-      // 再解析時は即座にランダムテキストを開始
-      setShowRandomTextFlag(true);
-      console.log("=== 再解析: showRandomTextFlag を true に設定 ===");
+      // Phase 4: 無効化前 再解析時は即座にランダムテキストを開始
+      //setShowRandomTextFlag(true);
+      //console.log("=== 再解析: showRandomTextFlag を true に設定 ===");
+      
+      // Phase 4: ランダムテキストは無効化
+      console.log("=== 再解析: ランダムテキストは無効化 ===");
+
     } else {
-      // 初回解析時も即座にランダムテキストを開始
-      setTimeout(() => {
-        setShowRandomTextFlag(true);
-        console.log("=== 初回解析: showRandomTextFlag を true に設定（遅延実行） ===");
-      }, 1800);
+      // Phase 4: ランダムテキストは無効化
+      console.log("=== 初回解析: ランダムテキストは無効化 ===");
     }
     
     if (isReanalysis) {
@@ -224,7 +288,6 @@ const analyzeText = useCallback(
       }, 1000); // CSS transitionと同期（1秒）
       
       animationTimersRef.current.push(mainTimer);
-      // randomTextTimerは削除（useEffectで管理）
       
       console.log("=== タイマーID: mainTimer=", mainTimer);
       console.log("=== 保存されたタイマー数:", animationTimersRef.current.length);
@@ -913,6 +976,241 @@ const analyzeText = useCallback(
     };
   }, [analysisState]);
 
+  // 改善ポイント表示セクションのレンダリング関数
+  const renderImprovementSection = () => {
+    // 型推論の問題を回避するため、早期リターンパターンを使用
+    if ((analysisState as string) === 'analyzing') {
+      return (
+        <div className="space-y-2">
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 min-h-[80px]">
+            {currentAnalysisPhase && analysisPhaseText.improvement_points ? (
+              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                {analysisPhaseText.improvement_points}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                <div className="h-4 bg-slate-200 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-slate-200 rounded animate-pulse w-4/5"></div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (!suggestion) return null;
+
+    if (suggestion.hasIssues) {
+      return (
+        <div className="space-y-2">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-h-[80px]">
+            {suggestion.improvement_points ? (
+              <>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {suggestion.improvement_points}
+                </p>
+                
+                {/* 詳細分析のアコーディオン */}
+                {suggestion.detailed_analysis && (
+                  <div className="mt-3">
+                    <button
+                      onClick={async () => {
+                        const newState = !showDetailedAnalysis;
+                        setShowDetailedAnalysis(newState);
+                        
+                        // ログ記録
+                        await log("detailed_analysis_toggled", {
+                          action: newState ? "expand" : "collapse",
+                          previousText: analyzedOriginalText,
+                          newText: suggestion.suggestion || undefined
+                        });
+                      }}
+                      className="flex items-center gap-1 text-xs font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
+                    >
+                      <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
+                      {showDetailedAnalysis ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </button>
+                    
+                    {showDetailedAnalysis && (
+                      <div className="mt-2 pt-2 border-t border-yellow-300">
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                          {suggestion.detailed_analysis}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="space-y-2">
+                <div className="h-4 bg-yellow-200 rounded animate-pulse w-full"></div>
+                <div className="h-4 bg-yellow-200 rounded animate-pulse w-4/5"></div>
+                <div className="mt-3 h-3 bg-yellow-300 rounded animate-pulse w-24"></div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="space-y-2">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            {currentAnalysisPhase && analysisPhaseText.improvement_points ? (
+              <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+                {analysisPhaseText.improvement_points}
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-slate-700 leading-relaxed">
+                  {suggestion.improvement_points}
+                </p>
+                
+                {/* 詳細分析のアコーディオン（hasIssues: falseの場合） */}
+                {suggestion.detailed_analysis && (
+                  <div className="mt-3">
+                    <button
+                      onClick={async () => {
+                        const newState = !showDetailedAnalysis;
+                        setShowDetailedAnalysis(newState);
+                        
+                        // ログ記録
+                        await log("detailed_analysis_toggled", {
+                          action: newState ? "expand" : "collapse",
+                          previousText: analyzedOriginalText,
+                          newText: suggestion.suggestion || undefined
+                        });
+                      }}
+                      className="flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-800 transition-colors"
+                    >
+                      <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
+                      {showDetailedAnalysis ? (
+                        <ChevronUp className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </button>
+                    
+                    {showDetailedAnalysis && (
+                      <div className="mt-2 pt-2 border-t border-green-300">
+                        <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
+                          {suggestion.detailed_analysis}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+  };
+
+  // Phase 4: 解析中テキストアニメーション
+  useEffect(() => {
+    // ガード条件：解析中かつ提案エリア表示中のみ動作
+    if (analysisState !== 'analyzing' || !showSuggestionArea) {
+      setCurrentAnalysisPhase(null);
+      setAnalysisPhaseText({ ai_receipt: '', improvement_points: '' });
+      return;
+    }
+
+    const phaseTimers: NodeJS.Timeout[] = [];
+    let dotTimer: NodeJS.Timeout;
+    let rotationTimer: NodeJS.Timeout;
+    let dots = 1;
+
+    // 文字数判定
+    const textLength = userDraft.length;
+    const lengthCategory = textLength <= 30 ? 'short' : textLength <= 200 ? 'medium' : 'long';
+
+    // transition完了を待つ（既存の1000msと同期）
+    const initTimer = setTimeout(() => {
+      // Phase 1: 関係性認識（0-1500ms）
+      setCurrentAnalysisPhase('relationship');
+      const relationshipText = `${DISTANCE_ADJECTIVES[social_distance]}${HIERARCHY_NOUNS[hierarchy]}へのメッセージですね`;
+      
+      // ドットアニメーション
+      const updateDots = () => {
+        setAnalysisPhaseText(prev => ({
+          ...prev,
+          ai_receipt: relationshipText + '.'.repeat(dots)
+        }));
+        dots = (dots % 3) + 1;
+      };
+      
+      updateDots();
+      dotTimer = setInterval(updateDots, 500);
+      
+      // Phase 2への遷移（1500ms後）
+      const phase2Timer = setTimeout(() => {
+        clearInterval(dotTimer);
+        setCurrentAnalysisPhase('analyzing');
+        
+        // 累積表示の実装
+        setAnalysisPhaseText({
+          ai_receipt: ANALYSIS_MESSAGES.phase2.ai_receipt[0] + '...',
+          improvement_points: ANALYSIS_MESSAGES.phase2.improvement_points[0] + '...'
+        });
+        
+        // 800ms後に2行目追加（文字数に応じて調整）
+        const addSecondLine = setTimeout(() => {
+          const secondLineAi = lengthCategory === 'short' 
+            ? LENGTH_BASED_MESSAGES.short.phase2
+            : ANALYSIS_MESSAGES.phase2.ai_receipt[1];
+            
+          setAnalysisPhaseText({
+            ai_receipt: ANALYSIS_MESSAGES.phase2.ai_receipt[0] + '...\n' + secondLineAi + '...',
+            improvement_points: ANALYSIS_MESSAGES.phase2.improvement_points.join('...\n') + '...'
+          });
+        }, 800);
+        
+        phaseTimers.push(addSecondLine);
+      }, 1500);
+      
+      // Phase 3への遷移（3500ms後）
+      const phase3Timer = setTimeout(() => {
+        setCurrentAnalysisPhase('finalizing');
+        let rotationIndex = 0;
+        
+        const rotate = () => {
+          const aiMessage = lengthCategory !== 'medium'
+            ? (rotationIndex === 0 ? LENGTH_BASED_MESSAGES[lengthCategory].phase3 : ANALYSIS_MESSAGES.phase3.ai_receipt[rotationIndex])
+            : ANALYSIS_MESSAGES.phase3.ai_receipt[rotationIndex];
+            
+          setAnalysisPhaseText({
+            ai_receipt: aiMessage + '...',
+            improvement_points: ANALYSIS_MESSAGES.phase3.improvement_points[rotationIndex] + '...'
+          });
+          rotationIndex = (rotationIndex + 1) % 3;
+        };
+        
+        rotate();
+        rotationTimer = setInterval(rotate, 2500);
+      }, 3500);
+      
+      phaseTimers.push(phase2Timer, phase3Timer);
+    }, 1000); // transition完了待ち
+
+    phaseTimers.push(initTimer);
+    
+    // animationTimersRefに追加（既存のクリーンアップ機構を活用）
+    animationTimersRef.current.push(...phaseTimers);
+    
+    return () => {
+      clearInterval(dotTimer);
+      clearInterval(rotationTimer);
+      phaseTimers.forEach(timer => clearTimeout(timer));
+      setAnalysisPhaseText({ ai_receipt: '', improvement_points: '' });
+      setCurrentAnalysisPhase(null);
+    };
+  }, [analysisState, showSuggestionArea, hierarchy, social_distance, userDraft.length]);
+
   // ========== ここにショートカットキーの実装を追加 ==========
   // ショートカットキーの実装
   useEffect(() => {
@@ -1129,9 +1427,10 @@ const analyzeText = useCallback(
 
                   {/* AI Receipt */}
                   <div className="text-sm text-slate-700 leading-relaxed min-h-[40px]">
-                    {(suggestion.ai_receipt || suggestion.reasoning) ? (
+                    {analysisState === 'analyzing' && currentAnalysisPhase && analysisPhaseText.ai_receipt ? (
+                      <div className="whitespace-pre-wrap">{analysisPhaseText.ai_receipt}</div>
+                    ) : (suggestion.ai_receipt || suggestion.reasoning) ? (
                       suggestion.ai_receipt || suggestion.reasoning
-
                     ) : (
                       <div className="space-y-2">
                         <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
@@ -1141,109 +1440,7 @@ const analyzeText = useCallback(
                   </div>
 
                   {/* 改善ポイント / Goodポイント */}
-                  {suggestion.hasIssues ? (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-semibold text-slate-700">
-                        {isJapanese ? "改善ポイント" : "Improvement Points"}
-                      </h4>
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 min-h-[80px]">
-                        {suggestion.improvement_points ? (
-                          <>
-                            <p className="text-sm text-slate-700 leading-relaxed">
-                              {suggestion.improvement_points}
-                            </p>
-                            
-                            {/* 詳細分析のアコーディオン */}
-                            {suggestion.detailed_analysis && (
-                              <div className="mt-3">
-                                <button
-                                  onClick={async () => {
-                                    const newState = !showDetailedAnalysis;
-                                    setShowDetailedAnalysis(newState);
-                                    
-                                    // ログ記録
-                                    await log("detailed_analysis_toggled", {
-                                      action: newState ? "expand" : "collapse",
-                                      previousText: analyzedOriginalText,
-                                      newText: suggestion.suggestion || undefined
-                                    });
-                                  }}
-                                  className="flex items-center gap-1 text-xs font-medium text-yellow-700 hover:text-yellow-800 transition-colors"
-                                >
-                                  <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
-                                  {showDetailedAnalysis ? (
-                                    <ChevronUp className="w-3 h-3" />
-                                  ) : (
-                                    <ChevronDown className="w-3 h-3" />
-                                  )}
-                                </button>
-                                
-                                {showDetailedAnalysis && (
-                                  <div className="mt-2 pt-2 border-t border-yellow-300">
-                                    <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
-                                      {suggestion.detailed_analysis}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          <div className="space-y-2">
-                            <div className="h-4 bg-yellow-200 rounded animate-pulse w-full"></div>
-                            <div className="h-4 bg-yellow-200 rounded animate-pulse w-4/5"></div>
-                            <div className="mt-3 h-3 bg-yellow-300 rounded animate-pulse w-24"></div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-semibold text-slate-700">
-                        {isJapanese ? "Goodポイント" : "Strengths"}
-                      </h4>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <p className="text-sm text-slate-700 leading-relaxed">
-                          {suggestion.improvement_points}
-                        </p>
-                        
-                        {/* 詳細分析のアコーディオン（hasIssues: falseの場合） */}
-                        {suggestion.detailed_analysis && (
-                          <div className="mt-3">
-                            <button
-                              onClick={async () => {
-                                const newState = !showDetailedAnalysis;
-                                setShowDetailedAnalysis(newState);
-                                
-                                // ログ記録
-                                await log("detailed_analysis_toggled", {
-                                  action: newState ? "expand" : "collapse",
-                                  previousText: analyzedOriginalText,
-                                  newText: suggestion.suggestion || undefined
-                                });
-                              }}
-                              className="flex items-center gap-1 text-xs font-medium text-green-700 hover:text-green-800 transition-colors"
-                            >
-                              <span>{isJapanese ? "もっと詳しく" : "Learn more"}</span>
-                              {showDetailedAnalysis ? (
-                                <ChevronUp className="w-3 h-3" />
-                              ) : (
-                                <ChevronDown className="w-3 h-3" />
-                              )}
-                            </button>
-                            
-                            {showDetailedAnalysis && (
-                              <div className="mt-2 pt-2 border-t border-green-300">
-                                <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap">
-                                  {suggestion.detailed_analysis}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  {renderImprovementSection()}
 
                   {/* hasIssues: falseの場合のみ青いバッジを表示 */}
                   {!suggestion.hasIssues && (
