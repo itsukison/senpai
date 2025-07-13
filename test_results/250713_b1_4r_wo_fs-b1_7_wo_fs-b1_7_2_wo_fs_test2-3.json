@@ -1,0 +1,2060 @@
+[
+    {
+        "run": 2,
+        "results": {
+            "TC01_L0_Perfect_Composite_JP": {
+                "payload": {
+                    "thread_context": "",
+                    "user_draft": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": false,
+                    "issue_pattern": [],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "過去の支援への感謝を示しつつ、追加のレビューを丁寧に依頼する",
+                        "barriers": []
+                    },
+                    "ai_receipt": "先輩のアドバイスを活かして修正版を作成し、さらなるブラッシュアップを目指されているのですね。",
+                    "improvement_points": "感謝から始めて相手の都合に配慮した依頼をすることで、継続的な支援を得やすくなります。",
+                    "detailed_analysis": "",
+                    "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                    "reasoning": "Perfect複合機能 L0"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のプレゼンアドバイスへの感謝と、修正版の確認依頼を丁寧に伝えていますね。",
+                        "improvement_points": "このままの丁寧な依頼表現で、上司に安心感を与えつつスムーズに確認を促せます。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:NoIssues",
+                        "functional_analysis": {
+                            "form": "感謝と依頼",
+                            "function": "上司に修正版のプレゼン資料を確認してもらい、フィードバックや承認を得る",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.3
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のプレゼンアドバイスに感謝しつつ、修正版の確認依頼を丁寧に伝えていますね。",
+                        "improvement_points": "このままの丁寧な依頼表現は、相手に負担をかけずに協力を得られるため効果的です。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:Polite,ClearRequest",
+                        "functional_analysis": {
+                            "form": "感謝と依頼の表現",
+                            "function": "相手に修正版プレゼンの確認を依頼し、協力を得る",
+                            "pred_function": "相手に丁寧さが伝わり、快く確認してもらえる",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.8
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のプレゼンアドバイスへの感謝と、修正版の確認依頼を丁寧に伝えられている状況ですね。",
+                        "improvement_points": "このままの丁寧な依頼表現で、上司に安心感を与えつつスムーズに確認を依頼できます。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:Polite,ClearRequest",
+                        "functional_analysis": {
+                            "form": "感謝と依頼",
+                            "function": "上司に修正版のプレゼン資料を確認してもらう",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.6
+                    }
+                }
+            },
+            "TC02_L1_Impolite_JP": {
+                "payload": {
+                    "thread_context": "[15:30] 部長: 明日の戦略会議、14時からに変更になりました。参加可能でしょうか？",
+                    "user_draft": "会議の件、了解しました。参加します。",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "会議参加の可否を明確に伝え、スケジュール変更を承知したことを示す",
+                        "barriers": [
+                            "敬語不足",
+                            "具体性がやや不足"
+                        ]
+                    },
+                    "ai_receipt": "上司からの急な会議時間変更の連絡に、迅速に対応されているのですね。",
+                    "improvement_points": "適切な敬語と時間の確認を含めることで、確実な意思疎通とプロフェッショナルな印象を与えられます。",
+                    "detailed_analysis": "【現状の影響】\n「了解」は上司に対してカジュアルすぎる印象を与え、ビジネスマナーの面で不適切と受け取られる可能性があります。\n\n【より良い結果に繋がる視点】\n「承知いたしました」という適切な敬語を使い、変更後の時間を復唱することで、聞き間違いを防ぎ、確実な出席意思を伝えられます。",
+                    "suggestion": "承知いたしました。\n明日14時からの戦略会議、参加いたします。",
+                    "reasoning": "敬語修正+時間確認 L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "部長からの会議時間変更の連絡を受けて、参加の意思を明確に伝えていますね。",
+                        "improvement_points": "現状の表現は簡潔で明確なため、部長に対して参加意思をスムーズに伝えられます。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearConfirmation,PoliteTone",
+                        "functional_analysis": {
+                            "form": "承諾・参加意思の表明",
+                            "function": "部長の会議時間変更の連絡を受けて、参加可能であることを明確に伝える",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.8
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "部長からの会議時間変更の連絡に対して、参加の意思を簡潔に伝えていますね。",
+                        "improvement_points": "このメッセージは明確で簡潔な了承表明であり、相手に安心感を与えます。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearConfirmation",
+                        "functional_analysis": {
+                            "form": "承諾・参加表明",
+                            "function": "部長の会議時間変更の連絡を理解し、参加の意思を伝える",
+                            "pred_function": "部長に安心感を与え、円滑な会議参加を促す",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.5
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "部長からの会議時間変更の連絡に対し、参加の意思を簡潔に伝えている状況ですね。",
+                        "improvement_points": "このままの表現で、明確かつ丁寧に参加意思を伝えられているため、相手に誤解なく伝わります。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearConfirmation,PoliteTone",
+                        "functional_analysis": {
+                            "form": "承諾・参加表明",
+                            "function": "部長の連絡内容を理解し、会議に参加する意思を明確に伝える",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.4
+                    }
+                }
+            },
+            "TC03_L2_MissingContext_JP": {
+                "payload": {
+                    "thread_context": "[10分前] 山田: クライアントのA社から問い合わせが来ています",
+                    "user_draft": "至急確認して対応お願い！重要案件なので。",
+                    "hierarchy": "peer",
+                    "social_distance": "close",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "MissingContext",
+                        "VagueIntent"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "A社からの問い合わせに対して、同僚に緊急対応を依頼する",
+                        "barriers": [
+                            "何を確認すべきか不明",
+                            "どう対応すべきか不明",
+                            "期限が不明確"
+                        ]
+                    },
+                    "ai_receipt": "A社からの重要な問い合わせで、急いで対応が必要な状況なのですね。プレッシャーを感じる状況かもしれません。",
+                    "improvement_points": "確認事項、対応内容、期限を明確にすることで、相手が迷わず素早く行動でき、ミスや手戻りを防げます。",
+                    "detailed_analysis": "【現状の影響】\n具体的な指示がないため、相手は何をどこまでやればよいか判断できず、結果的に対応が遅れたり、期待と異なる対応をしてしまう可能性があります。\n\n【より良い結果に繋がる視点】\n5W1Hを明確にすることで、相手の認知負荷を下げ、正確で迅速な対応を促せます。特に緊急時こそ、明確な情報共有が重要です。",
+                    "suggestion": "A社の件、至急お願い！\n【要確認項目】\n■ 確認内容：[## ここに確認事項を補足 例）見積もりの納期について ##]\n■ 対応方法：[## ここに期待する対応を補足 例）本日中に回答メール送信 ##]\n■ 完了期限：[## ここに期限を補足 例）15時まで ##]\n重要案件なので、もし不明点があればすぐ相談してください。",
+                    "reasoning": "Context欠如 L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "Impolite",
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "このメッセージは、重要な案件について迅速な対応を求めていますが、具体的な内容や対応方法が明示されておらず、相手に負担や混乱を与えるかもしれません。",
+                        "improvement_points": "具体的な確認事項や対応内容を明示することで、相手が迷わず行動でき、スムーズな対応を促せます。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は命令的に受け取られやすく、親しい同僚間でも心理的負担を感じさせる可能性があります。また、何をどのように確認し、どのように対応すればよいのかが不明確なため、相手が具体的な行動に移しづらい状態です。重要案件であることは伝わっていますが、詳細な指示や優先順位、期限などが不足しています。\n【改善効果】具体的な確認内容や対応の指示を加えることで、相手は何をすべきか明確になり、効率的かつ確実に対応できるようになります。トーンを少し柔らかくすることで、関係性を良好に保ちながら協力を得やすくなります。",
+                        "suggestion": "クライアントのA社からの問い合わせについて、至急内容を確認して対応をお願いできますか？重要案件なので、対応の進捗も教えてもらえると助かります。[## 具体的な対応内容や期限を補足 例）今日中に回答をお願いします ##]",
+                        "reasoning": "L2:Impolite,MissingContext,MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "依頼（急ぎの対応要請）",
+                            "function": "同僚に重要案件の問い合わせ内容を迅速に確認し、対応してもらうことで問題を早期解決する",
+                            "barriers": [
+                                "命令的でやや威圧的な表現が心理的負担となる可能性",
+                                "具体的な確認事項や対応方法、期限が示されていないため行動が不明確",
+                                "対応の進捗報告など次のステップが提示されていない"
+                            ],
+                            "contextual_obligations": [
+                                "山田さんからのクライアントA社の問い合わせ連絡への対応"
+                            ]
+                        },
+                        "_elapsed_time": 7.9
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "Impolite",
+                            "MissingContext",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "重要な案件で急ぎの対応を求めている状況が伝わっていますが、具体的な内容や対応範囲が明示されていないため、受け手が戸惑うかもしれません。",
+                        "improvement_points": "具体的な確認内容や対応期限を明示することで、相手が迷わず迅速に行動できるようになります。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は強い命令調に感じられ、受け手にプレッシャーを与える可能性があります。また、何をどのように対応すべきかの具体的な情報が不足しているため、相手が何を優先すべきか判断しづらくなっています。【改善効果】具体的な指示や期限を加えることで、受け手の認知的負担が減り、効率的かつ円滑な対応が期待できます。さらに、丁寧な言い回しにすることで良好な関係性を維持しやすくなります。",
+                        "suggestion": "クライアントのA社からの問い合わせについて、至急内容を確認して対応をお願いできますか？重要案件のため、[## いつまでに対応すべきかを補足 例）本日中 ##]ご対応いただけると助かります。",
+                        "reasoning": "L2:MissingContext,Impolite,urgency_high",
+                        "functional_analysis": {
+                            "form": "依頼",
+                            "function": "重要案件の問い合わせについて、具体的な内容を確認し迅速に対応してもらう",
+                            "pred_function": "強い命令調で相手にプレッシャーを与え、具体的な指示がないため対応が遅れる可能性がある",
+                            "barriers": {
+                                "emotional": [
+                                    "強い命令調でプレッシャーを感じる"
+                                ],
+                                "cognitive": [
+                                    "対応内容の具体性が不足している",
+                                    "対応期限が明示されていない"
+                                ],
+                                "action": []
+                            },
+                            "contextual_obligations": [
+                                "山田さんからのクライアントA社の問い合わせ情報を踏まえ、具体的な対応指示を明示する必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 7.4
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "Impolite",
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "クライアントの重要案件について、迅速な対応を求める緊急のメッセージであり、相手に急ぎの行動を期待している状況かもしれません。",
+                        "improvement_points": "依頼内容の具体化と丁寧な表現を加えることで、相手が理解しやすく行動しやすくなります。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は命令的に響きやすく、相手にプレッシャーを与えたり、心理的負担を感じさせる可能性があります。また、何を確認し、どのように対応すべきか具体的な指示が不足しているため、相手が迷いやすく、対応が遅れるリスクがあります。さらに、いつまでに対応すべきかの期限も明示されていません。\n【改善効果】依頼内容を具体的にし、丁寧な言葉遣いにすることで、相手が状況を正確に理解しやすくなり、心理的負担も軽減されます。結果として、迅速かつ的確な対応を促すことができ、重要案件の処理がスムーズになります。",
+                        "suggestion": "お疲れ様です。クライアントのA社からの重要な問い合わせについて、至急ご確認のうえ対応をお願いできますでしょうか。対応の期限や詳細については[## 具体的な対応内容や期限を補足 ##]をご教示いただけると助かります。",
+                        "reasoning": "L2:Impolite,MissingContext,MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "依頼",
+                            "function": "相手にクライアントの重要案件を迅速に確認し、対応してもらう",
+                            "barriers": [
+                                "命令的でやや威圧的な表現による感情コスト",
+                                "具体的な確認事項や対応内容が不明瞭な認知コスト",
+                                "対応期限や次のステップが示されていないアクションコスト"
+                            ],
+                            "contextual_obligations": [
+                                "クライアントA社からの問い合わせに対する迅速な対応が求められている"
+                            ]
+                        },
+                        "_elapsed_time": 7.0
+                    }
+                }
+            },
+            "TC04_L3_HarshTone_JP": {
+                "payload": {
+                    "thread_context": "[2日前 9:00] 田中: 新規顧客向けの提案書、作成開始しました\n[昨日 18:00] 田中: 構成案ができたので、明日共有します",
+                    "user_draft": "まだ提案書できてないの？明日のプレゼンに間に合わないじゃん。今すぐ送って。",
+                    "hierarchy": "junior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "HarshTone",
+                        "MissingAcknowledgment"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "明日のプレゼンに向けて、部下から提案書を至急入手したい",
+                        "barriers": [
+                            "威圧的なトーン",
+                            "部下の進捗報告を無視",
+                            "プレゼン情報の共有不足"
+                        ]
+                    },
+                    "ai_receipt": "明日のプレゼンが迫っていて、提案書の完成を急ぐ必要がある状況なのですね。焦りを感じてしまう状況かもしれません。",
+                    "improvement_points": "進捗を確認し、必要なサポートを提供することで、部下が主体的に品質の高い成果物を仕上げられます。",
+                    "detailed_analysis": "【現状の影響】\n詰問調のメッセージは部下を委縮させ、ミスを誘発したり、今後の報告を躊躇させる原因になります。また、プレゼンの存在を今初めて伝えることで、部下に無用な混乱を与えます。\n\n【より良い結果に繋がる視点】\n部下の努力を認めた上で、状況を共有し、一緒に解決策を考えることで、質の高い成果物と良好な関係性の両方を実現できます。",
+                    "suggestion": "田中さん、提案書の進捗共有ありがとうございます。\n\n【## Action idea 1: 例）実は明日の午後、急遽プレゼンの機会をいただきました。現在の完成度を教えていただけますか？】\n\n【## Action idea: 2 例）もし本日中に一度確認させていただければ、フィードバックをお返しできます。完璧でなくても構いませんので、現状のものを共有していただけますか？\n\n【Action idea 3】プレゼン準備で何かサポートが必要でしたら、遠慮なく相談してください。一緒に成功させましょう！",
+                    "reasoning": "PsySafety再構築 L3"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "Impolite",
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗について早急な対応を求めつつ、期限に間に合わないことへの焦りが感じられますが、強い表現がプレッシャーを与えてしまうかもしれません。",
+                        "improvement_points": "表現を柔らかくし、具体的な状況確認を加えることで、相手が安心して対応しやすくなります。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージは「まだできてないの？」や「今すぐ送って」という強い言い回しが含まれ、受け手にプレッシャーや否定的な感情を与えやすいです。また、提案書の進捗状況や具体的な送付時間の確認がなく、相手がどう対応すべきか分かりにくい状態です。これにより、コミュニケーションの摩擦や心理的負担が増え、期限内の対応が逆に難しくなる恐れがあります。\n【改善効果】柔らかい表現に変え、進捗状況の確認や送付予定時刻の質問を加えることで、相手が状況を伝えやすくなり、協力的な対応を促せます。これにより、期限内に提案書が間に合う可能性が高まり、良好な関係性も維持できます。",
+                        "suggestion": "提案書の進捗はいかがでしょうか？明日のプレゼンに間に合うか心配なので、もし可能でしたら、送っていただける時間を教えていただけますか？",
+                        "reasoning": "L2:HarshTone,MissingContext,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "催促・確認",
+                            "function": "提案書の進捗状況を把握し、期限内に提出してもらうこと",
+                            "barriers": [
+                                "強い表現による相手の心理的負担",
+                                "具体的な進捗や送付予定時刻の不明確さ",
+                                "相手がどう対応すべきかの指示不足"
+                            ],
+                            "contextual_obligations": [
+                                "前回の提案書構成案の共有予定に対する進捗確認"
+                            ]
+                        },
+                        "_elapsed_time": 7.4
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "Impolite",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗について急ぎの確認をしたいお気持ちが伝わりますが、少し強い口調になっているかもしれません。",
+                        "improvement_points": "依頼を丁寧かつ具体的に伝えることで、相手が安心して対応しやすくなります。",
+                        "detailed_analysis": "【現状の影響】強い言い回しは相手にプレッシャーを与え、心理的な負担や関係性の悪化を招く恐れがあります。また、具体的な期限や状況の確認が不足しているため、相手が何を優先すべきか判断しづらくなっています。\n【改善効果】丁寧な依頼と明確な情報提供により、相手がスムーズに行動でき、良好なコミュニケーションと提案書の質の向上が期待できます。",
+                        "suggestion": "お疲れ様です。提案書の進捗についてお伺いしたいのですが、明日のプレゼンに間に合うかどうか教えていただけますか？もし可能であれば、できるだけ早めに共有していただけると助かります。よろしくお願いします。",
+                        "reasoning": "L2:HarshTone,MissingContext(When,What),UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "進捗確認と依頼",
+                            "function": "提案書の進捗状況を把握し、早急に共有してもらうことでプレゼン準備を確実に進める",
+                            "pred_function": "強い口調により相手が萎縮し、協力的な対応が得られにくくなる可能性がある",
+                            "barriers": {
+                                "emotional": [
+                                    "強い口調で相手にプレッシャーを与える",
+                                    "相手の努力や状況を考慮していない印象を与える"
+                                ],
+                                "cognitive": [
+                                    "具体的な進捗状況や共有のタイミングが不明確",
+                                    "依頼の背景や理由が十分に伝わっていない"
+                                ],
+                                "action": [
+                                    "いつまでに何を送ってほしいかが曖昧",
+                                    "相手が優先すべき事項が明確でない"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "前回の構成案共有予定に対するフォローアップ",
+                                "明日のプレゼンに向けた期限意識の共有"
+                            ]
+                        },
+                        "_elapsed_time": 7.9
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "Impolite",
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗を急かす強い口調でのメッセージですが、田中さんにとってはプレッシャーを感じやすい表現かもしれません。また、具体的な状況確認や理由の説明が不足しているため、混乱を招く可能性もあります。",
+                        "improvement_points": "依頼のトーンを柔らかくし、提案書の進捗状況を具体的に尋ねることで、田中さんが安心して状況を共有しやすくなります。",
+                        "detailed_analysis": "【現状の影響】「まだ提案書できてないの？」「今すぐ送って」という強い表現は、田中さんにプレッシャーや不快感を与え、心理的安全性を損ないます。また、なぜ急いでいるのかや、具体的に何をいつまでに欲しいのかが明確でないため、田中さんがどう対応すべきか判断しづらい状況です。さらに、田中さんが昨日「明日共有します」と伝えているのに、その点に触れずに急かすため、認知的負担も増しています。\n【改善効果】トーンを柔らかくし、提案書の進捗状況を具体的に尋ねることで、田中さんが安心して現状を報告しやすくなり、信頼関係を維持できます。また、具体的な期限や必要な内容を明示すると、行動が明確になり、効率的に対応してもらいやすくなります。",
+                        "suggestion": "田中さん、提案書の進捗はいかがでしょうか？明日のプレゼンに向けて、もし可能であれば構成案を今すぐ共有していただけると助かります。よろしくお願いします。",
+                        "reasoning": "L2:HarshTone,MissingContext,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "催促・依頼",
+                            "function": "田中さんから提案書の進捗状況を具体的に把握し、必要な資料を早急に入手する",
+                            "barriers": [
+                                "感情コスト: 強い口調がプレッシャーとなり心理的安全性を損なう",
+                                "認知コスト: 進捗状況や理由の説明が不足し、何をいつまでにすべきか不明確",
+                                "アクションコスト: 具体的な行動指示（何をいつまでに送るか）が明示されていない"
+                            ],
+                            "contextual_obligations": [
+                                "田中さんが昨日「明日共有します」と伝えているため、その状況を踏まえた対応が望ましい"
+                            ]
+                        },
+                        "_elapsed_time": 17.5
+                    }
+                }
+            },
+            "TC05_L1_TooInformal_EN": {
+                "payload": {
+                    "thread_context": "[Yesterday 3:45 PM] Sarah: Could you review the Q3 report and share your feedback by EOD tomorrow?",
+                    "user_draft": "Sure, will do.",
+                    "hierarchy": "peer",
+                    "social_distance": "distant",
+                    "language": "english"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "Confirm acceptance of the review request and commit to the deadline",
+                        "barriers": [
+                            "Too casual for distant relationship",
+                            "Lacks professional courtesy"
+                        ]
+                    },
+                    "ai_receipt": "You're committing to review Sarah's Q3 report within a tight deadline.",
+                    "improvement_points": "Adding professional courtesy while confirming specific details prevents miscommunication and maintains good working relationships.",
+                    "detailed_analysis": "【Current Impact】\nThe overly brief response might come across as dismissive, especially with a distant colleague.\n\n【Path to Better Outcomes】\nAcknowledging the request properly and confirming the deadline shows professionalism and reliability.",
+                    "suggestion": "Thank you for sharing the Q3 report.\n\nI'll review it and send my feedback by EOD tomorrow.",
+                    "reasoning": "Tone formality L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "You acknowledged Sarah's request briefly, which confirms your intention to complete the task, but the message lacks details on timing and follow-up, which might leave some uncertainty given the distant peer relationship.",
+                        "improvement_points": "Adding a clear confirmation of the deadline and a brief mention of the next step will ensure Sarah feels confident about the timing and progress.",
+                        "detailed_analysis": "【Current Impact】The current reply 'Sure, will do.' is polite but very brief, lacking explicit confirmation of the deadline and any indication of when or how feedback will be provided. In a distant peer relationship, this can cause uncertainty or require Sarah to follow up again.\n【Improvement Effect】By explicitly stating the deadline and the plan for feedback, you reduce ambiguity and build trust, making it easier for Sarah to plan accordingly and feel assured that the task is on track.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by the end of tomorrow.",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "Acknowledgment and commitment",
+                            "function": "To confirm to Sarah that you will complete the review and provide feedback as requested",
+                            "barriers": [
+                                "Lack of explicit confirmation of the deadline",
+                                "No mention of next steps or timing for feedback"
+                            ],
+                            "contextual_obligations": [
+                                "Respond to Sarah's request to review the Q3 report and provide feedback by EOD tomorrow"
+                            ]
+                        },
+                        "_elapsed_time": 4.4
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "You acknowledged the request briefly, but the response lacks specifics about when and how you will provide feedback, which might leave the requester uncertain.",
+                        "improvement_points": "Adding a clear commitment with a timeframe will help the requester feel confident about receiving your feedback on time.",
+                        "detailed_analysis": "【Current Impact】The brief reply 'Sure, will do.' confirms your willingness but does not specify when the feedback will be delivered, which may cause uncertainty or require follow-up from Sarah.\n【Improvement Effect】By specifying the expected timing or method for your feedback, you reduce ambiguity and build trust, making it easier for Sarah to plan accordingly.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by end of day tomorrow.",
+                        "reasoning": "L2:MissingContext(When)",
+                        "functional_analysis": {
+                            "form": "Acknowledgment and commitment",
+                            "function": "To confirm that you will review the report and provide feedback by the requested deadline",
+                            "pred_function": "The current message confirms willingness but lacks clarity on timing, which may cause uncertainty",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "Lack of clear timing for feedback"
+                                ],
+                                "action": []
+                            },
+                            "contextual_obligations": [
+                                "Respond specifically to Sarah's request to review the Q3 report and provide feedback by EOD tomorrow"
+                            ]
+                        },
+                        "_elapsed_time": 4.5
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "You acknowledged the request briefly, but your reply lacks details about when and how you will provide the feedback, which might leave Sarah uncertain about your plan.",
+                        "improvement_points": "Adding a clear commitment with a deadline and any conditions will help Sarah understand your plan and feel assured about the follow-up.",
+                        "detailed_analysis": "【Current Impact】The short reply “Sure, will do.” confirms willingness but omits critical details such as the timing or method of feedback delivery, which can cause uncertainty and reduce trust in timely completion.\n【Improvement Effect】By specifying when and how you will provide feedback, you reduce cognitive load on Sarah, clarify expectations, and strengthen your professional communication, especially given the distant peer relationship.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by end of day tomorrow as requested.",
+                        "reasoning": "L2:MissingContext(When,How),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "Acknowledgment with implicit commitment",
+                            "function": "To confirm willingness to review the report and provide feedback by the requested deadline",
+                            "barriers": [
+                                "Lack of explicit timing and method for feedback delivery causing cognitive cost",
+                                "Potential uncertainty for the requester about follow-up action"
+                            ],
+                            "contextual_obligations": [
+                                "Responding to Sarah's request for feedback by EOD tomorrow"
+                            ]
+                        },
+                        "_elapsed_time": 3.3
+                    }
+                }
+            },
+            "TC06_L1_AmbiguousThanks_JP": {
+                "payload": {
+                    "thread_context": "",
+                    "user_draft": "ありがとうございます。",
+                    "hierarchy": "peer",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "MissingContext"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "何かに対して感謝を表明する（対象不明）",
+                        "barriers": [
+                            "感謝対象が不明確"
+                        ]
+                    },
+                    "ai_receipt": "感謝の気持ちを伝えたい状況ですね。",
+                    "improvement_points": "感謝の対象を明示することで、相手により具体的に伝わります。",
+                    "detailed_analysis": "【現状の影響】\n感謝対象が不明確だと、相手は何に対する感謝か推測する必要があります。\n\n【より良い結果に繋がる視点】\n具体的に言及することで、相手の貢献を正確に認識していることが伝わります。",
+                    "suggestion": "[## 感謝の対象 例）先ほどのアドバイス ##]、ありがとうございます。",
+                    "reasoning": "Context不足 L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "シンプルに感謝の気持ちを伝えているメッセージですね。",
+                        "improvement_points": "このままの表現でも、相手に感謝の気持ちが伝わり、良好な関係を維持できます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:NoIssues",
+                        "functional_analysis": {
+                            "form": "感謝",
+                            "function": "相手に感謝の気持ちを伝え、良好な関係を維持する",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.6
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "感謝の気持ちを簡潔に伝えたいという意図が伝わっています。",
+                        "improvement_points": "このままでも感謝の意図が明確で、相手に好意的に受け取られます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:ClearExpression",
+                        "functional_analysis": {
+                            "form": "感謝を伝える",
+                            "function": "相手に感謝の気持ちを伝える",
+                            "pred_function": "相手に感謝の意図が正しく伝わり、良好な関係を維持する",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.9
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "シンプルに感謝を伝えるメッセージで、相手に対する敬意や感謝の気持ちが表現されています。",
+                        "improvement_points": "このままの表現でも、感謝の気持ちが明確に伝わり、良好な関係を維持できます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:NoIssues",
+                        "functional_analysis": {
+                            "form": "感謝",
+                            "function": "相手に感謝の気持ちを伝え、良好な関係を維持する",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.8
+                    }
+                }
+            },
+            "TC07_L2_IndirectRefusal_JP": {
+                "payload": {
+                    "thread_context": "[1時間前] 取引先: 新しいプロジェクトでぜひ御社と協業したいのですが",
+                    "user_draft": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして...",
+                    "hierarchy": "peer",
+                    "social_distance": "distant",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "VagueIntent"
+                    ],
+                    "detected_mentions": [
+                        "@営業部長",
+                        "@田中"
+                    ],
+                    "functional_analysis": {
+                        "purpose": "協業提案を丁寧に断りたい",
+                        "barriers": [
+                            "意図が不明確で期待を持たせる可能性"
+                        ]
+                    },
+                    "ai_receipt": "魅力的な提案を断らざるを得ない、難しい立場にいらっしゃいますね。",
+                    "improvement_points": "期待を持たせずに、でも関係性は維持する明確な表現で、お互いの時間を節約できます。",
+                    "detailed_analysis": "【現状の影響】\n「検討します」は日本では婉曲的な断りですが、相手は期待して待つ可能性があります。\n\n【より良い結果に繋がる視点】\n現状の制約を明確に伝えつつ、将来の可能性を残すことで関係性を保てます。",
+                    "suggestion": "@営業部長 @田中\n\nご提案ありがとうございます。大変魅力的なプロジェクトですが、\n【要確認項目】\n■ 現在の状況：[## 具体的な制約 例）今期は既存案件でリソースが埋まっており ##]\n■ 結論：誠に恐縮ですが、今回は見送らせていただければと存じます。\n\n将来的に状況が変わりましたら、ぜひまたお声がけください。",
+                    "reasoning": "Clarity+Respect L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "ご提案への感謝を示しつつ、リソースの制約を伝えていますが、検討の具体的な次のステップや時期が明示されていないため、相手にとって判断や期待調整が難しい状況かもしれません。",
+                        "improvement_points": "検討の具体的なスケジュールや次の連絡時期を明示することで、相手が安心して待てる環境をつくれます。",
+                        "detailed_analysis": "【現状の影響】現在の表現では、検討する旨は伝わるものの、いつまでに回答が得られるか、次にどのようなアクションがあるかが不明確です。そのため、取引先は今後の進め方や期待値の調整ができず、不安や不満を感じる可能性があります。\n\n【改善効果】具体的な検討期間や次の連絡予定を伝えることで、相手は安心して待つことができ、信頼関係の維持やスムーズな協議の進行につながります。明確なスケジュールは相手の認知負担を減らし、双方のコミュニケーション効率を高めます。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、[## 検討完了の目安時期や次回連絡予定を補足 例）来週中に改めてご連絡いたします ##]。",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "感謝と検討報告",
+                            "function": "取引先の提案に感謝を示しつつ、検討中であることを伝え、今後の対応を円滑に進めるための期待調整をする",
+                            "barriers": [
+                                "検討の具体的な期限や次の連絡時期が示されていないため、相手が今後の動きを予測しづらい",
+                                "リソース不足の説明はあるが、検討の進捗や見通しが不明瞭で認知負担が高い"
+                            ],
+                            "contextual_obligations": [
+                                "取引先からの協業提案に対して前向きな検討を示しつつ、次のアクションを明示して信頼関係を維持する必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 8.3
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "新しいプロジェクトの協業提案に対し、感謝を伝えつつも社内リソース不足で即答できない状況を伝えようとしているのですね。",
+                        "improvement_points": "社内検討の具体的なタイミングや次の連絡予定を示すことで、相手が安心して待てるようになります。",
+                        "detailed_analysis": "【現状の影響】現在の表現ではリソース不足を伝えていますが、検討の期限や次のアクションが明確でないため、相手は今後の対応を予測しづらい状況です。これにより相手の不安や不信感を招く可能性があります。\n【改善効果】具体的な検討期間や連絡予定を示すことで、相手は安心して待つことができ、信頼関係の維持につながります。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、[## 検討にかかる期間や次のご連絡予定を補足 例）来週中にご返答いたします ##]。",
+                        "reasoning": "L2:MissingContext(When,NextStep)",
+                        "functional_analysis": {
+                            "form": "感謝と検討の報告",
+                            "function": "提案への感謝を伝えつつ、社内での検討状況を共有し、相手に安心感を与える",
+                            "pred_function": "検討の具体的な見通しが不明瞭で、相手が次の行動を取りづらくなる",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "検討期間や次の連絡予定が不明確"
+                                ],
+                                "action": [
+                                    "相手が次に何を期待すればよいか分からない"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "取引先からの新規協業提案への初回応答"
+                            ]
+                        },
+                        "_elapsed_time": 6.5
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "現在のメッセージは感謝を示しつつ、社内リソースの制約を伝えていますが、具体的な検討スケジュールや次のアクションが明示されていないため、受け手にとって次に何をすべきかが分かりにくい状況かもしれません。",
+                        "improvement_points": "検討の具体的なタイミングや次の連絡予定を明示することで、相手が安心して待てる環境を作り、スムーズなコミュニケーションにつながります。",
+                        "detailed_analysis": "【現状の影響】\n現在のメッセージは感謝の意を示しつつも、「社内で検討する」とだけ伝えているため、相手は検討がどの程度進んでいるのか、いつ返答があるのかが不明で、待つ側の不安や混乱を招く可能性があります。また、リソースの制約を伝える表現はややネガティブに受け取られるかもしれません。\n\n【改善効果】\n具体的な検討スケジュールや次の連絡予定を示すことで、相手は安心感を持ち、待つ間の不安が軽減されます。これにより信頼関係が維持され、今後の協業に向けた前向きな関係構築が促進されます。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、[## 検討完了の目安時期（例：来週中）を補足 ##]。進捗があり次第、改めてご連絡いたしますので、今しばらくお待ちいただけますと幸いです。",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "感謝と検討の報告",
+                            "function": "取引先の提案に感謝を示しつつ、社内で検討中であることを伝え、今後の連絡につなげる",
+                            "barriers": [
+                                "検討の具体的な時期や次の連絡予定が記載されていないため、相手が次に何を期待すればよいか不明（認知コスト）",
+                                "リソース制約の表現がややネガティブで、相手に不安を与える可能性（感情コスト）"
+                            ],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 10.4
+                    }
+                }
+            },
+            "TC08_L3_UnansweredQuestion_JP": {
+                "payload": {
+                    "thread_context": "[3日前 10:44] 田中: T社への提案、A案とB案どちらがよいでしょうか？検討お願いします。\n[2日前 15:00] 山田: 私はA案推しです",
+                    "user_draft": "T社の担当者が異動するって聞きましたが、本当ですか？",
+                    "hierarchy": "peer",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "UnansweredQuestion"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "T社担当者の異動情報を確認したい",
+                        "barriers": [
+                            "田中さんの質問に未回答",
+                            "議論の流れを無視"
+                        ]
+                    },
+                    "ai_receipt": "T社の人事異動情報が気になり、提案の判断に影響する可能性を考えているのですね。",
+                    "improvement_points": "未回答の質問に答えつつ新情報を統合することで、効率的に意思決定を進められます。",
+                    "detailed_analysis": "【現状の影響】\n未回答の質問を放置すると、相手は無視されたと感じ、今後の協力を得にくくなります。\n\n【より良い結果に繋がる視点】\n両方の懸案事項を同時に処理することで、チーム全体の意思決定が迅速化します。",
+                    "suggestion": "田中さん、山田さん\n\n提案検討の件、遅くなってすみません。\n\n【Action idea 1】私もA案が良いと思います。理由：[## 理由を補足 例）実現可能性が高く、T社のニーズに合致 ##]\n\n【Action idea 2】ただ、T社の担当者が異動するという話を聞きました。この情報は確かでしょうか？\n\n【Action idea 3】もし本当なら、新担当者の意向も確認した方が良いかもしれません。情報収集しつつ、A案で進める準備をしておきませんか？",
+                    "reasoning": "Challenge+SpeakUp L3"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社の担当者異動についての真偽を確認したい一方で、前の議論で出たA案・B案の提案検討に対する返答がまだない状況かもしれません。",
+                        "improvement_points": "前の提案検討の質問に触れつつ、担当者異動の確認をすることで、話題のつながりが明確になり、相手が回答しやすくなります。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージは担当者の異動についての質問に集中しており、前の会話で田中さんが提案したA案・B案のどちらが良いかという重要な質問に触れていません。このため、相手は話題のつながりを感じにくく、未回答の質問が放置されている印象を与えかねません。\n【改善効果】前の質問に軽く触れてから担当者異動の確認をすることで、会話の流れを保ちつつ、両方の事項に対して相手が答えやすくなります。これにより信頼関係が維持され、効率的なコミュニケーションが促進されます。",
+                        "suggestion": "田中さんのご提案いただいたA案とB案についてはどちらがよいか検討中でしょうか？\nところで、T社の担当者が異動するって聞きましたが、本当ですか？",
+                        "reasoning": "L2:MissingContext,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "質問",
+                            "function": "T社の担当者異動の事実確認を行い、正確な情報を得る",
+                            "barriers": [
+                                "前の会話での提案検討に関する質問に触れていないため、未回答のまま放置されている印象を与える",
+                                "質問の背景や文脈が不足しており、話題のつながりが不明確"
+                            ],
+                            "contextual_obligations": [
+                                "田中さんからのA案・B案どちらが良いかという提案検討の質問に未回答"
+                            ]
+                        },
+                        "_elapsed_time": 7.6
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社の担当者の異動についての事実確認を求めることで、情報の正確さを把握しようとしている状況かもしれません。ただ、前の会話で提案案の検討が進んでいるため、未回答の質問や依頼に配慮が必要です。",
+                        "improvement_points": "前の提案案の検討状況に触れつつ、異動の事実確認をすることで、会話の流れを維持しつつスムーズに情報共有できます。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージは、T社担当者の異動についての確認だけに焦点が当たっており、前の会話での提案案の選択に関する質問が未回答のままです。このため、受信者はどの話題に優先的に対応すべきか判断しづらく、混乱や対応遅れが生じる可能性があります。\n【改善効果】提案案の検討状況に触れたうえで異動の確認を行うことで、未回答の質問に配慮しつつ、情報共有の効率が上がり、受信者が適切に対応しやすくなります。",
+                        "suggestion": "田中さんからの提案案の件については、A案推しの意見を踏まえて検討を進めていますが、\nT社の担当者が異動するという話を聞きました。本当でしょうか？[## 確認できる情報や時期を補足 ##]",
+                        "reasoning": "L2:MissingContext(UnansweredQuestion),contextual_obligation",
+                        "functional_analysis": {
+                            "form": "質問（事実確認）",
+                            "function": "T社担当者の異動の事実を確認し、正確な情報を得る",
+                            "pred_function": "未回答の提案案選択の質問が放置され、会話の流れが乱れる可能性がある",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "前の提案案選択に関する質問が未回答で、会話の文脈が不十分",
+                                    "異動の話題だけだと受信者が優先対応を迷う"
+                                ],
+                                "action": [
+                                    "提案案の検討状況が明示されていないため、受信者が次に何をすべきか判断しづらい"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "田中さんの提案案選択に関する未回答の質問に配慮する必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 8.0
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社の担当者の異動についての確認をしたい状況ですね。提案の検討中に重要な情報を把握しようとしているようです。",
+                        "improvement_points": "現状のメッセージは明確な質問で、相手が情報を提供しやすいため効果的です。",
+                        "detailed_analysis": "",
+                        "suggestion": "T社の担当者が異動するって聞きましたが、本当ですか？",
+                        "reasoning": "L0:ClearQuestion,AppropriateTone",
+                        "functional_analysis": {
+                            "form": "質問",
+                            "function": "T社担当者の異動についての事実確認をし、提案検討に必要な情報を得る",
+                            "barriers": [],
+                            "contextual_obligations": [
+                                "田中さんのA案とB案どちらがよいかの質問に対する返答がまだ"
+                            ]
+                        },
+                        "_elapsed_time": 3.2
+                    }
+                }
+            },
+            "TC09_L0_Perfect_Report_EN": {
+                "payload": {
+                    "thread_context": "[Monday 10:00 AM] Manager: How's the client presentation prep going? We need to be ready by Thursday.",
+                    "user_draft": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                    "hierarchy": "senior",
+                    "social_distance": "close",
+                    "language": "english"
+                },
+                "ideal_output": {
+                    "hasIssues": false,
+                    "issue_pattern": [],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "Report progress on presentation preparation and seek guidance on review timing",
+                        "barriers": []
+                    },
+                    "ai_receipt": "You're making solid progress on the client presentation and proactively managing your manager's review needs.",
+                    "improvement_points": "Clear progress updates with specific details and options for review timing help managers plan effectively and build confidence in project completion.",
+                    "detailed_analysis": "",
+                    "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                    "reasoning": "Perfect progress report L0"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You are providing a clear and timely update to your manager about the progress on the client presentation, while also offering flexible options for review.",
+                        "improvement_points": "This message effectively balances detailed progress reporting with considerate options for your manager’s preferred review timing, supporting smooth collaboration.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0: ClearProgressUpdate, PoliteTone, FlexibleReviewOffer",
+                        "functional_analysis": {
+                            "form": "Progress update with a question offering review options",
+                            "function": "To inform the manager of current progress and to confirm their preference for reviewing the work either in parts or all at once",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.4
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You are providing a clear and positive update on the presentation progress while offering flexibility on the review timing, which supports smooth collaboration with your manager.",
+                        "improvement_points": "Your message effectively shares progress and invites input, helping your manager stay informed and involved in a timely manner.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0:ClearUpdate,PoliteOffer",
+                        "functional_analysis": {
+                            "form": "Progress update with offer for interim review",
+                            "function": "To inform the manager of current progress and facilitate timely feedback by offering review options",
+                            "pred_function": "Maintain good communication and collaboration with the manager",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.8
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You are providing a clear and timely update to your manager about the progress of the client presentation, outlining completed and ongoing tasks and offering flexible options for review.",
+                        "improvement_points": "This message effectively keeps your manager informed and engaged by detailing progress and offering review options, which supports smooth collaboration and timely feedback.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0:ClearProgressUpdate,OfferReviewOptions,AppropriateTone",
+                        "functional_analysis": {
+                            "form": "Progress update with an offer for review",
+                            "function": "To inform the manager of current progress and to facilitate timely feedback by offering flexible review options",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.9
+                    }
+                }
+            },
+            "TC10_L2_TerseTooShort_JP": {
+                "payload": {
+                    "thread_context": "[11:00] 課長: 企画書の修正、お願いできますか？クライアントから指摘があったので、対応が必要です。",
+                    "user_draft": "了解",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite",
+                        "MissingFollowUp"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "修正依頼を承諾する",
+                        "barriers": [
+                            "敬語不足",
+                            "具体的な対応計画が不明",
+                            "完了時期の未提示"
+                        ]
+                    },
+                    "ai_receipt": "クライアントからの指摘に基づく企画書修正という重要なタスクを引き受ける状況ですね。",
+                    "improvement_points": "適切な敬語で承諾し、いつまでに対応するかを明示することで、上司が安心して他の業務に集中できます。",
+                    "detailed_analysis": "【現状の影響】\n「了解」という返答では、いつ修正が完了するか分からず、上司は進捗を別途確認する必要が生じます。また、敬語として不適切です。\n\n【より良い結果に繋がる視点】\n承諾と同時に対応予定を伝えることで、上司の不安を解消し、必要に応じて優先順位の調整も可能になります。",
+                    "suggestion": "承知いたしました。\n\n【要確認項目】\n■ 修正箇所：[## クライアントの指摘内容を確認 例）価格表の更新と導入事例の追加 ##]\n■ 完了予定：[## いつまでに対応予定か 例）本日17時まで ##]\n\n優先して対応いたします。",
+                    "reasoning": "Respect+Planning L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "課長からの企画書修正依頼に対して「了解」と返信されていますが、具体的な対応方針や期限が示されておらず、次の行動が不明瞭な状況かもしれません。",
+                        "improvement_points": "修正対応の具体的な予定や期限を伝えることで、課長が進捗を把握しやすくなり、安心感を与えられます。",
+                        "detailed_analysis": "【現状の影響】「了解」のみの返信では、企画書の修正に関していつどのように対応するのかが不明確で、課長が進捗状況を把握しづらくなります。また、クライアントからの指摘対応という重要な依頼であるため、具体的な対応予定を示さないと認知コストとアクションコストが高まります。\n【改善効果】具体的な対応予定や期限を伝えることで、課長は安心して任せられ、必要に応じてフォローアップもしやすくなります。これにより、信頼関係が維持され、スムーズな業務遂行が期待できます。",
+                        "suggestion": "了解しました。企画書の修正は[##いつまでに対応するか例：本日17時までに##]を目標に進めます。進捗があり次第、改めてご報告いたします。",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "承諾・了解の返答",
+                            "function": "課長からの企画書修正依頼を承知し、対応予定を伝えて安心させる",
+                            "barriers": [
+                                "対応期限や具体的な行動予定が示されていないため、相手が進捗を把握しづらい",
+                                "次の報告やフォローアップの意思表示がないため、アクションの連続性が不明"
+                            ],
+                            "contextual_obligations": [
+                                "課長からの企画書修正依頼に対する具体的な対応予定の明示"
+                            ]
+                        },
+                        "_elapsed_time": 7.5
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredDecision",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "課長からの企画書修正依頼に対し「了解」とだけ返信されているため、具体的な対応方針や期限が伝わっておらず、次の行動が不明瞭な状況かもしれません。",
+                        "improvement_points": "具体的な対応内容や期限を明示することで、課長が安心して進捗を把握でき、スムーズな作業連携が可能になります。",
+                        "detailed_analysis": "【現状の影響】「了解」だけの返信では、企画書修正に関する具体的な対応方針やいつまでに対応するかが伝わらず、課長が次の判断やフォローをしづらい状況です。これにより、認識のズレや作業遅延のリスクが高まります。\n【改善効果】対応内容や期限を明確に伝えることで、課長は安心して進捗を把握でき、必要なサポートや調整もしやすくなります。結果として、円滑なコミュニケーションと効率的な業務遂行が期待できます。",
+                        "suggestion": "企画書の修正、承知しました。対応予定の期限は[## 具体的な期限を入力 例）明日17時まで ##]です。進捗があり次第、改めてご報告いたします。",
+                        "reasoning": "L2:MissingContext(When),UnansweredDecision",
+                        "functional_analysis": {
+                            "form": "承諾・了解の返答",
+                            "function": "課長の依頼に対して対応する意思を示し、作業を進める準備を整える",
+                            "pred_function": "対応内容や期限が不明瞭で、課長が次の判断やフォローをしづらい",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "対応期限や具体的な対応内容が不明確"
+                                ],
+                                "action": [
+                                    "次の具体的な行動が不明確で、課長が進めてよいか判断しにくい"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "課長からの企画書修正依頼に対する具体的な対応方針の提示",
+                                "対応期限の明示"
+                            ]
+                        },
+                        "_elapsed_time": 8.6
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "課長からの企画書修正の依頼に対して「了解」とだけ返しているため、具体的な対応内容やスケジュールが伝わらず、相手が次の行動を判断しにくい状況かもしれません。",
+                        "improvement_points": "具体的な対応内容や期限を明示することで、課長が安心して進捗を把握でき、円滑に業務を進められます。",
+                        "detailed_analysis": "【現状の影響】「了解」という短い返答は承知の意を示していますが、修正の詳細やいつ対応するかが不明確なため、課長が進捗を把握しづらく、追加の確認や催促が必要になる可能性があります。\n【改善効果】対応内容や期限を明確にすることで、課長が安心して業務を任せられ、双方の認識のズレを防ぎ、効率的なコミュニケーションが実現します。",
+                        "suggestion": "企画書の修正、承知しました。対応は[##いつまでに対応するかを補足 例）本日中に対応します##]。",
+                        "reasoning": "L2:MissingContext(When),UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "承諾・返答",
+                            "function": "課長の依頼を受け入れ、具体的な対応予定を伝えて安心させる",
+                            "barriers": [
+                                "対応期限や具体的な対応内容が不明で、課長が次の行動を判断しにくい",
+                                "返答が短すぎて認知コストが高く、相手に不安を与える可能性"
+                            ],
+                            "contextual_obligations": [
+                                "課長からの企画書修正依頼に対して具体的な対応予定を伝える必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 15.7
+                    }
+                }
+            }
+        }
+    },
+    {
+        "run": 3,
+        "results": {
+            "TC01_L0_Perfect_Composite_JP": {
+                "payload": {
+                    "thread_context": "",
+                    "user_draft": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": false,
+                    "issue_pattern": [],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "過去の支援への感謝を示しつつ、追加のレビューを丁寧に依頼する",
+                        "barriers": []
+                    },
+                    "ai_receipt": "先輩のアドバイスを活かして修正版を作成し、さらなるブラッシュアップを目指されているのですね。",
+                    "improvement_points": "感謝から始めて相手の都合に配慮した依頼をすることで、継続的な支援を得やすくなります。",
+                    "detailed_analysis": "",
+                    "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                    "reasoning": "Perfect複合機能 L0"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のアドバイスに感謝しつつ、修正版の確認を丁寧に依頼されている状況ですね。上司に対して礼儀正しく配慮した表現が使われています。",
+                        "improvement_points": "現状のままでも、丁寧な依頼表現で上司に配慮しつつ、修正版の確認をお願いできています。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:PoliteRequest,AppropriateTone",
+                        "functional_analysis": {
+                            "form": "感謝＋依頼",
+                            "function": "上司に修正版のプレゼン資料を確認してもらう",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.5
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のプレゼンアドバイスへの感謝を伝えつつ、修正版の確認を丁寧に依頼している状況ですね。",
+                        "improvement_points": "このままの丁寧な依頼表現は、相手に負担を感じさせずスムーズに確認をお願いできるため効果的です。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:Polite,ClearRequest",
+                        "functional_analysis": {
+                            "form": "感謝と依頼",
+                            "function": "プレゼン修正版の確認を丁寧に依頼し、相手に負担をかけずに協力を得る",
+                            "pred_function": "相手が快く確認しやすい印象を持つ",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.6
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "昨日のプレゼンアドバイスに感謝しつつ、修正版の確認を丁寧に依頼されていますね。",
+                        "improvement_points": "このままの丁寧な依頼表現で、相手に負担なく再確認を促せます。",
+                        "detailed_analysis": "",
+                        "suggestion": "昨日はプレゼンのアドバイスありがとうございました。修正版を作成したので、もしお時間あれば再度ご確認いただけますでしょうか。",
+                        "reasoning": "L0:Polite,ClearRequest",
+                        "functional_analysis": {
+                            "form": "感謝＋依頼",
+                            "function": "相手に修正版プレゼンの確認を依頼し、協力を得る",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.2
+                    }
+                }
+            },
+            "TC02_L1_Impolite_JP": {
+                "payload": {
+                    "thread_context": "[15:30] 部長: 明日の戦略会議、14時からに変更になりました。参加可能でしょうか？",
+                    "user_draft": "会議の件、了解しました。参加します。",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "会議参加の可否を明確に伝え、スケジュール変更を承知したことを示す",
+                        "barriers": [
+                            "敬語不足",
+                            "具体性がやや不足"
+                        ]
+                    },
+                    "ai_receipt": "上司からの急な会議時間変更の連絡に、迅速に対応されているのですね。",
+                    "improvement_points": "適切な敬語と時間の確認を含めることで、確実な意思疎通とプロフェッショナルな印象を与えられます。",
+                    "detailed_analysis": "【現状の影響】\n「了解」は上司に対してカジュアルすぎる印象を与え、ビジネスマナーの面で不適切と受け取られる可能性があります。\n\n【より良い結果に繋がる視点】\n「承知いたしました」という適切な敬語を使い、変更後の時間を復唱することで、聞き間違いを防ぎ、確実な出席意思を伝えられます。",
+                    "suggestion": "承知いたしました。\n明日14時からの戦略会議、参加いたします。",
+                    "reasoning": "敬語修正+時間確認 L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "明日の戦略会議の時間変更を受けて、参加の意思を簡潔に伝えていますね。",
+                        "improvement_points": "このままの表現でも、上司に対して明確に参加意思を伝えられており、スムーズなコミュニケーションが可能です。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearFunction,PoliteTone",
+                        "functional_analysis": {
+                            "form": "承諾・参加表明",
+                            "function": "上司の連絡内容を理解し、戦略会議に参加する意思を明確に伝える",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.4
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "明日の戦略会議の時間変更を受けて、参加の意思表示を簡潔に伝えられていますね。",
+                        "improvement_points": "このままの表現で、上司に対して明確に参加の意思を伝え、スムーズなコミュニケーションが可能です。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearConfirmation",
+                        "functional_analysis": {
+                            "form": "参加意思の表明・承諾",
+                            "function": "上司に対して戦略会議の時間変更を理解し、参加する意思を明確に伝える",
+                            "pred_function": "上司が参加者の出席状況を把握し、会議の準備を進められる",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.0
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "部長からの会議時間変更の連絡に対し、参加の意思を簡潔に伝えていますね。",
+                        "improvement_points": "このままの表現でも、明確かつ丁寧に参加意思を伝えられているため、円滑なコミュニケーションが可能です。",
+                        "detailed_analysis": "",
+                        "suggestion": "会議の件、了解しました。参加します。",
+                        "reasoning": "L0:ClearConfirmation,Polite",
+                        "functional_analysis": {
+                            "form": "承諾・参加意思の表明",
+                            "function": "部長の会議変更連絡を受けて、参加可能であることを明確に伝え、予定調整の安心感を与える",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.2
+                    }
+                }
+            },
+            "TC03_L2_MissingContext_JP": {
+                "payload": {
+                    "thread_context": "[10分前] 山田: クライアントのA社から問い合わせが来ています",
+                    "user_draft": "至急確認して対応お願い！重要案件なので。",
+                    "hierarchy": "peer",
+                    "social_distance": "close",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "MissingContext",
+                        "VagueIntent"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "A社からの問い合わせに対して、同僚に緊急対応を依頼する",
+                        "barriers": [
+                            "何を確認すべきか不明",
+                            "どう対応すべきか不明",
+                            "期限が不明確"
+                        ]
+                    },
+                    "ai_receipt": "A社からの重要な問い合わせで、急いで対応が必要な状況なのですね。プレッシャーを感じる状況かもしれません。",
+                    "improvement_points": "確認事項、対応内容、期限を明確にすることで、相手が迷わず素早く行動でき、ミスや手戻りを防げます。",
+                    "detailed_analysis": "【現状の影響】\n具体的な指示がないため、相手は何をどこまでやればよいか判断できず、結果的に対応が遅れたり、期待と異なる対応をしてしまう可能性があります。\n\n【より良い結果に繋がる視点】\n5W1Hを明確にすることで、相手の認知負荷を下げ、正確で迅速な対応を促せます。特に緊急時こそ、明確な情報共有が重要です。",
+                    "suggestion": "A社の件、至急お願い！\n【要確認項目】\n■ 確認内容：[## ここに確認事項を補足 例）見積もりの納期について ##]\n■ 対応方法：[## ここに期待する対応を補足 例）本日中に回答メール送信 ##]\n■ 完了期限：[## ここに期限を補足 例）15時まで ##]\n重要案件なので、もし不明点があればすぐ相談してください。",
+                    "reasoning": "Context欠如 L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "Impolite",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "クライアントの重要案件について、迅速な対応を求めるメッセージですが、詳細が不足しているため、相手に伝わりにくいかもしれません。",
+                        "improvement_points": "具体的な確認内容や期限を明示することで、相手がスムーズに対応できるようになります。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は急ぎのニュアンスを伝えていますが、何を確認すべきか、いつまでに対応すべきかが明確でないため、受け手が戸惑い、対応が遅れる可能性があります。また、命令形が強く感じられ、親しい同僚間でもやや威圧的に受け取られることがあります。\n【改善効果】具体的な内容や期限を加えることで、相手は何を優先すべきか理解しやすくなり、スムーズかつ迅速な対応が期待できます。トーンを少し柔らかくすることで、良好な関係性を維持しつつ協力を得やすくなります。",
+                        "suggestion": "クライアントのA社からの問い合わせについて、至急ご確認いただけますか？重要案件のため、[## いつまでに対応が必要か ##]までに対応をお願いしたいです。",
+                        "reasoning": "L2:MissingContext(What,When),Impolite",
+                        "functional_analysis": {
+                            "form": "依頼",
+                            "function": "同僚にクライアントからの重要案件の内容を具体的に確認し、迅速に対応してもらう",
+                            "barriers": [
+                                "確認すべき具体的な内容が不明",
+                                "対応期限が示されていないため優先度が伝わりにくい",
+                                "命令形でやや威圧的に感じられる可能性"
+                            ],
+                            "contextual_obligations": [
+                                "山田さんからのクライアントA社の問い合わせについての情報を踏まえた対応"
+                            ]
+                        },
+                        "_elapsed_time": 9.0
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "MissingContext",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "急ぎの重要案件について、相手に迅速な対応を求めている状況ですね。ただ、具体的な内容や背景が不足しているため、受け手が戸惑うかもしれません。",
+                        "improvement_points": "具体的な確認事項や背景を補足し、丁寧な依頼表現にすることで、相手がスムーズに対応できるようになります。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は急ぎの要望を伝えていますが、具体的な内容や対応方法が示されていないため、受け手は何をどうすべきか判断しづらい状態です。また、命令的な口調がやや強く感じられ、関係性によってはプレッシャーに感じる可能性があります。\n【改善効果】具体的な情報や背景を加え、依頼のトーンを少し柔らかくすることで、受け手が安心して行動に移しやすくなり、結果的に迅速かつ的確な対応が期待できます。",
+                        "suggestion": "クライアントのA社から問い合わせが来ています。至急内容を確認して対応をお願いできますか？重要案件なので、よろしくお願いします。",
+                        "reasoning": "L2:HarshTone,MissingContext,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "依頼・指示",
+                            "function": "クライアントの問い合わせ内容を速やかに確認し、適切に対応してもらう",
+                            "pred_function": "命令的な表現や情報不足により、相手が戸惑ったり対応が遅れたりする可能性がある",
+                            "barriers": {
+                                "emotional": [
+                                    "強い命令口調でプレッシャーを感じる可能性"
+                                ],
+                                "cognitive": [
+                                    "問い合わせ内容や対応方法の具体的な情報が不足している"
+                                ],
+                                "action": [
+                                    "何をどう対応すべきか明確でないため、行動に移しにくい"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "クライアントA社からの問い合わせ内容を共有し、対応の指示を明確にする必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 7.6
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "Impolite",
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "クライアントからの重要な問い合わせに対して、迅速な対応を求めている状況で、急ぎのトーンが強く伝わっていますが、具体的な指示や背景が不足しているかもしれません。",
+                        "improvement_points": "具体的な確認内容や対応の期限を明示することで、相手が行動しやすくなり、スムーズに重要案件を進められます。",
+                        "detailed_analysis": "【現状の影響】「至急確認して対応お願い！」という表現は急ぎの気持ちが伝わる一方で、命令的に感じられやすく、相手にプレッシャーを与える可能性があります。また、何を具体的に確認すべきか、どのように対応すべきかの情報が不足しているため、相手が戸惑いやすく、行動に迷いが生じるかもしれません。期限や優先度の明示もないため、対応の緊急度が伝わりにくいです。 【改善効果】具体的な内容や期限を示すことで、相手が何をすべきか明確になり、ストレスなく迅速に動けるようになります。さらに、丁寧な依頼表現にすることで、関係性が良好に保たれ、協力的な対応を引き出しやすくなります。",
+                        "suggestion": "クライアントのA社からの問い合わせについて、至急ご確認いただき、対応をお願いできますか？重要案件のため、[## いつまでに対応すべきか具体的な期限 ##]までにご対応いただけると助かります。よろしくお願いします。",
+                        "reasoning": "L2:MissingContext(What,When),Impolite,MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "依頼",
+                            "function": "相手にクライアントからの重要な問い合わせについて迅速かつ具体的に対応してもらう",
+                            "barriers": [
+                                "命令的で急ぎすぎるトーンが感情コストを増加させている",
+                                "具体的な確認内容や対応期限が示されておらず認知コストが高い",
+                                "次の具体的な行動ステップが不明確でアクションコストが高い"
+                            ],
+                            "contextual_obligations": [
+                                "山田さんからのクライアントA社の問い合わせ情報を踏まえ、対応内容の具体化が必要"
+                            ]
+                        },
+                        "_elapsed_time": 8.5
+                    }
+                }
+            },
+            "TC04_L3_HarshTone_JP": {
+                "payload": {
+                    "thread_context": "[2日前 9:00] 田中: 新規顧客向けの提案書、作成開始しました\n[昨日 18:00] 田中: 構成案ができたので、明日共有します",
+                    "user_draft": "まだ提案書できてないの？明日のプレゼンに間に合わないじゃん。今すぐ送って。",
+                    "hierarchy": "junior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "HarshTone",
+                        "MissingAcknowledgment"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "明日のプレゼンに向けて、部下から提案書を至急入手したい",
+                        "barriers": [
+                            "威圧的なトーン",
+                            "部下の進捗報告を無視",
+                            "プレゼン情報の共有不足"
+                        ]
+                    },
+                    "ai_receipt": "明日のプレゼンが迫っていて、提案書の完成を急ぐ必要がある状況なのですね。焦りを感じてしまう状況かもしれません。",
+                    "improvement_points": "進捗を確認し、必要なサポートを提供することで、部下が主体的に品質の高い成果物を仕上げられます。",
+                    "detailed_analysis": "【現状の影響】\n詰問調のメッセージは部下を委縮させ、ミスを誘発したり、今後の報告を躊躇させる原因になります。また、プレゼンの存在を今初めて伝えることで、部下に無用な混乱を与えます。\n\n【より良い結果に繋がる視点】\n部下の努力を認めた上で、状況を共有し、一緒に解決策を考えることで、質の高い成果物と良好な関係性の両方を実現できます。",
+                    "suggestion": "田中さん、提案書の進捗共有ありがとうございます。\n\n【## Action idea 1: 例）実は明日の午後、急遽プレゼンの機会をいただきました。現在の完成度を教えていただけますか？】\n\n【## Action idea: 2 例）もし本日中に一度確認させていただければ、フィードバックをお返しできます。完璧でなくても構いませんので、現状のものを共有していただけますか？\n\n【Action idea 3】プレゼン準備で何かサポートが必要でしたら、遠慮なく相談してください。一緒に成功させましょう！",
+                    "reasoning": "PsySafety再構築 L3"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "Impolite",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗について早急な対応を求める強い口調で伝えようとしている状況で、相手にプレッシャーを与えかねない表現が含まれています。",
+                        "improvement_points": "トーンを柔らかくし、具体的な状況確認と協力をお願いすることで、相手が前向きに対応しやすくなります。",
+                        "detailed_analysis": "【現状の影響】「まだ提案書できてないの？」「今すぐ送って」といった表現は、相手に急かす印象を強く与え、心理的負担や防御的な反応を招きやすいです。また、提案書の進捗状況の具体的な確認や、いつまでに送ってほしいかの明示がないため、相手がどう対応すればよいか判断しづらい面もあります。これにより、コミュニケーションの齟齬や関係性の悪化が起こる可能性があります。\n【改善効果】トーンを和らげて状況を丁寧に尋ね、具体的な期限や期待を明示することで、相手が安心して報告や対応ができるようになります。これにより、提案書の完成をスムーズに促進し、良好な関係を維持しやすくなります。",
+                        "suggestion": "提案書の進捗はいかがでしょうか？明日のプレゼンに間に合うか心配なので、可能であれば今の段階での状況を共有していただけますか？\nお手数ですが、よろしくお願いいたします。",
+                        "reasoning": "L2:HarshTone,MissingContext(When,What),UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "質問＋依頼",
+                            "function": "提案書の進捗状況を把握し、明日のプレゼンに間に合うように早急な対応を促す",
+                            "barriers": [
+                                "強い口調で相手にプレッシャーを与え、心理的負担が高い",
+                                "具体的な進捗状況や期限が明示されておらず、相手の認知負荷が高い",
+                                "相手の努力や状況を配慮する表現が不足している"
+                            ],
+                            "contextual_obligations": [
+                                "田中さんからの提案書構成案の共有予定（昨日の18:00のメッセージ）に対する進捗確認が必要"
+                            ]
+                        },
+                        "_elapsed_time": 8.5
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "Impolite",
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗について急ぎの確認をしたい状況で、締切が近いため焦りやプレッシャーを感じているかもしれません。",
+                        "improvement_points": "丁寧で具体的な依頼にすることで、相手が安心して対応しやすくなり、スムーズに提案書を共有してもらえます。",
+                        "detailed_analysis": "【現状の影響】現在の表現は強い言い方で、部下の田中さんにプレッシャーを与え、萎縮させてしまう可能性があります。また、進捗の共有依頼としては具体性や配慮が不足しているため、受け取り手が戸惑うかもしれません。\n【改善効果】丁寧な依頼にすることで田中さんが安心して作業を進めやすくなり、期限内に提案書を共有してもらいやすくなります。結果的にチームの信頼関係も維持されます。",
+                        "suggestion": "提案書の進捗についてお伺いしたいのですが、明日のプレゼンに間に合うように、可能であれば今すぐ構成案を共有していただけますか？お忙しいところ恐れ入りますが、よろしくお願いいたします。",
+                        "reasoning": "L2:HarshTone,Impolite,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "進捗確認と依頼",
+                            "function": "提案書の進捗状況を把握し、期限内に資料を受け取る",
+                            "pred_function": "強い表現により相手が萎縮し、正確な進捗共有が難しくなる可能性",
+                            "barriers": {
+                                "emotional": [
+                                    "威圧的な表現で相手が不快・萎縮する"
+                                ],
+                                "cognitive": [],
+                                "action": [
+                                    "具体的な共有内容が不明確で行動しづらい",
+                                    "進捗の詳細や現在の状況が不足している"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "前回の構成案共有予定（明日共有）に対する進捗確認"
+                            ]
+                        },
+                        "_elapsed_time": 7.0
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "HarshTone",
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "提案書の進捗についての焦りと、明日のプレゼンに間に合わせたいという緊急の気持ちが伝わってきますが、厳しい口調が田中さんの負担になってしまうかもしれません。",
+                        "improvement_points": "トーンを柔らかくし、具体的な状況確認と協力を促すことで、田中さんが安心して対応しやすくなります。",
+                        "detailed_analysis": "【現状の影響】「まだ提案書できてないの？」「今すぐ送って」という表現は、田中さんにプレッシャーや責められている印象を与え、心理的負担が大きくなり、協力的な対応を妨げる可能性があります。また、提案書の具体的な進捗状況や、どこまでできているのかの情報が不足しているため、田中さんもどう答えればよいか迷いやすいです。さらに、前回の構成案共有予定に対する確認が含まれていないため、未応答の依頼や質問が残ったままになっています。\n【改善効果】トーンを柔らかくし、提案書の進捗状況を具体的に尋ねることで、田中さんが状況を説明しやすくなり、信頼関係が維持されます。明日のプレゼンに間に合わせるための協力的な雰囲気が生まれ、スムーズなコミュニケーションと行動が促進されます。",
+                        "suggestion": "提案書の進捗について教えてもらえますか？明日のプレゼンに間に合わせたいので、もし可能であれば構成案の共有予定も含めて、今の状況を教えていただけると助かります。",
+                        "reasoning": "L2:HarshTone,MissingContext,UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "質問・依頼",
+                            "function": "田中さんから提案書の進捗状況を具体的に教えてもらい、明日のプレゼンに間に合わせるための協力を得る",
+                            "barriers": [
+                                "威圧的な表現による感情的負担",
+                                "提案書の具体的な進捗状況が不明で認知的負担",
+                                "前回の構成案共有予定への未応答が文脈的責任として残っている"
+                            ],
+                            "contextual_obligations": [
+                                "前回の構成案共有予定（昨日18:00のメッセージ）への対応が必要"
+                            ]
+                        },
+                        "_elapsed_time": 7.5
+                    }
+                }
+            },
+            "TC05_L1_TooInformal_EN": {
+                "payload": {
+                    "thread_context": "[Yesterday 3:45 PM] Sarah: Could you review the Q3 report and share your feedback by EOD tomorrow?",
+                    "user_draft": "Sure, will do.",
+                    "hierarchy": "peer",
+                    "social_distance": "distant",
+                    "language": "english"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "Confirm acceptance of the review request and commit to the deadline",
+                        "barriers": [
+                            "Too casual for distant relationship",
+                            "Lacks professional courtesy"
+                        ]
+                    },
+                    "ai_receipt": "You're committing to review Sarah's Q3 report within a tight deadline.",
+                    "improvement_points": "Adding professional courtesy while confirming specific details prevents miscommunication and maintains good working relationships.",
+                    "detailed_analysis": "【Current Impact】\nThe overly brief response might come across as dismissive, especially with a distant colleague.\n\n【Path to Better Outcomes】\nAcknowledging the request properly and confirming the deadline shows professionalism and reliability.",
+                    "suggestion": "Thank you for sharing the Q3 report.\n\nI'll review it and send my feedback by EOD tomorrow.",
+                    "reasoning": "Tone formality L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "Your brief reply confirms your intention to complete the task, but it lacks details about timing or any questions, which might leave your peer uncertain about your exact plan.",
+                        "improvement_points": "Adding a clear confirmation with a specific timeline or request for clarification helps your peer understand your commitment and next steps, enhancing mutual trust.",
+                        "detailed_analysis": "【Current Impact】The message 'Sure, will do.' is polite but very brief and does not specify when you will provide the feedback or if you need any further information. This can cause uncertainty for Sarah, who requested feedback by end of day tomorrow, as she might be unsure about your progress or any potential issues.\n【Improvement Effect】By explicitly confirming the deadline or asking any clarifying questions, you reduce ambiguity and reassure your peer of your commitment, which fosters smoother collaboration and trust.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by end of day tomorrow. Please let me know if there are any specific points you want me to focus on.",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "承諾・簡潔な返答",
+                            "function": "依頼されたタスクを完了する意思を示し、相手に安心感を与える",
+                            "barriers": [
+                                "具体的な期限や進捗の明示がないため、相手が状況を正確に把握できない",
+                                "質問や確認がないため、潜在的な誤解や不足情報のリスクが残る"
+                            ],
+                            "contextual_obligations": [
+                                "Sarahからの「Q3報告書のレビューと明日EODまでのフィードバック」の依頼に応答"
+                            ]
+                        },
+                        "_elapsed_time": 5.6
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "You acknowledged the request briefly but didn't specify any details or confirm the deadline, which might leave the requester uncertain about your exact plan.",
+                        "improvement_points": "Adding a clear confirmation of the deadline and a brief note on your plan will help the requester feel assured and reduce follow-up questions.",
+                        "detailed_analysis": "【Current Impact】The short reply 'Sure, will do.' confirms willingness but lacks specifics such as the deadline or any clarifying remarks, which can cause uncertainty and require additional follow-ups. 【Improvement Effect】By explicitly mentioning the deadline and your plan, the requester gains confidence in your commitment and timing, improving communication efficiency and trust.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by the end of tomorrow.",
+                        "reasoning": "L2:MissingContext(When)",
+                        "functional_analysis": {
+                            "form": "Acknowledgment and commitment",
+                            "function": "To confirm the intention to review the report and provide feedback within the requested timeframe",
+                            "pred_function": "May leave the requester uncertain about timing and commitment",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "Lack of explicit deadline confirmation"
+                                ],
+                                "action": []
+                            },
+                            "contextual_obligations": [
+                                "Respond explicitly to the request for feedback by EOD tomorrow"
+                            ]
+                        },
+                        "_elapsed_time": 4.0
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "You acknowledged your peer's request briefly, but the message lacks details on when and how you will provide the feedback, which might leave some uncertainty.",
+                        "improvement_points": "Adding specific timing and confirmation details will make your commitment clearer and help your peer plan accordingly.",
+                        "detailed_analysis": "【Current impact】The brief reply 'Sure, will do.' confirms your agreement but omits when exactly you will review and share feedback. This can cause your peer to feel uncertain about the timing and reliability of your commitment, especially given the distant social distance.\n【Improvement effect】By specifying the expected timing and confirming the action, you reduce ambiguity and build trust, facilitating smoother collaboration and better planning.",
+                        "suggestion": "Sure, I will review the Q3 report and share my feedback by EOD tomorrow as requested.",
+                        "reasoning": "L2:MissingContext(When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "Acknowledgement and commitment",
+                            "function": "To confirm to the peer that you will review the Q3 report and provide feedback by the requested deadline",
+                            "barriers": [
+                                "MissingContext: The timing and scope of the action are not specified, causing potential uncertainty",
+                                "MissingFollowUp: No explicit confirmation of the deadline or next steps"
+                            ],
+                            "contextual_obligations": [
+                                "Respond to Sarah's request to review and provide feedback on the Q3 report by EOD tomorrow"
+                            ]
+                        },
+                        "_elapsed_time": 3.7
+                    }
+                }
+            },
+            "TC06_L1_AmbiguousThanks_JP": {
+                "payload": {
+                    "thread_context": "",
+                    "user_draft": "ありがとうございます。",
+                    "hierarchy": "peer",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "MissingContext"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "何かに対して感謝を表明する（対象不明）",
+                        "barriers": [
+                            "感謝対象が不明確"
+                        ]
+                    },
+                    "ai_receipt": "感謝の気持ちを伝えたい状況ですね。",
+                    "improvement_points": "感謝の対象を明示することで、相手により具体的に伝わります。",
+                    "detailed_analysis": "【現状の影響】\n感謝対象が不明確だと、相手は何に対する感謝か推測する必要があります。\n\n【より良い結果に繋がる視点】\n具体的に言及することで、相手の貢献を正確に認識していることが伝わります。",
+                    "suggestion": "[## 感謝の対象 例）先ほどのアドバイス ##]、ありがとうございます。",
+                    "reasoning": "Context不足 L1"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "シンプルに感謝の気持ちを伝えるメッセージですね。",
+                        "improvement_points": "このままでも相手に感謝が伝わり、良好な関係を維持できます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:NoIssues",
+                        "functional_analysis": {
+                            "form": "感謝",
+                            "function": "相手に感謝の気持ちを伝え、良好な関係を維持する",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.5
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "感謝の気持ちをシンプルに伝えたいメッセージですね。",
+                        "improvement_points": "このままでも感謝の意が伝わり、良好な関係維持に役立ちます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:NoIssue",
+                        "functional_analysis": {
+                            "form": "感謝を伝える",
+                            "function": "相手に感謝の気持ちを伝え、良好な関係を維持する",
+                            "pred_function": "相手に感謝が伝わり、関係が良好に保たれる",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.6
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "シンプルに感謝の気持ちを伝えているメッセージですね。",
+                        "improvement_points": "このままでも感謝を伝える目的が十分に果たせており、相手に好意的な印象を与えます。",
+                        "detailed_analysis": "",
+                        "suggestion": "ありがとうございます。",
+                        "reasoning": "L0:NoIssues",
+                        "functional_analysis": {
+                            "form": "感謝",
+                            "function": "相手に感謝の気持ちを伝え、良好な関係を維持する",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.0
+                    }
+                }
+            },
+            "TC07_L2_IndirectRefusal_JP": {
+                "payload": {
+                    "thread_context": "[1時間前] 取引先: 新しいプロジェクトでぜひ御社と協業したいのですが",
+                    "user_draft": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして...",
+                    "hierarchy": "peer",
+                    "social_distance": "distant",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "VagueIntent"
+                    ],
+                    "detected_mentions": [
+                        "@営業部長",
+                        "@田中"
+                    ],
+                    "functional_analysis": {
+                        "purpose": "協業提案を丁寧に断りたい",
+                        "barriers": [
+                            "意図が不明確で期待を持たせる可能性"
+                        ]
+                    },
+                    "ai_receipt": "魅力的な提案を断らざるを得ない、難しい立場にいらっしゃいますね。",
+                    "improvement_points": "期待を持たせずに、でも関係性は維持する明確な表現で、お互いの時間を節約できます。",
+                    "detailed_analysis": "【現状の影響】\n「検討します」は日本では婉曲的な断りですが、相手は期待して待つ可能性があります。\n\n【より良い結果に繋がる視点】\n現状の制約を明確に伝えつつ、将来の可能性を残すことで関係性を保てます。",
+                    "suggestion": "@営業部長 @田中\n\nご提案ありがとうございます。大変魅力的なプロジェクトですが、\n【要確認項目】\n■ 現在の状況：[## 具体的な制約 例）今期は既存案件でリソースが埋まっており ##]\n■ 結論：誠に恐縮ですが、今回は見送らせていただければと存じます。\n\n将来的に状況が変わりましたら、ぜひまたお声がけください。",
+                    "reasoning": "Clarity+Respect L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "ご提案に感謝しつつも、社内リソースの制約を伝え、検討を約束する内容ですね。ただ、具体的な検討期限や次のステップが示されていないため、相手に不安を与えるかもしれません。",
+                        "improvement_points": "検討の期限や次のアクションを明確に伝えることで、相手に安心感を与え、信頼関係を維持できます。",
+                        "detailed_analysis": "【現状の影響】現在の表現は感謝と検討の意思を示していますが、「現在リソースが限られている」という情報だけで、検討の具体的なスケジュールや対応方針が見えにくく、相手が次に何を期待すべきか分かりにくいです。このため、相手は不安や不満を感じる可能性があります。\n【改善効果】検討の期限や次のステップを明示することで、相手は安心して待つことができ、信頼関係の維持・向上につながります。例えば「○月○日までに改めてご連絡します」といった具体的な案内があると効果的です。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、【## 検討の期限や次の連絡時期を補足 例）○月○日までに改めてご連絡いたします ##】。",
+                        "reasoning": "L2:MissingContext,MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "感謝と検討の報告",
+                            "function": "提案に感謝しつつ、社内で検討することを伝え、相手に待ってもらう",
+                            "barriers": [
+                                "検討の期限や次のアクションが明示されていないため、相手が次に何を期待すればよいか不明",
+                                "リソース制約の説明があるが、具体的な対応方針が不足している"
+                            ],
+                            "contextual_obligations": [
+                                "取引先からの新規プロジェクト協業提案への初期応答"
+                            ]
+                        },
+                        "_elapsed_time": 8.7
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "UnansweredDecision"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "新しいプロジェクトの協業提案に対して、感謝を伝えつつも社内リソースの制約を伝え、前向きに検討する姿勢を示そうとされています。",
+                        "improvement_points": "リソースの制約について具体的な状況や検討のタイミングを明示することで、相手が次の行動を取りやすくなります。",
+                        "detailed_analysis": "【現状の影響】現在の表現は感謝と検討の意思を示していますが、リソースが限られていることだけが伝わり、具体的な検討時期や対応方針が不明瞭です。そのため取引先は次に何を期待すれば良いか判断しづらくなっています。\n【改善効果】検討のスケジュールや今後の連絡予定を明示することで、相手は安心して待つことができ、信頼関係の維持につながります。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、【## 検討完了の目安時期をお知らせください 例）来週中 ##】。進捗があり次第、改めてご連絡いたします。",
+                        "reasoning": "L2:MissingContext,UnansweredDecision",
+                        "functional_analysis": {
+                            "form": "感謝と検討の報告",
+                            "function": "取引先の提案に感謝を伝えつつ、社内で前向きに検討していることを知らせ、今後の対応を明確にする",
+                            "pred_function": "検討状況や今後の見通しが不明瞭なため、取引先が次の行動を判断しづらい",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "検討完了の時期が不明確",
+                                    "リソース制約の具体的な影響が伝わりづらい"
+                                ],
+                                "action": [
+                                    "次の連絡や対応の見通しが示されていない"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "取引先からの協業提案に対する前向きな検討状況の報告と今後の連絡予定の明示"
+                            ]
+                        },
+                        "_elapsed_time": 7.1
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [
+                            "@営業部長",
+                            "@田中"
+                        ],
+                        "ai_receipt": "ご提案に感謝しつつも、現在のリソース不足を伝えていますが、具体的な次のステップや検討の期限が示されていないため、相手にとって判断や期待調整が難しい状況かもしれません。",
+                        "improvement_points": "検討の期限や次の連絡予定を明示することで、相手が今後の対応を把握しやすくなり、信頼関係を維持しやすくなります。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージはリソースが限られていることを伝えていますが、検討の具体的なタイムラインや次に連絡する時期が示されていないため、取引先が今後の期待値をつかみにくく、対応の優先度を判断しづらい状況です。また、曖昧な表現が相手に不安や疑問を与え、コミュニケーションの認知コストを高めています。\n【改善効果】検討期限や次の連絡予定を明示することで、取引先は今後の見通しを立てやすくなり、安心感が生まれます。これにより、双方の信頼関係が強化され、円滑な協議が進みやすくなります。",
+                        "suggestion": "@営業部長 @田中 ご提案ありがとうございます。社内で検討させていただきますが、現在リソースが限られておりまして、[## 検討の期限や次の連絡予定を補足 例）来週中に改めてご連絡いたします ##]。",
+                        "reasoning": "L2:MissingContext(NextStep),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "感謝と検討の報告",
+                            "function": "取引先の提案に感謝しつつ、社内で検討中であることを伝え、今後の対応に期待を持たせる",
+                            "barriers": [
+                                "検討の期限や次の連絡予定が示されておらず、相手の認知コストが高い",
+                                "次の具体的なアクションが不明確で、相手が今後どう動けばよいか判断しづらい"
+                            ],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 8.2
+                    }
+                }
+            },
+            "TC08_L3_UnansweredQuestion_JP": {
+                "payload": {
+                    "thread_context": "[3日前 10:44] 田中: T社への提案、A案とB案どちらがよいでしょうか？検討お願いします。\n[2日前 15:00] 山田: 私はA案推しです",
+                    "user_draft": "T社の担当者が異動するって聞きましたが、本当ですか？",
+                    "hierarchy": "peer",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "UnansweredQuestion"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "T社担当者の異動情報を確認したい",
+                        "barriers": [
+                            "田中さんの質問に未回答",
+                            "議論の流れを無視"
+                        ]
+                    },
+                    "ai_receipt": "T社の人事異動情報が気になり、提案の判断に影響する可能性を考えているのですね。",
+                    "improvement_points": "未回答の質問に答えつつ新情報を統合することで、効率的に意思決定を進められます。",
+                    "detailed_analysis": "【現状の影響】\n未回答の質問を放置すると、相手は無視されたと感じ、今後の協力を得にくくなります。\n\n【より良い結果に繋がる視点】\n両方の懸案事項を同時に処理することで、チーム全体の意思決定が迅速化します。",
+                    "suggestion": "田中さん、山田さん\n\n提案検討の件、遅くなってすみません。\n\n【Action idea 1】私もA案が良いと思います。理由：[## 理由を補足 例）実現可能性が高く、T社のニーズに合致 ##]\n\n【Action idea 2】ただ、T社の担当者が異動するという話を聞きました。この情報は確かでしょうか？\n\n【Action idea 3】もし本当なら、新担当者の意向も確認した方が良いかもしれません。情報収集しつつ、A案で進める準備をしておきませんか？",
+                    "reasoning": "Challenge+SpeakUp L3"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社への提案に関する議論の中で、担当者の異動について確認したいという関心が示されていますが、背景情報が不足しているため、相手にとっては意図がやや分かりにくいかもしれません。",
+                        "improvement_points": "担当者異動の確認という質問の背景や目的を明確にすることで、相手が適切に回答しやすくなります。",
+                        "detailed_analysis": "【現状の影響】現在の表現では、担当者の異動についての情報を求めていますが、なぜその情報が必要なのか、提案検討との関連が明示されていません。そのため、受け手は質問の意図を推測しづらく、回答が遅れたり、誤解が生じる可能性があります。\n【改善効果】異動の確認が提案内容にどう影響するのかを簡潔に示すことで、相手は質問の重要性を理解しやすくなり、スムーズな情報共有と意思決定が促進されます。",
+                        "suggestion": "T社の担当者が異動するとのことですが、本当でしょうか？\nこの情報が提案の検討に影響するため、確認させてください。",
+                        "reasoning": "L2:MissingContext(Why),UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "質問",
+                            "function": "T社担当者の異動の事実確認を通じて、提案検討に必要な正確な情報を得る",
+                            "barriers": [
+                                "背景情報が不足しており、質問の目的や重要性が不明確",
+                                "提案検討との関連性が示されていないため、相手が回答の優先度を判断しにくい"
+                            ],
+                            "contextual_obligations": [
+                                "田中さんのA案・B案どちらがよいかという質問に対して、提案検討のために必要な情報を補完する責任"
+                            ]
+                        },
+                        "_elapsed_time": 7.3
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社の担当者の異動についての確認をしたい状況で、提案のA案・B案の検討が進む中で重要な情報を把握しようとしているようですね。",
+                        "improvement_points": "質問の背景や目的を少し補足することで、相手が答えやすくなり、情報共有がスムーズになります。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージは質問自体は明確ですが、なぜその情報を知りたいのかが伝わりにくいため、相手が答える動機や重要性を感じにくい可能性があります。\n【改善効果】背景を少し補足することで、相手が回答しやすくなり、会話の流れや提案検討の効率が向上します。",
+                        "suggestion": "T社の担当者が異動するって聞きましたが、本当ですか？\nもしそうなら、提案内容の検討に影響があるかと思い確認させてください。",
+                        "reasoning": "L2:MissingContext(Why),UnansweredQuestion",
+                        "functional_analysis": {
+                            "form": "質問",
+                            "function": "T社担当者の異動情報を確認し、提案検討に影響があるか把握する",
+                            "pred_function": "質問の背景が不明確で回答が得られにくい",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "質問の背景や目的が不足しているため、相手が回答の重要性を理解しにくい"
+                                ],
+                                "action": [
+                                    "回答に必要な背景情報が不足しているため、相手が回答をためらう可能性がある"
+                                ]
+                            },
+                            "contextual_obligations": [
+                                "3日前の田中さんの提案案選定の質問に対する検討状況の把握",
+                                "山田さんのA案推しの意見を踏まえた情報共有"
+                            ]
+                        },
+                        "_elapsed_time": 8.7
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "UnansweredQuestion",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "T社の担当者の異動についての確認をしたい一方で、前回の田中さんの提案案に関する質問にはまだ答えていない状況かもしれません。",
+                        "improvement_points": "前回の提案案の検討状況に触れつつ、担当者の異動についての確認をすることで、相手が状況を把握しやすくなり、円滑な議論が促進されます。",
+                        "detailed_analysis": "【現状の影響】現在のメッセージはT社担当者の異動についての質問だけで、田中さんが提示したA案とB案のどちらがよいかという重要な質問に対して応答がありません。このため、議論が停滞し、相手に未対応の印象を与えてしまう可能性があります。\n【改善効果】提案案の検討状況に触れることで、会話の流れを維持しつつ、担当者の異動に関する情報も効率的に共有でき、相手が必要な情報を一度に把握しやすくなります。",
+                        "suggestion": "田中さんのご提案のA案とB案についてはどのようにお考えでしょうか？\nまた、T社の担当者が異動するという話を聞きましたが、本当でしょうか？[## 詳細を教えてください ##]",
+                        "reasoning": "L3:MissingContext,UnansweredQuestion,ContextualIntegration",
+                        "functional_analysis": {
+                            "form": "質問",
+                            "function": "T社担当者の異動の真偽を確認しつつ、前回の提案案の検討状況にも触れて議論の停滞を防ぐ",
+                            "barriers": [
+                                "未回答の提案案に関する質問が放置されているため、相手に未対応の印象を与える認知コスト",
+                                "担当者異動の話題が唐突で背景説明や文脈が不足している認知コスト",
+                                "次の行動（提案案の方向性決定）が不明確なアクションコスト"
+                            ],
+                            "contextual_obligations": [
+                                "田中の提案案に関する質問への回答が未対応"
+                            ]
+                        },
+                        "_elapsed_time": 9.0
+                    }
+                }
+            },
+            "TC09_L0_Perfect_Report_EN": {
+                "payload": {
+                    "thread_context": "[Monday 10:00 AM] Manager: How's the client presentation prep going? We need to be ready by Thursday.",
+                    "user_draft": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                    "hierarchy": "senior",
+                    "social_distance": "close",
+                    "language": "english"
+                },
+                "ideal_output": {
+                    "hasIssues": false,
+                    "issue_pattern": [],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "Report progress on presentation preparation and seek guidance on review timing",
+                        "barriers": []
+                    },
+                    "ai_receipt": "You're making solid progress on the client presentation and proactively managing your manager's review needs.",
+                    "improvement_points": "Clear progress updates with specific details and options for review timing help managers plan effectively and build confidence in project completion.",
+                    "detailed_analysis": "",
+                    "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                    "reasoning": "Perfect progress report L0"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You’re providing a clear and timely update on the presentation progress while offering flexibility on how your manager would prefer to review the materials.",
+                        "improvement_points": "This message effectively keeps your manager informed and engaged by clearly outlining progress and offering options for review, supporting smooth collaboration.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0: ClearProgressUpdate, PoliteOffer",
+                        "functional_analysis": {
+                            "form": "Progress update with offer to review",
+                            "function": "To inform the manager of current progress and to offer options for reviewing the work, facilitating alignment and timely feedback",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 3.5
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You are providing a clear and positive update on the presentation progress, showing readiness to accommodate your manager's review preferences.",
+                        "improvement_points": "Your message effectively communicates progress and offers flexible review options, helping your manager stay informed and involved.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0:ClearUpdate,FlexibleReviewOptions",
+                        "functional_analysis": {
+                            "form": "Progress update with inquiry about review preference",
+                            "function": "To inform the manager of current progress and to confirm preferred timing for review",
+                            "pred_function": "To maintain good communication and ensure alignment on next steps",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [],
+                                "action": []
+                            },
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 4.0
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": false,
+                        "issue_pattern": [],
+                        "detected_mentions": [],
+                        "ai_receipt": "You are providing a clear and timely update on the presentation progress, showing proactive communication and offering options for review.",
+                        "improvement_points": "This message effectively keeps your manager informed and engaged by clearly outlining progress and inviting feedback, which supports smooth collaboration.",
+                        "detailed_analysis": "",
+                        "suggestion": "Hi! The presentation is coming along well. I've completed the market analysis slides (1-15) and the competitive landscape section. Currently working on the financial projections, which should be done by tomorrow afternoon. Would you like to review the completed sections now, or shall I send everything together once finished?",
+                        "reasoning": "L0:ClearProgressUpdate,ProactiveEngagement",
+                        "functional_analysis": {
+                            "form": "progress update with an offer for review",
+                            "function": "to keep the manager informed about the presentation status and to invite their input on the review timing",
+                            "barriers": [],
+                            "contextual_obligations": []
+                        },
+                        "_elapsed_time": 2.5
+                    }
+                }
+            },
+            "TC10_L2_TerseTooShort_JP": {
+                "payload": {
+                    "thread_context": "[11:00] 課長: 企画書の修正、お願いできますか？クライアントから指摘があったので、対応が必要です。",
+                    "user_draft": "了解",
+                    "hierarchy": "senior",
+                    "social_distance": "neutral",
+                    "language": "japanese"
+                },
+                "ideal_output": {
+                    "hasIssues": true,
+                    "issue_pattern": [
+                        "Impolite",
+                        "MissingFollowUp"
+                    ],
+                    "detected_mentions": [],
+                    "functional_analysis": {
+                        "purpose": "修正依頼を承諾する",
+                        "barriers": [
+                            "敬語不足",
+                            "具体的な対応計画が不明",
+                            "完了時期の未提示"
+                        ]
+                    },
+                    "ai_receipt": "クライアントからの指摘に基づく企画書修正という重要なタスクを引き受ける状況ですね。",
+                    "improvement_points": "適切な敬語で承諾し、いつまでに対応するかを明示することで、上司が安心して他の業務に集中できます。",
+                    "detailed_analysis": "【現状の影響】\n「了解」という返答では、いつ修正が完了するか分からず、上司は進捗を別途確認する必要が生じます。また、敬語として不適切です。\n\n【より良い結果に繋がる視点】\n承諾と同時に対応予定を伝えることで、上司の不安を解消し、必要に応じて優先順位の調整も可能になります。",
+                    "suggestion": "承知いたしました。\n\n【要確認項目】\n■ 修正箇所：[## クライアントの指摘内容を確認 例）価格表の更新と導入事例の追加 ##]\n■ 完了予定：[## いつまでに対応予定か 例）本日17時まで ##]\n\n優先して対応いたします。",
+                    "reasoning": "Respect+Planning L2"
+                },
+                "version_results": {
+                    "b1.4r_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "VagueIntent",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "課長からの企画書修正依頼に対して「了解」と簡潔に返答されていますが、具体的な対応内容やスケジュールが示されていないため、相手が次の行動をイメージしづらい状況かもしれません。",
+                        "improvement_points": "具体的な対応内容や期限を明示することで、課長が進捗を把握しやすくなり、信頼感が高まります。",
+                        "detailed_analysis": "【現状の影響】「了解」だけでは、企画書のどの部分をいつまでに修正するのかが不明確で、課長が次の判断やフォローをしにくくなります。また、相手にとっては進捗状況が見えづらく、安心感が得られません。\n【改善効果】修正内容や期限を具体的に伝えることで、課長が安心して任せられ、必要に応じて適切なフォローや調整が可能になります。これにより、信頼関係の維持と業務効率の向上が期待できます。",
+                        "suggestion": "了解しました。企画書の修正について、[##具体的な修正内容や対応期限を補足 例）本日午後5時までに対応します##]。",
+                        "reasoning": "L2:MissingContext(What,When)",
+                        "functional_analysis": {
+                            "form": "承諾・了解の返答",
+                            "function": "課長からの修正依頼を受け入れ、対応する意志を示す",
+                            "barriers": [
+                                "対応内容や期限が不明確で次の行動がイメージしづらい",
+                                "進捗状況が伝わらず安心感を与えにくい"
+                            ],
+                            "contextual_obligations": [
+                                "課長からの企画書修正依頼に対する具体的な対応表明"
+                            ]
+                        },
+                        "_elapsed_time": 7.4
+                    },
+                    "b1.7.2_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "VagueIntent",
+                            "MissingContext"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "企画書の修正依頼に対して「了解」とだけ返すため、具体的な対応内容やスケジュールが伝わりにくい状況かもしれません。",
+                        "improvement_points": "具体的な対応内容や予定を伝えることで、課長が進捗を把握しやすくなり、安心感を与えられます。",
+                        "detailed_analysis": "【現状の影響】「了解」だけでは、どのように対応するのか、いつまでに完了するのかが不明確で、課長が進捗状況を把握しづらくなります。これにより、追加の確認や催促が必要になる可能性があります。\n【改善効果】対応内容や期限を明示することで、課長が安心して任せられると感じ、信頼関係の維持やスムーズな業務進行につながります。",
+                        "suggestion": "企画書の修正、承知しました。具体的には[## 修正内容の詳細 ##]を対応し、[## いつまでに完了予定か ##]までに仕上げます。何か追加の指示があればお知らせください。",
+                        "reasoning": "L2:MissingContext(What,When)",
+                        "functional_analysis": {
+                            "form": "承諾・同意",
+                            "function": "企画書の修正依頼を受け入れ、対応の具体的な内容とスケジュールを伝えることで安心感を与え、業務を円滑に進める",
+                            "pred_function": "単に「了解」と返すだけでは、課長が進捗や対応内容を把握しづらく、不安や追加確認の手間が生じる",
+                            "barriers": {
+                                "emotional": [],
+                                "cognitive": [
+                                    "対応内容が不明確",
+                                    "対応期限が不明"
+                                ],
+                                "action": []
+                            },
+                            "contextual_obligations": [
+                                "課長からの修正依頼に具体的に応答する必要がある"
+                            ]
+                        },
+                        "_elapsed_time": 6.3
+                    },
+                    "b1.7_wo_fs": {
+                        "hasIssues": true,
+                        "issue_pattern": [
+                            "MissingContext",
+                            "MissingFollowUp"
+                        ],
+                        "detected_mentions": [],
+                        "ai_receipt": "課長からの企画書修正の依頼に対して「了解」とだけ返したため、具体的な対応内容やスケジュールが伝わりにくい状況かもしれません。",
+                        "improvement_points": "具体的な対応内容や期限を明示することで、課長が進捗を把握しやすくなり、信頼感が向上します。",
+                        "detailed_analysis": "【現状の影響】「了解」だけの返答は承知の意を示していますが、何をいつまでに行うのかが不明確なため、課長が次の判断や調整を行いにくくなります。また、クライアントからの指摘対応という重要な依頼であるため、具体的な対応計画を示すことで安心感を与えられます。\n【改善効果】具体的な対応内容や期限を伝えることで、課長は進捗を把握しやすくなり、必要に応じて追加指示や調整がしやすくなります。これにより、業務の円滑な進行と良好な関係維持につながります。",
+                        "suggestion": "企画書の修正、承知しました。具体的な対応内容や期限については[## 例：いつまでにどの部分を修正するか ##]を教えていただけますか？",
+                        "reasoning": "L2:MissingContext(What,When),MissingFollowUp",
+                        "functional_analysis": {
+                            "form": "承諾・返信",
+                            "function": "課長の依頼を承知し、対応の意思を示すことで安心させる",
+                            "barriers": [
+                                "対応内容や期限が不明確で認知コストが高い",
+                                "次の具体的な行動が示されておらずアクションコストが発生"
+                            ],
+                            "contextual_obligations": [
+                                "課長からの企画書修正依頼への具体的な対応内容の明示"
+                            ]
+                        },
+                        "_elapsed_time": 7.6
+                    }
+                }
+            }
+        }
+    }
+]
