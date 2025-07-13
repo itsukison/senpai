@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 
 interface MessageEditorProps {
   mode: 'input' | 'suggestion';
@@ -156,8 +155,8 @@ export function MessageEditor({
     writeTitle: isJapanese ? "投稿予定のメッセージを書く" : "Write your message",
     suggestionTitle: isJapanese ? "SenpAI Senseiのメッセージ案（編集可能）" : "SenpAI Sensei's suggestion (editable)",
     writePlaceholder: isJapanese
-      ? "ここに、これから相手に送ろうとしているメッセージを入力してください。　入力後、右下の送信/解析ボタンをクリックしてください。"
-      : "Start typing your message here... Click the analyze button when ready.",
+      ? "ここに、これから相手に送ろうとしているメッセージを入力してください。\n\n入力後、右下の送信/解析ボタンをクリックしてください。"
+      : "Start typing your message here...\n\nClick the analyze button when ready.",
     suggestionPlaceholder: isJapanese
       ? "ここに改善案が表示されます。このエリアは、直接編集が可能です。"
       : "Suggestions will appear here. This area is directly editable.",
@@ -332,9 +331,12 @@ return (
           onBlur={handleBlur}    // Phase 3: ブラーイベント
           placeholder={mode === 'input' ? labels.writePlaceholder : labels.suggestionPlaceholder}
           disabled={!isEditable || isTransitioning}
-          className={`w-full resize-y border-0 rounded-none !outline-none focus:!outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 pb-20 transition-all duration-300 ${
+          className={`w-full resize-y border-0 rounded-none !outline-none focus:!outline-none focus:ring-0 focus-visible:ring-0 text-xs sm:text-sm leading-relaxed px-4 pt-3 transition-all duration-300 ${
             isTransitioning ? 'opacity-80' : ''
-          } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'}`}
+          } ${!isEditable ? 'bg-gray-50 text-gray-500' : 'bg-white text-gray-900'} ${
+            // 動的なpadding-bottom: テキスト量に応じて調整
+            text && text.split('\n').length > 2 ? 'pb-12' : 'pb-16'
+          }`}
           rows={5}
           style={{ 
             fontFamily: "Inter, sans-serif",

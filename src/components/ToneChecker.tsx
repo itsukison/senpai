@@ -102,6 +102,21 @@ export function ToneChecker({ isJapanese, promptVersion }: ToneCheckerProps) {
     'senior': '目上のかた'
   };
 
+  // 英語版の定数（新規追加）
+  const DISTANCE_ADJECTIVES_EN: Record<string, string> = {
+    'very_close': 'a very close',
+    'close': 'a friendly',
+    'neutral': 'a standard professional',
+    'distant': 'a somewhat distant',
+    'very_distant': 'a formal'
+  };
+
+  const HIERARCHY_NOUNS_EN: Record<string, string> = {
+    'junior': 'team member',
+    'peer': 'colleague',
+    'senior': 'senior colleague'
+  };
+
   const ANALYSIS_MESSAGES = {
     phase2: {
       ai_receipt: [
@@ -330,6 +345,16 @@ const analyzeText = useCallback(
         issue_pattern: [],
         detected_mentions: []
       });
+    } else {
+      // 再解析時も suggestion をリセット（hasIssues: falseの表示を防ぐ）
+      setSuggestion(prev => ({
+        ...prev!,
+        hasIssues: true,  // 一旦trueにリセット
+        suggestion: null,
+        ai_receipt: '',
+        improvement_points: '',
+        detailed_analysis: ''
+      }));
     }
     
     // displayTextも初期化
@@ -1121,19 +1146,64 @@ const analyzeText = useCallback(
     }
 
     const phaseTimers: NodeJS.Timeout[] = [];
-    let dotTimer: NodeJS.Timeout;
-    let rotationTimer: NodeJS.Timeout;
+    let dotTimer: NodeJS.Timeout | undefined;
+    let rotationTimer: NodeJS.Timeout | undefined;
     let dots = 1;
 
     // 文字数判定
     const textLength = userDraft.length;
     const lengthCategory = textLength <= 30 ? 'short' : textLength <= 200 ? 'medium' : 'long';
 
+    // このuseEffect実行時の言語設定でメッセージを決定
+    const CURRENT_LANG_MESSAGES = isJapanese ? {
+      relationship: (distance: string, hierarchy: string) => 
+        `${DISTANCE_ADJECTIVES[distance]}${HIERARCHY_NOUNS[hierarchy]}へのメッセージですね`,
+      phase2: {
+        line1: "このメッセージで達成したい目的を分析しています",
+        line2: {
+          short: "簡潔なメッセージから意図を読み取っています",
+          medium: "ビジネスゴールと人間関係の両立を検討しています",
+          long: "詳細な内容から要点を抽出しています"
+        }
+      },
+      phase3: [
+        ["関係性を大切にしながら、目的を達成する方法を最終化しています", "誤解なく、スムーズに伝わる表現に磨き上げています"],
+        ["このコミュニケーションが生み出す価値を最大化しています", "あなたの状況を深く理解し、最適な表現を調整しています"],
+        ["相手の立場に立って、メッセージの受け取られ方を検証しています", "プロフェッショナルかつ温かみのある表現に仕上げています"],
+        {
+          short: ["短い言葉に込められた想いを大切にしています", "改善ポイントを抽出しています"],
+          medium: ["改善ポイントを抽出しています", "相手の視点から検証しています"],
+          long: ["情報を整理して伝わりやすくしています", "改善ポイントを抽出しています"]
+        }
+      ]
+    } : {
+      relationship: (distance: string, hierarchy: string) => 
+        `A message to ${DISTANCE_ADJECTIVES_EN[distance]} ${HIERARCHY_NOUNS_EN[hierarchy]}`,
+      phase2: {
+        line1: "Analyzing the purpose you want to achieve with this message",
+        line2: {
+          short: "Reading intentions from your concise message",
+          medium: "Balancing business goals with relationship building",
+          long: "Extracting key points from detailed content"
+        }
+      },
+      phase3: [
+        ["Finalizing approaches that achieve your goals while nurturing relationships", "Refining expressions for clear and smooth communication"],
+        ["Maximizing the value this communication creates", "Fine-tuning expressions based on deep understanding of your situation"],
+        ["Validating message reception from the recipient's perspective", "Crafting professional yet warm expressions"],
+        {
+          short: ["Cherishing the sentiments in your brief words", "Extracting improvement points"],
+          medium: ["Extracting improvement points", "Validating from the recipient's perspective"],
+          long: ["Organizing information for better clarity", "Extracting improvement points"]
+        }
+      ]
+    };
+
     // transition完了を待つ（既存の1000msと同期）
     const initTimer = setTimeout(() => {
       // Phase 1: 関係性認識（0-1500ms）
       setCurrentAnalysisPhase('relationship');
-      const relationshipText = `${DISTANCE_ADJECTIVES[social_distance]}${HIERARCHY_NOUNS[hierarchy]}へのメッセージですね`;
+      const relationshipText = CURRENT_LANG_MESSAGES.relationship(social_distance, hierarchy);
       
       // ドットアニメーション
       const updateDots = () => {
@@ -1152,47 +1222,59 @@ const analyzeText = useCallback(
         clearInterval(dotTimer);
         setCurrentAnalysisPhase('analyzing');
         
-        // 累積表示の実装
+        // Phase 2: 1行目のみ表示（改善ポイントは空欄）
         setAnalysisPhaseText({
-          ai_receipt: ANALYSIS_MESSAGES.phase2.ai_receipt[0] + '...',
-          improvement_points: ANALYSIS_MESSAGES.phase2.improvement_points[0] + '...'
+          ai_receipt: CURRENT_LANG_MESSAGES.phase2.line1 + '...',
+          improvement_points: ''  // 空欄に変更
         });
         
-        // 800ms後に2行目追加（文字数に応じて調整）
+        // 1500ms後に2行目追加（3000ms時点）
         const addSecondLine = setTimeout(() => {
-          const secondLineAi = lengthCategory === 'short' 
-            ? LENGTH_BASED_MESSAGES.short.phase2
-            : ANALYSIS_MESSAGES.phase2.ai_receipt[1];
-            
+          const secondLineAi = CURRENT_LANG_MESSAGES.phase2.line2[lengthCategory];
+          
           setAnalysisPhaseText({
-            ai_receipt: ANALYSIS_MESSAGES.phase2.ai_receipt[0] + '...\n' + secondLineAi + '...',
-            improvement_points: ANALYSIS_MESSAGES.phase2.improvement_points.join('...\n') + '...'
+            ai_receipt: CURRENT_LANG_MESSAGES.phase2.line1 + '...\n' + secondLineAi + '...',
+            improvement_points: ''  // 引き続き空欄
           });
-        }, 800);
+        }, 1500);  // 800ms → 1500msに変更
         
         phaseTimers.push(addSecondLine);
       }, 1500);
       
-      // Phase 3への遷移（3500ms後）
+      // Phase 3への遷移（4500ms後）
       const phase3Timer = setTimeout(() => {
         setCurrentAnalysisPhase('finalizing');
+        
+        // Phase 2の最終状態を保持（AI Receipt固定）
+        const finalPhase2Text = CURRENT_LANG_MESSAGES.phase2.line1 + '...\n' + 
+                               CURRENT_LANG_MESSAGES.phase2.line2[lengthCategory] + '...';
+        
         let rotationIndex = 0;
         
         const rotate = () => {
-          const aiMessage = lengthCategory !== 'medium'
-            ? (rotationIndex === 0 ? LENGTH_BASED_MESSAGES[lengthCategory].phase3 : ANALYSIS_MESSAGES.phase3.ai_receipt[rotationIndex])
-            : ANALYSIS_MESSAGES.phase3.ai_receipt[rotationIndex];
-            
+          // 改善ポイントのローテーション用メッセージを構築
+          let improvementLines: string[] = [];
+          
+          if (rotationIndex < 3) {
+            // 最初の3つのローテーションは配列から直接取得
+            improvementLines = CURRENT_LANG_MESSAGES.phase3[rotationIndex] as string[];
+          } else {  // rotationIndex === 3
+            // 4番目のローテーションは文字数に応じて分岐
+            const lastRotation = CURRENT_LANG_MESSAGES.phase3[3] as { short: string[], medium: string[], long: string[] };
+            improvementLines = lastRotation[lengthCategory];
+          }
+          
           setAnalysisPhaseText({
-            ai_receipt: aiMessage + '...',
-            improvement_points: ANALYSIS_MESSAGES.phase3.improvement_points[rotationIndex] + '...'
+            ai_receipt: finalPhase2Text,  // 固定
+            improvement_points: improvementLines.join('...\n') + '...'
           });
-          rotationIndex = (rotationIndex + 1) % 3;
+          
+          rotationIndex = (rotationIndex + 1) % 4;  // 3 → 4に変更
         };
         
         rotate();
-        rotationTimer = setInterval(rotate, 2500);
-      }, 3500);
+        rotationTimer = setInterval(rotate, 3500);  // 1500ms → 3500msに変更
+      }, 4500);  // 3500ms → 4500msに変更
       
       phaseTimers.push(phase2Timer, phase3Timer);
     }, 1000); // transition完了待ち
@@ -1203,8 +1285,8 @@ const analyzeText = useCallback(
     animationTimersRef.current.push(...phaseTimers);
     
     return () => {
-      clearInterval(dotTimer);
-      clearInterval(rotationTimer);
+      if (dotTimer) clearInterval(dotTimer);
+      if (rotationTimer) clearInterval(rotationTimer);
       phaseTimers.forEach(timer => clearTimeout(timer));
       setAnalysisPhaseText({ ai_receipt: '', improvement_points: '' });
       setCurrentAnalysisPhase(null);
