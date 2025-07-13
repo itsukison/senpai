@@ -232,8 +232,11 @@ button, a, input, select {
 textarea {
   transition: height 0.2s ease-out;
   
-  /* 内側の余白を美しく */
-  padding: 12px 16px !important;
+  /* 内側の余白を美しく - padding-bottomは動的に設定 */
+  padding-top: 12px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  /* padding-bottomは動的に設定するため削除 */
   
   /* フォーカス時の美しいアウトライン */
   outline: none !important;

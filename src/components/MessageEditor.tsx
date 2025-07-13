@@ -341,15 +341,17 @@ return (
           style={{ 
             fontFamily: "Inter, sans-serif",
             minHeight: "120px",
-            maxHeight: "70vh"
+            maxHeight: "70vh",
+            paddingBottom: text && text.length > 100 ? '80px' : '96px'
           }}
         />
 
         {/* ボタンエリア - グラデーション背景付き */}
         <div className="absolute bottom-0 left-0 right-0 z-10">
-          {/* グラデーション背景 */}
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-white/90 to-transparent pointer-events-none h-20" />
-          
+          {/* 完全に不透明な白い背景でテキストを隠す */}
+          <div className="absolute bottom-0 left-0 right-0 bg-white" style={{ height: '56px' }} />
+          {/* グラデーション背景 - 高さと透明度を調整 */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white from-30% via-white/90 via-60% to-transparent pointer-events-none h-20" />
           {/* ボタンコンテンツ */}
           <div className="relative flex items-center justify-between px-4 pb-2 pt-8">
             {/* 左側：トグルボタン */}
