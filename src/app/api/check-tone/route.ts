@@ -64,7 +64,7 @@ function getAvailableVersions(): string[] {
 
 // 設定を一元管理
 const CONFIG = {
-  DEFAULT_PROMPT_VERSION: 'b1.8',  // ハードコード指定
+  DEFAULT_PROMPT_VERSION: 'b1.9',  // ハードコード指定
   AVAILABLE_VERSIONS: getAvailableVersions()
 }
 
