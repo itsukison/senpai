@@ -55,16 +55,16 @@ function getAvailableVersions(): string[] {
       ...betaVersions.slice(0, 2)
     ]
     
-    return selectedVersions.length > 0 ? selectedVersions : ['v8.4', 'b1.4']
+    return selectedVersions.length > 0 ? selectedVersions : ['v8.4', 'b2.3']
   } catch (error) {
     console.error('Failed to get available versions:', error)
-    return ['v8.4', 'b1.4']
+    return ['v8.4', 'b2.3']
   }
 }
 
 // 設定を一元管理
 const CONFIG = {
-  DEFAULT_PROMPT_VERSION: 'b1.9',  // ハードコード指定
+  DEFAULT_PROMPT_VERSION: 'b2.3',  // ハードコード指定
   AVAILABLE_VERSIONS: getAvailableVersions()
 }
 
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     console.log('User Message:', userMessage);
 
     // バージョンに応じたプロンプトを選択
-    const selectedPrompt = PROMPTS[prompt_version as string] || loadPromptFromFile('v8.4');
+    const selectedPrompt = PROMPTS[prompt_version as string] || loadPromptFromFile('b2.3');
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4.1-mini", //"gpt-4o-mini",
